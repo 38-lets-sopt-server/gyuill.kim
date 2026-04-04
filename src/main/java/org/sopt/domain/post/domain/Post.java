@@ -1,8 +1,8 @@
-package org.sopt;
+package org.sopt.domain.post.domain;
 
 import java.time.LocalDateTime;
 
-class Post {
+public class Post {
     private final Long id;          // 게시글 상세 화면 — 특정 게시글 식별용
     private String title;     // 목록, 상세, 글쓰기 화면 — 제목
     private String content;   // 목록(미리보기), 상세(전체) 화면 — 내용

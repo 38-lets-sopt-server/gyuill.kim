@@ -1,8 +1,10 @@
-package org.sopt;
+package org.sopt.domain.post.dto.response;
+
+import org.sopt.domain.post.domain.Post;
 
 import java.time.LocalDateTime;
 
-class PostResponse {
+public class PostResponse {
     Long id;
     String title;
     String content;

@@ -1,9 +1,9 @@
-package org.sopt;
+package org.sopt.domain.post.dto.request;
 
-class CreatePostRequest {
-    String title;
-    String content;
-    String author;
+public class CreatePostRequest {
+    public String title;
+    public String content;
+    public String author;
 
     public CreatePostRequest(String title, String content, String author) {
         this.title = title;

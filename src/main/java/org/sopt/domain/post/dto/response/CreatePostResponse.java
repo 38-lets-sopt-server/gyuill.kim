@@ -1,8 +1,8 @@
-package org.sopt;
+package org.sopt.domain.post.dto.response;
 
-class CreatePostResponse {
+public class CreatePostResponse {
     Long id;
-    String message;
+    public String message;
 
     public CreatePostResponse(Long id, String message) {
         this.id = id;
