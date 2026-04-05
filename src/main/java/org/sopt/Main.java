@@ -2,6 +2,7 @@ package org.sopt;
 
 import org.sopt.domain.post.controller.PostController;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
+import org.sopt.domain.post.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
 import org.sopt.domain.post.exception.PostNotFoundException;
@@ -78,7 +79,7 @@ public class Main {
                         String newTitle = scanner.nextLine();
                         System.out.print("새 내용: ");
                         String newContent = scanner.nextLine();
-                        postController.updatePost(updateId, newTitle, newContent);
+                        postController.updatePost(updateId, new UpdatePostRequest(newTitle, newContent));
                         System.out.println("게시글 수정 완료!");
                     } catch (PostNotFoundException | IllegalArgumentException e) {
                         System.out.println("에러: " + e.getMessage());

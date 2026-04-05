@@ -2,6 +2,7 @@ package org.sopt.domain.post.controller;
 
 
 import org.sopt.domain.post.dto.request.CreatePostRequest;
+import org.sopt.domain.post.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
 import org.sopt.domain.post.service.PostService;
@@ -27,8 +28,8 @@ public class PostController {
     }
 
     // PUT /posts/{id} 📝 과제
-    public void updatePost(Long id, String newTitle, String newContent) {
-        postService.updatePost(id, newTitle, newContent);
+    public void updatePost(Long id, UpdatePostRequest request) {
+        postService.updatePost(id, request);
     }
 
     // DELETE /posts/{id} 📝 과제

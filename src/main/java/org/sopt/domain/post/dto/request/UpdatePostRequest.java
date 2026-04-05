@@ -1,14 +1,12 @@
 package org.sopt.domain.post.dto.request;
 
-public class CreatePostRequest {
+public class UpdatePostRequest {
     public String title;
     public String content;
-    public String author;
 
-    public CreatePostRequest(String title, String content, String author) {
+    public UpdatePostRequest(String title, String content) {
         this.title = title;
         this.content = content;
-        this.author = author;
     }
 
     public void validate() {
