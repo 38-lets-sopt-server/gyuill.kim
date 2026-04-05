@@ -4,6 +4,7 @@ import org.sopt.domain.post.domain.Post;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
+import org.sopt.domain.post.exception.PostNotFoundException;
 import org.sopt.domain.post.repository.PostRepository;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class PostService {
     public PostResponse getPost(Long id) {
         Post post = postRepository.findById(id);
         if (post == null) {
-            throw new IllegalArgumentException("존재하지 않는 게시글입니다!");
+            throw new PostNotFoundException();
         }
         return new PostResponse(post);
     }
@@ -44,7 +45,7 @@ public class PostService {
     public void updatePost(Long id, String newTitle, String newContent) {
         Post post = postRepository.findById(id);
         if (post == null) {
-            throw new IllegalArgumentException("존재하지 않는 게시글입니다!");
+            throw new PostNotFoundException();
         }
         if (newTitle == null || newTitle.isBlank()) {
             throw new IllegalArgumentException("제목은 필수입니다!");
@@ -59,7 +60,7 @@ public class PostService {
     public void deletePost(Long id) {
         boolean deleted = postRepository.deleteById(id);
         if (!deleted) {
-            throw new IllegalArgumentException("존재하지 않는 게시글입니다!");
+            throw new PostNotFoundException();
         }
     }
 }

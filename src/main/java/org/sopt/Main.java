@@ -4,6 +4,7 @@ import org.sopt.domain.post.controller.PostController;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
+import org.sopt.domain.post.exception.PostNotFoundException;
 
 import java.util.Scanner;
 
@@ -62,7 +63,7 @@ public class Main {
                         PostResponse post = postController.getPost(scanner.nextLong());
                         scanner.nextLine();
                         System.out.println(post);
-                    } catch (IllegalArgumentException e) {
+                    } catch (PostNotFoundException | IllegalArgumentException e) {
                         scanner.nextLine();
                         System.out.println("에러: " + e.getMessage());
                     }
@@ -79,7 +80,7 @@ public class Main {
                         String newContent = scanner.nextLine();
                         postController.updatePost(updateId, newTitle, newContent);
                         System.out.println("게시글 수정 완료!");
-                    } catch (IllegalArgumentException e) {
+                    } catch (PostNotFoundException | IllegalArgumentException e) {
                         System.out.println("에러: " + e.getMessage());
                     }
                     break;
@@ -90,7 +91,7 @@ public class Main {
                         postController.deletePost(scanner.nextLong());
                         scanner.nextLine();
                         System.out.println("게시글 삭제 완료!");
-                    } catch (IllegalArgumentException e) {
+                    } catch (PostNotFoundException | IllegalArgumentException e) {
                         scanner.nextLine();
                         System.out.println("에러: " + e.getMessage());
                     }
