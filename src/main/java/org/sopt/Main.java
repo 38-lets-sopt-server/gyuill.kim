@@ -31,17 +31,20 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    System.out.print("제목: ");
-                    String title = scanner.nextLine();
-                    System.out.print("내용: ");
-                    String content = scanner.nextLine();
-                    System.out.print("작성자: ");
-                    String author = scanner.nextLine();
-                    // 클라이언트가 요청 객체를 만들어서 Controller에 전달
-                    CreatePostResponse response = postController.createPost(
-                            new CreatePostRequest(title, content, author)
-                    );
-                    System.out.println(response.message);
+                    try {
+                        System.out.print("제목: ");
+                        String title = scanner.nextLine();
+                        System.out.print("내용: ");
+                        String content = scanner.nextLine();
+                        System.out.print("작성자: ");
+                        String author = scanner.nextLine();
+                        CreatePostResponse response = postController.createPost(
+                                new CreatePostRequest(title, content, author)
+                        );
+                        System.out.println(response.message);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("에러: " + e.getMessage());
+                    }
                     break;
 
                 case 2:
@@ -54,27 +57,43 @@ public class Main {
                     break;
 
                 case 3:
-                    System.out.print("조회할 게시글 ID: ");
-                    PostResponse post = postController.getPost(scanner.nextLong());
-                    scanner.nextLine();
-                    if (post != null) System.out.println(post);
+                    try {
+                        System.out.print("조회할 게시글 ID: ");
+                        PostResponse post = postController.getPost(scanner.nextLong());
+                        scanner.nextLine();
+                        System.out.println(post);
+                    } catch (IllegalArgumentException e) {
+                        scanner.nextLine();
+                        System.out.println("에러: " + e.getMessage());
+                    }
                     break;
 
                 case 4:
-                    System.out.print("수정할 게시글 ID: ");
-                    Long updateId = scanner.nextLong();
-                    scanner.nextLine();
-                    System.out.print("새 제목: ");
-                    String newTitle = scanner.nextLine();
-                    System.out.print("새 내용: ");
-                    String newContent = scanner.nextLine();
-                    postController.updatePost(updateId, newTitle, newContent);
+                    try {
+                        System.out.print("수정할 게시글 ID: ");
+                        Long updateId = scanner.nextLong();
+                        scanner.nextLine();
+                        System.out.print("새 제목: ");
+                        String newTitle = scanner.nextLine();
+                        System.out.print("새 내용: ");
+                        String newContent = scanner.nextLine();
+                        postController.updatePost(updateId, newTitle, newContent);
+                        System.out.println("게시글 수정 완료!");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("에러: " + e.getMessage());
+                    }
                     break;
 
                 case 5:
-                    System.out.print("삭제할 게시글 ID: ");
-                    postController.deletePost(scanner.nextLong());
-                    scanner.nextLine();
+                    try {
+                        System.out.print("삭제할 게시글 ID: ");
+                        postController.deletePost(scanner.nextLong());
+                        scanner.nextLine();
+                        System.out.println("게시글 삭제 완료!");
+                    } catch (IllegalArgumentException e) {
+                        scanner.nextLine();
+                        System.out.println("에러: " + e.getMessage());
+                    }
                     break;
 
                 case 0:
