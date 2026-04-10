@@ -1,9 +1,6 @@
 package org.sopt.domain.post.controller;
-
-
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
 import org.sopt.domain.post.service.PostService;
 import org.sopt.global.response.ApiResponse;
@@ -14,10 +11,10 @@ public class PostController {
     private final PostService postService = new PostService();
 
     // POST /posts
-    public ApiResponse<CreatePostResponse> createPost(CreatePostRequest request) {
+    public ApiResponse<PostResponse> createPost(CreatePostRequest request) {
         try {
-            CreatePostResponse response = postService.createPost(request);
-            return ApiResponse.success(response.message, response);
+            PostResponse response = postService.createPost(request);
+            return ApiResponse.success("게시글 등록 완료!", response);
         } catch (RuntimeException e) {
             return ApiResponse.failure(e.getMessage());
         }

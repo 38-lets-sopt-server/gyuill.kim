@@ -3,7 +3,6 @@ package org.sopt;
 import org.sopt.domain.post.controller.PostController;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
 import org.sopt.global.response.ApiResponse;
 
@@ -13,7 +12,6 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // 클라이언트는 Controller만 알면 돼요. Service도 Repository도 몰라도 돼요.
         PostController postController = new PostController();
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -40,7 +38,7 @@ public class Main {
                     System.out.print("작성자: ");
                     String author = scanner.nextLine();
 
-                    ApiResponse<CreatePostResponse> createResponse = postController.createPost(
+                    ApiResponse<PostResponse> createResponse = postController.createPost(
                             new CreatePostRequest(title, content, author)
                     );
                     System.out.println(createResponse.getMessage());

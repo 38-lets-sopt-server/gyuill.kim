@@ -3,7 +3,6 @@ package org.sopt.domain.post.service;
 import org.sopt.domain.post.domain.Post;
 import org.sopt.domain.post.dto.request.CreatePostRequest;
 import org.sopt.domain.post.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.dto.response.CreatePostResponse;
 import org.sopt.domain.post.dto.response.PostResponse;
 import org.sopt.domain.post.exception.PostNotFoundException;
 import org.sopt.domain.post.repository.PostRepository;
@@ -14,12 +13,17 @@ public class PostService {
     private final PostRepository postRepository = new PostRepository();
 
     // CREATE
-    public CreatePostResponse createPost(CreatePostRequest request) {
+    public PostResponse createPost(CreatePostRequest request) {
         request.validate();
 
-        Post post = new Post(postRepository.generateId(), request.title, request.content, request.author);
+        Post post = new Post(
+                postRepository.generateId(),
+                request.title(),
+                request.content(),
+                request.author()
+        );
         postRepository.save(post);
-        return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
+        return new PostResponse(post);
     }
 
     // READ - 전체 📝 과제
@@ -40,7 +44,7 @@ public class PostService {
         request.validate();
 
         Post post = findPostOrThrow(id);
-        post.update(request.title, request.content);
+        post.update(request.title(), request.content());
     }
 
     // DELETE 📝 과제
