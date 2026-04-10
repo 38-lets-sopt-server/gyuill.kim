@@ -1,13 +1,6 @@
 package org.sopt.domain.post.dto.request;
 
-public class UpdatePostRequest {
-    public String title;
-    public String content;
-
-    public UpdatePostRequest(String title, String content) {
-        this.title = title;
-        this.content = content;
-    }
+public record UpdatePostRequest(String title, String content) {
 
     public void validate() {
         if (title == null || title.isBlank()) {
