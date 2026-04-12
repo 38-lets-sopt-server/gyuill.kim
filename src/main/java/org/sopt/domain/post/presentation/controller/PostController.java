@@ -11,9 +11,17 @@ import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.global.response.ApiResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
 
@@ -21,8 +29,8 @@ public class PostController {
         this.postService = postService;
     }
 
-    // POST /posts
-    public ApiResponse<PostResponse> createPost(CreatePostRequest request) {
+    @PostMapping
+    public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
         PostResult result = postService.createPost(
                 CreatePostCommand.of(request.title(), request.content(), request.author())
@@ -30,7 +38,7 @@ public class PostController {
         return ApiResponse.success(PostSuccessCode.POST_CREATED, PostResponse.from(result));
     }
 
-    // GET /posts
+    @GetMapping
     public ApiResponse<List<PostResponse>> getAllPosts() {
         List<PostResponse> responses = postService.getAllPosts().stream()
                 .map(PostResponse::from)
@@ -38,22 +46,22 @@ public class PostController {
         return ApiResponse.success(PostSuccessCode.POST_LIST_READ, responses);
     }
 
-    // GET /posts/{id}
-    public ApiResponse<PostResponse> getPost(Long id) {
-        PostResult result = postService.getPost(id);
+    @GetMapping("/{postId}")
+    public ApiResponse<PostResponse> getPost(@PathVariable Long postId) {
+        PostResult result = postService.getPost(postId);
         return ApiResponse.success(PostSuccessCode.POST_READ, PostResponse.from(result));
     }
 
-    // PUT /posts/{id}
-    public ApiResponse<Void> updatePost(Long id, UpdatePostRequest request) {
+    @PatchMapping("/{postId}")
+    public ApiResponse<Void> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
         request.validate();
-        postService.updatePost(id, UpdatePostCommand.of(request.title(), request.content()));
+        postService.updatePost(postId, UpdatePostCommand.of(request.title(), request.content()));
         return ApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }
 
-    // DELETE /posts/{id}
-    public ApiResponse<Void> deletePost(Long id) {
-        postService.deletePost(id);
+    @DeleteMapping("/{postId}")
+    public ApiResponse<Void> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
         return ApiResponse.success(PostSuccessCode.POST_DELETED, null);
     }
 }
