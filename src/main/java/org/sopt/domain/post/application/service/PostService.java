@@ -1,9 +1,9 @@
 package org.sopt.domain.post.application.service;
 
+import org.sopt.domain.post.application.dto.CreatePostCommand;
+import org.sopt.domain.post.application.dto.PostResult;
+import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.domain.model.Post;
-import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
-import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -18,42 +18,33 @@ public class PostService {
         this.postRepository = postRepository;
     }
 
-    // CREATE
-    public PostResponse createPost(CreatePostRequest request) {
-        request.validate();
-
+    public PostResult createPost(CreatePostCommand command) {
         Post post = new Post(
                 postRepository.generateId(),
-                request.title(),
-                request.content(),
-                request.author()
+                command.title(),
+                command.content(),
+                command.author()
         );
         postRepository.save(post);
-        return new PostResponse(post);
+        return PostResult.from(post);
     }
 
-    // READ - 전체 📝 과제
-    public List<PostResponse> getAllPosts() {
+    public List<PostResult> getAllPosts() {
         return postRepository.findAll().stream()
-                .map(PostResponse::new)
+                .map(PostResult::from)
                 .toList();
     }
 
-    // READ - 단건 📝 과제
-    public PostResponse getPost(Long id) {
+    public PostResult getPost(Long id) {
         Post post = findPostOrThrow(id);
-        return new PostResponse(post);
+        return PostResult.from(post);
     }
 
-    // UPDATE 📝 과제
-    public void updatePost(Long id, UpdatePostRequest request) {
-        request.validate();
-
+    public void updatePost(Long id, UpdatePostCommand command) {
         Post post = findPostOrThrow(id);
-        post.update(request.title(), request.content());
+        post.update(command.title(), command.content());
     }
 
-    // DELETE 📝 과제
     public void deletePost(Long id) {
         findPostOrThrow(id);
         postRepository.deleteById(id);

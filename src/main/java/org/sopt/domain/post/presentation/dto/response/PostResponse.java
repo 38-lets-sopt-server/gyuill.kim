@@ -1,6 +1,6 @@
 package org.sopt.domain.post.presentation.dto.response;
 
-import org.sopt.domain.post.domain.model.Post;
+import org.sopt.domain.post.application.dto.PostResult;
 
 import java.time.LocalDateTime;
 
@@ -11,18 +11,13 @@ public record PostResponse(
         String author,
         LocalDateTime createdAt
 ) {
-    public PostResponse(Post post) {
-        this(
-                post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                post.getAuthor(),
-                post.getCreatedAt()
+    public static PostResponse from(PostResult result) {
+        return new PostResponse(
+                result.id(),
+                result.title(),
+                result.content(),
+                result.author(),
+                result.createdAt()
         );
-    }
-
-    @Override
-    public String toString() {
-        return "[" + id + "] " + title + " - " + author + " (" + createdAt + ")\n" + content;
     }
 }
