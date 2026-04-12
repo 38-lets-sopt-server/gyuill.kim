@@ -1,6 +1,7 @@
 package org.sopt.domain.post.application.service;
 
 import org.sopt.domain.post.application.dto.CreatePostCommand;
+import org.sopt.domain.post.application.dto.PostPageResult;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.domain.model.BoardType;
@@ -37,11 +38,16 @@ public class PostService {
         );
     }
 
-    public List<PostResult> getPosts(BoardType boardType) {
+    public PostPageResult getPosts(BoardType boardType, int page, int size) {
         List<Post> posts = boardType == null
                 ? postRepository.findAll()
                 : postRepository.findAllByBoardType(boardType);
-        return posts.stream()
+        int totalElements = posts.size();
+        int totalPages = totalElements == 0 ? 0 : (int) Math.ceil((double) totalElements / size);
+        int fromIndex = Math.min(page * size, totalElements);
+        int toIndex = Math.min(fromIndex + size, totalElements);
+
+        List<PostResult> content = posts.subList(fromIndex, toIndex).stream()
                 .map(post -> new PostResult(
                         post.getId(),
                         post.getBoardType(),
@@ -51,6 +57,15 @@ public class PostService {
                         post.getCreatedAt()
                 ))
                 .toList();
+
+        return new PostPageResult(
+                content,
+                page,
+                size,
+                totalElements,
+                totalPages,
+                page < totalPages
+        );
     }
 
     public PostResult getPost(Long id) {

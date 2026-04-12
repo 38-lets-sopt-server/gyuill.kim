@@ -3,13 +3,16 @@ package org.sopt.domain.post.presentation.controller;
 import java.util.List;
 
 import org.sopt.domain.post.application.dto.CreatePostCommand;
+import org.sopt.domain.post.application.dto.PostPageResult;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.application.service.PostService;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
+import org.sopt.domain.post.presentation.dto.request.GetPostsRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
+import org.sopt.domain.post.presentation.dto.response.PostPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.global.response.ApiResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,18 +54,33 @@ public class PostController {
     }
 
     @GetMapping
-    public ApiResponse<List<PostResponse>> getAllPosts(@RequestParam(required = false) BoardType boardType) {
-        List<PostResponse> responses = postService.getPosts(boardType).stream()
-                .map(result -> new PostResponse(
-                        result.id(),
-                        result.boardType(),
-                        result.title(),
-                        result.content(),
-                        result.author(),
-                        result.createdAt()
+    public ApiResponse<PostPageResponse> getAllPosts(
+            @RequestParam(required = false) BoardType boardType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        GetPostsRequest request = new GetPostsRequest(boardType, page, size);
+        request.validate();
+
+        PostPageResult result = postService.getPosts(request.boardType(), request.page(), request.size());
+        List<PostResponse> responses = result.content().stream()
+                .map(postResult -> new PostResponse(
+                        postResult.id(),
+                        postResult.boardType(),
+                        postResult.title(),
+                        postResult.content(),
+                        postResult.author(),
+                        postResult.createdAt()
                 ))
                 .toList();
-        return ApiResponse.success(PostSuccessCode.POST_LIST_READ, responses);
+        return ApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostPageResponse(
+                responses,
+                result.page(),
+                result.size(),
+                result.totalElements(),
+                result.totalPages(),
+                result.hasNext()
+        ));
     }
 
     @GetMapping("/{postId}")
