@@ -9,40 +9,41 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class InMemoryPostRepository implements PostRepository {
     private final List<Post> postList = new ArrayList<>();
-    private Long nextId = 1L;
+    private final AtomicLong nextId = new AtomicLong(1L);
 
     @Override
-    public Post save(Post post) {
-        post.assignId(nextId++);
+    public synchronized Post save(Post post) {
+        post.assignId(nextId.getAndIncrement());
         postList.add(post);
         return post;
     }
 
     @Override
-    public List<Post> findAll() {
+    public synchronized List<Post> findAll() {
         return List.copyOf(postList);
     }
 
     @Override
-    public List<Post> findAllByBoardType(BoardType boardType) {
+    public synchronized List<Post> findAllByBoardType(BoardType boardType) {
         return postList.stream()
                 .filter(post -> post.getBoardType() == boardType)
                 .toList();
     }
 
     @Override
-    public Optional<Post> findById(Long id) {
+    public synchronized Optional<Post> findById(Long id) {
         return postList.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst();
     }
 
     @Override
-    public void deleteById(Long id) {
+    public synchronized void deleteById(Long id) {
         postList.removeIf(p -> p.getId().equals(id));
     }
 
