@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
         log.warn("Business exception: {}", errorCode.getMessage());
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(new ApiResponse<>(false, errorCode.getMessage(), null));
+                .body(ApiResponse.failure(errorCode));
     }
 
     // JSON 파싱 실패 처리
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<Void> handleMessageNotReadableException(HttpMessageNotReadableException e) {
         log.warn("Request body is not readable: {}", e.getMessage());
-        return new ApiResponse<>(false, GlobalErrorCode.INVALID_REQUEST.getMessage(), null);
+        return ApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
     }
 
     // 존재하지 않는 리소스 요청 처리
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<Void> handleNoResourceFound(NoResourceFoundException e) {
         log.debug("Resource not found: {}", e.getResourcePath());
-        return new ApiResponse<>(false, GlobalErrorCode.RESOURCE_NOT_FOUND.getMessage(), null);
+        return ApiResponse.failure(GlobalErrorCode.RESOURCE_NOT_FOUND);
     }
 
     // 그 외 모든 예외 처리
@@ -49,6 +49,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Void> handleException(Exception e) {
         log.error("Unexpected error occurred", e);
-        return new ApiResponse<>(false, GlobalErrorCode.INTERNAL_SERVER_ERROR.getMessage(), null);
+        return ApiResponse.failure(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 }

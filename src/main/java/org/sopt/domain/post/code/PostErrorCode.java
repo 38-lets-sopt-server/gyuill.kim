@@ -5,16 +5,23 @@ import org.springframework.http.HttpStatus;
 
 public enum PostErrorCode implements ErrorCode {
 
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
-    INVALID_POST_CONTENT(HttpStatus.BAD_REQUEST, "게시글 내용이 올바르지 않습니다."),
+    POST_NOT_FOUND("PST-001", HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+    INVALID_POST_CONTENT("PST-002", HttpStatus.BAD_REQUEST, "게시글 내용이 올바르지 않습니다."),
     ;
 
+    private final String code;
     private final HttpStatus httpStatus;
     private final String message;
 
-    PostErrorCode(HttpStatus httpStatus, String message) {
+    PostErrorCode(String code, HttpStatus httpStatus, String message) {
+        this.code = code;
         this.httpStatus = httpStatus;
         this.message = message;
+    }
+
+    @Override
+    public String getCode() {
+        return code;
     }
 
     @Override

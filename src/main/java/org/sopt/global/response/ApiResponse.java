@@ -1,12 +1,15 @@
 package org.sopt.global.response;
 
-public record ApiResponse<T>(boolean success, String message, T data) {
+import org.sopt.global.code.ErrorCode;
+import org.sopt.global.code.SuccessCode;
 
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, message, data);
+public record ApiResponse<T>(String code, boolean success, String message, T data) {
+
+    public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
+        return new ApiResponse<>(successCode.getCode(), true, successCode.getMessage(), data);
     }
 
-    public static <T> ApiResponse<T> failure(String message) {
-        return new ApiResponse<>(false, message, null);
+    public static <T> ApiResponse<T> failure(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getCode(), false, errorCode.getMessage(), null);
     }
 }
