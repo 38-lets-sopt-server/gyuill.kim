@@ -1,7 +1,11 @@
 package org.sopt.domain.post.exception;
 
-public class PostNotFoundException extends RuntimeException {
+import org.sopt.domain.post.code.PostErrorCode;
+import org.sopt.global.exception.BaseException;
+
+public class PostNotFoundException extends BaseException {
+
     public PostNotFoundException() {
-        super("존재하지 않는 게시글입니다!");
+        super(PostErrorCode.POST_NOT_FOUND);
     }
 }
