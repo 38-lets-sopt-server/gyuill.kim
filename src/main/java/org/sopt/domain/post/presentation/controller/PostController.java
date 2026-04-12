@@ -15,6 +15,7 @@ import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.presentation.dto.response.PostPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.global.response.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,7 +36,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<ApiResponse<PostResponse>> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
         PostResult result = postService.createPost(new CreatePostCommand(
                 request.boardType(),
@@ -54,7 +55,7 @@ public class PostController {
     }
 
     @GetMapping
-    public ApiResponse<PostPageResponse> getAllPosts(
+    public ResponseEntity<ApiResponse<PostPageResponse>> getAllPosts(
             @RequestParam(required = false) BoardType boardType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -84,7 +85,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ApiResponse<PostResponse> getPost(@PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
         PostResult result = postService.getPost(postId);
         return ApiResponse.success(PostSuccessCode.POST_READ, new PostResponse(
                 result.id(),
@@ -97,14 +98,14 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}")
-    public ApiResponse<Void> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
+    public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
         request.validate();
         postService.updatePost(postId, new UpdatePostCommand(request.title(), request.content()));
         return ApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }
 
     @DeleteMapping("/{postId}")
-    public ApiResponse<Void> deletePost(@PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return ApiResponse.success(PostSuccessCode.POST_DELETED, null);
     }
