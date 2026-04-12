@@ -16,5 +16,8 @@ public record CreatePostRequest(BoardType boardType, String title, String conten
         if (content == null || content.isBlank()) {
             throw new BaseException(PostErrorCode.INVALID_POST_CONTENT);
         }
+        if (author == null || author.isBlank()) {
+            throw new BaseException(PostErrorCode.INVALID_POST_AUTHOR);
+        }
     }
 }
