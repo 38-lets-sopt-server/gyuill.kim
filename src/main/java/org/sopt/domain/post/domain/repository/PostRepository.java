@@ -3,6 +3,7 @@ package org.sopt.domain.post.domain.repository;
 import org.sopt.domain.post.domain.model.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository {
 
@@ -10,7 +11,7 @@ public interface PostRepository {
 
     List<Post> findAll();
 
-    Post findById(Long id);
+    Optional<Post> findById(Long id);
 
     void deleteById(Long id);
 }

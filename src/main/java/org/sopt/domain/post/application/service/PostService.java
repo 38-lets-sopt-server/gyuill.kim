@@ -50,10 +50,7 @@ public class PostService {
     }
 
     private Post findPostOrThrow(Long id) {
-        Post post = postRepository.findById(id);
-        if (post == null) {
-            throw new PostNotFoundException();
-        }
-        return post;
+        return postRepository.findById(id)
+                .orElseThrow(PostNotFoundException::new);
     }
 }

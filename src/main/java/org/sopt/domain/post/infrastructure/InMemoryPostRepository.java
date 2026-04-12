@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class InMemoryPostRepository implements PostRepository {
@@ -22,15 +23,14 @@ public class InMemoryPostRepository implements PostRepository {
 
     @Override
     public List<Post> findAll() {
-        return postList;
+        return List.copyOf(postList);
     }
 
     @Override
-    public Post findById(Long id) {
+    public Optional<Post> findById(Long id) {
         return postList.stream()
                 .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
