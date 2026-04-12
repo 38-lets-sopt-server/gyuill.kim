@@ -6,6 +6,7 @@ import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.application.service.PostService;
+import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,14 +35,14 @@ public class PostController {
     public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
         PostResult result = postService.createPost(
-                CreatePostCommand.of(request.title(), request.content(), request.author())
+                CreatePostCommand.of(request.boardType(), request.title(), request.content(), request.author())
         );
         return ApiResponse.success(PostSuccessCode.POST_CREATED, PostResponse.from(result));
     }
 
     @GetMapping
-    public ApiResponse<List<PostResponse>> getAllPosts() {
-        List<PostResponse> responses = postService.getAllPosts().stream()
+    public ApiResponse<List<PostResponse>> getAllPosts(@RequestParam(required = false) BoardType boardType) {
+        List<PostResponse> responses = postService.getPosts(boardType).stream()
                 .map(PostResponse::from)
                 .toList();
         return ApiResponse.success(PostSuccessCode.POST_LIST_READ, responses);

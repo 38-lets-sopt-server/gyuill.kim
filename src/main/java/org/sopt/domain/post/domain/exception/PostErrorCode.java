@@ -8,6 +8,7 @@ public enum PostErrorCode implements ErrorCode {
     POST_NOT_FOUND("PST-001", HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
     INVALID_POST_TITLE("PST-002", HttpStatus.BAD_REQUEST, "게시글 제목은 필수입니다."),
     INVALID_POST_CONTENT("PST-003", HttpStatus.BAD_REQUEST, "게시글 내용은 필수입니다."),
+    INVALID_BOARD_TYPE("PST-004", HttpStatus.BAD_REQUEST, "게시판 종류는 필수입니다."),
     ;
 
     private final String code;

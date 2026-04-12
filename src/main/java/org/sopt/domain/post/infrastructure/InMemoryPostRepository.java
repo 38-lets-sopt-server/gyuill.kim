@@ -1,5 +1,6 @@
 package org.sopt.domain.post.infrastructure;
 
+import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.repository.PostRepository;
 
@@ -24,6 +25,13 @@ public class InMemoryPostRepository implements PostRepository {
     @Override
     public List<Post> findAll() {
         return List.copyOf(postList);
+    }
+
+    @Override
+    public List<Post> findAllByBoardType(BoardType boardType) {
+        return postList.stream()
+                .filter(post -> post.getBoardType() == boardType)
+                .toList();
     }
 
     @Override

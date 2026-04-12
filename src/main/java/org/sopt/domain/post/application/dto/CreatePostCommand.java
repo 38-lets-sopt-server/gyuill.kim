@@ -1,8 +1,10 @@
 package org.sopt.domain.post.application.dto;
 
-public record CreatePostCommand(String title, String content, String author) {
+import org.sopt.domain.post.domain.model.BoardType;
 
-    public static CreatePostCommand of(String title, String content, String author) {
-        return new CreatePostCommand(title, content, author);
+public record CreatePostCommand(BoardType boardType, String title, String content, String author) {
+
+    public static CreatePostCommand of(BoardType boardType, String title, String content, String author) {
+        return new CreatePostCommand(boardType, title, content, author);
     }
 }

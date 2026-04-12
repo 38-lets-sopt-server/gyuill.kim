@@ -3,6 +3,7 @@ package org.sopt.domain.post.application.service;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
+import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.repository.PostRepository;
@@ -20,6 +21,7 @@ public class PostService {
 
     public PostResult createPost(CreatePostCommand command) {
         Post post = new Post(
+                command.boardType(),
                 command.title(),
                 command.content(),
                 command.author()
@@ -28,8 +30,11 @@ public class PostService {
         return PostResult.from(savedPost);
     }
 
-    public List<PostResult> getAllPosts() {
-        return postRepository.findAll().stream()
+    public List<PostResult> getPosts(BoardType boardType) {
+        List<Post> posts = boardType == null
+                ? postRepository.findAll()
+                : postRepository.findAllByBoardType(boardType);
+        return posts.stream()
                 .map(PostResult::from)
                 .toList();
     }
