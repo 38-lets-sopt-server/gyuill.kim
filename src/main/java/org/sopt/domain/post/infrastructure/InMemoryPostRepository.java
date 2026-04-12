@@ -14,8 +14,10 @@ public class InMemoryPostRepository implements PostRepository {
     private Long nextId = 1L;
 
     @Override
-    public void save(Post post) {
+    public Post save(Post post) {
+        post.assignId(nextId++);
         postList.add(post);
+        return post;
     }
 
     @Override
@@ -36,8 +38,4 @@ public class InMemoryPostRepository implements PostRepository {
         postList.removeIf(p -> p.getId().equals(id));
     }
 
-    @Override
-    public Long generateId() {
-        return nextId++;
-    }
 }

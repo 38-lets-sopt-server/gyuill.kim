@@ -20,13 +20,12 @@ public class PostService {
 
     public PostResult createPost(CreatePostCommand command) {
         Post post = new Post(
-                postRepository.generateId(),
                 command.title(),
                 command.content(),
                 command.author()
         );
-        postRepository.save(post);
-        return PostResult.from(post);
+        Post savedPost = postRepository.save(post);
+        return PostResult.from(savedPost);
     }
 
     public List<PostResult> getAllPosts() {
