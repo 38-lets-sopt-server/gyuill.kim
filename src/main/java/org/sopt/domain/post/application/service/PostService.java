@@ -64,7 +64,7 @@ public class PostService {
                 size,
                 totalElements,
                 totalPages,
-                page < totalPages
+                page + 1 < totalPages
         );
     }
 
