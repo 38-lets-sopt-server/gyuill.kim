@@ -34,16 +34,33 @@ public class PostController {
     @PostMapping
     public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
-        PostResult result = postService.createPost(
-                CreatePostCommand.of(request.boardType(), request.title(), request.content(), request.author())
-        );
-        return ApiResponse.success(PostSuccessCode.POST_CREATED, PostResponse.from(result));
+        PostResult result = postService.createPost(new CreatePostCommand(
+                request.boardType(),
+                request.title(),
+                request.content(),
+                request.author()
+        ));
+        return ApiResponse.success(PostSuccessCode.POST_CREATED, new PostResponse(
+                result.id(),
+                result.boardType(),
+                result.title(),
+                result.content(),
+                result.author(),
+                result.createdAt()
+        ));
     }
 
     @GetMapping
     public ApiResponse<List<PostResponse>> getAllPosts(@RequestParam(required = false) BoardType boardType) {
         List<PostResponse> responses = postService.getPosts(boardType).stream()
-                .map(PostResponse::from)
+                .map(result -> new PostResponse(
+                        result.id(),
+                        result.boardType(),
+                        result.title(),
+                        result.content(),
+                        result.author(),
+                        result.createdAt()
+                ))
                 .toList();
         return ApiResponse.success(PostSuccessCode.POST_LIST_READ, responses);
     }
@@ -51,13 +68,20 @@ public class PostController {
     @GetMapping("/{postId}")
     public ApiResponse<PostResponse> getPost(@PathVariable Long postId) {
         PostResult result = postService.getPost(postId);
-        return ApiResponse.success(PostSuccessCode.POST_READ, PostResponse.from(result));
+        return ApiResponse.success(PostSuccessCode.POST_READ, new PostResponse(
+                result.id(),
+                result.boardType(),
+                result.title(),
+                result.content(),
+                result.author(),
+                result.createdAt()
+        ));
     }
 
     @PatchMapping("/{postId}")
     public ApiResponse<Void> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
         request.validate();
-        postService.updatePost(postId, UpdatePostCommand.of(request.title(), request.content()));
+        postService.updatePost(postId, new UpdatePostCommand(request.title(), request.content()));
         return ApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }
 

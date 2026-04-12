@@ -27,7 +27,14 @@ public class PostService {
                 command.author()
         );
         Post savedPost = postRepository.save(post);
-        return PostResult.from(savedPost);
+        return new PostResult(
+                savedPost.getId(),
+                savedPost.getBoardType(),
+                savedPost.getTitle(),
+                savedPost.getContent(),
+                savedPost.getAuthor(),
+                savedPost.getCreatedAt()
+        );
     }
 
     public List<PostResult> getPosts(BoardType boardType) {
@@ -35,13 +42,27 @@ public class PostService {
                 ? postRepository.findAll()
                 : postRepository.findAllByBoardType(boardType);
         return posts.stream()
-                .map(PostResult::from)
+                .map(post -> new PostResult(
+                        post.getId(),
+                        post.getBoardType(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getAuthor(),
+                        post.getCreatedAt()
+                ))
                 .toList();
     }
 
     public PostResult getPost(Long id) {
         Post post = findPostOrThrow(id);
-        return PostResult.from(post);
+        return new PostResult(
+                post.getId(),
+                post.getBoardType(),
+                post.getTitle(),
+                post.getContent(),
+                post.getAuthor(),
+                post.getCreatedAt()
+        );
     }
 
     public void updatePost(Long id, UpdatePostCommand command) {
