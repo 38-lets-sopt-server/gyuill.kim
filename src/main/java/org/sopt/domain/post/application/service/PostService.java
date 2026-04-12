@@ -1,16 +1,22 @@
-package org.sopt.domain.post.service;
+package org.sopt.domain.post.application.service;
 
-import org.sopt.domain.post.domain.Post;
-import org.sopt.domain.post.dto.request.CreatePostRequest;
-import org.sopt.domain.post.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.dto.response.PostResponse;
-import org.sopt.domain.post.exception.PostNotFoundException;
-import org.sopt.domain.post.repository.PostRepository;
+import org.sopt.domain.post.domain.model.Post;
+import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
+import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
+import org.sopt.domain.post.presentation.dto.response.PostResponse;
+import org.sopt.domain.post.domain.exception.PostNotFoundException;
+import org.sopt.domain.post.domain.repository.PostRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PostService {
-    private final PostRepository postRepository = new PostRepository();
+    private final PostRepository postRepository;
+
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     // CREATE
     public PostResponse createPost(CreatePostRequest request) {

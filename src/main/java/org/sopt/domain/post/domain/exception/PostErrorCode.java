@@ -1,4 +1,4 @@
-package org.sopt.domain.post.code;
+package org.sopt.domain.post.domain.exception;
 
 import org.sopt.global.code.ErrorCode;
 import org.springframework.http.HttpStatus;

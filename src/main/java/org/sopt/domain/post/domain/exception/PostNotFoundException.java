@@ -1,6 +1,5 @@
-package org.sopt.domain.post.exception;
+package org.sopt.domain.post.domain.exception;
 
-import org.sopt.domain.post.code.PostErrorCode;
 import org.sopt.global.exception.BaseException;
 
 public class PostNotFoundException extends BaseException {

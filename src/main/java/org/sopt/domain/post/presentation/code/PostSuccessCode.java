@@ -1,4 +1,4 @@
-package org.sopt.domain.post.code;
+package org.sopt.domain.post.presentation.code;
 
 import org.sopt.global.code.SuccessCode;
 import org.springframework.http.HttpStatus;

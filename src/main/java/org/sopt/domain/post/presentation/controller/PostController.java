@@ -1,16 +1,22 @@
-package org.sopt.domain.post.controller;
+package org.sopt.domain.post.presentation.controller;
 
 import java.util.List;
 
-import org.sopt.domain.post.code.PostSuccessCode;
-import org.sopt.domain.post.dto.request.CreatePostRequest;
-import org.sopt.domain.post.dto.request.UpdatePostRequest;
-import org.sopt.domain.post.dto.response.PostResponse;
-import org.sopt.domain.post.service.PostService;
+import org.sopt.domain.post.presentation.code.PostSuccessCode;
+import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
+import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
+import org.sopt.domain.post.presentation.dto.response.PostResponse;
+import org.sopt.domain.post.application.service.PostService;
 import org.sopt.global.response.ApiResponse;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 public class PostController {
-    private final PostService postService = new PostService();
+    private final PostService postService;
+
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
 
     // POST /posts
     public ApiResponse<PostResponse> createPost(CreatePostRequest request) {

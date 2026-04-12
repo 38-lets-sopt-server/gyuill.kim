@@ -1,4 +1,4 @@
-package org.sopt.domain.post.dto.request;
+package org.sopt.domain.post.presentation.dto.request;
 
 public record UpdatePostRequest(String title, String content) {
 
