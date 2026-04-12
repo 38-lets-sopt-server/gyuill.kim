@@ -23,6 +23,7 @@ public class PostController {
 
     // POST /posts
     public ApiResponse<PostResponse> createPost(CreatePostRequest request) {
+        request.validate();
         PostResult result = postService.createPost(
                 CreatePostCommand.of(request.title(), request.content(), request.author())
         );
@@ -45,6 +46,7 @@ public class PostController {
 
     // PUT /posts/{id}
     public ApiResponse<Void> updatePost(Long id, UpdatePostRequest request) {
+        request.validate();
         postService.updatePost(id, UpdatePostCommand.of(request.title(), request.content()));
         return ApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }

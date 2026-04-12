@@ -36,6 +36,14 @@ public class GlobalExceptionHandler {
         return ApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
     }
 
+    // 입력값 검증 실패 처리
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.warn("Validation failed: {}", e.getMessage());
+        return ApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
+    }
+
     // 존재하지 않는 리소스 요청 처리
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
