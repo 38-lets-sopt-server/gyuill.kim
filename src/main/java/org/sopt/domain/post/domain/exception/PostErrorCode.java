@@ -1,0 +1,40 @@
+package org.sopt.domain.post.domain.exception;
+
+import org.sopt.global.code.ErrorCode;
+import org.springframework.http.HttpStatus;
+
+public enum PostErrorCode implements ErrorCode {
+
+    POST_NOT_FOUND("PST-001", HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+    INVALID_POST_TITLE("PST-002", HttpStatus.BAD_REQUEST, "게시글 제목은 필수입니다."),
+    INVALID_POST_CONTENT("PST-003", HttpStatus.BAD_REQUEST, "게시글 내용은 필수입니다."),
+    INVALID_BOARD_TYPE("PST-004", HttpStatus.BAD_REQUEST, "게시판 종류는 필수입니다."),
+    INVALID_PAGINATION("PST-005", HttpStatus.BAD_REQUEST, "페이지 요청 값이 올바르지 않습니다."),
+    INVALID_POST_AUTHOR("PST-006", HttpStatus.BAD_REQUEST, "게시글 작성자는 필수입니다."),
+    ;
+
+    private final String code;
+    private final HttpStatus httpStatus;
+    private final String message;
+
+    PostErrorCode(String code, HttpStatus httpStatus, String message) {
+        this.code = code;
+        this.httpStatus = httpStatus;
+        this.message = message;
+    }
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+}

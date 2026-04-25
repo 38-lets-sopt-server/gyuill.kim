@@ -1,0 +1,36 @@
+package org.sopt.global.code;
+
+import org.springframework.http.HttpStatus;
+
+public enum GlobalSuccessCode implements SuccessCode {
+
+    OK("GLB-200", HttpStatus.OK, "요청이 성공했습니다."),
+    CREATED("GLB-201", HttpStatus.CREATED, "리소스가 생성되었습니다."),
+    NO_CONTENT("GLB-204", HttpStatus.NO_CONTENT, "요청이 성공적으로 처리되었습니다."),
+    ;
+
+    private final String code;
+    private final HttpStatus httpStatus;
+    private final String message;
+
+    GlobalSuccessCode(String code, HttpStatus httpStatus, String message) {
+        this.code = code;
+        this.httpStatus = httpStatus;
+        this.message = message;
+    }
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+}

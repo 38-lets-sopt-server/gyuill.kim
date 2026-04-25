@@ -1,33 +1,18 @@
 package org.sopt.global.response;
 
-public class ApiResponse<T> {
-    private final boolean success;
-    private final String message;
-    private final T data;
+import org.sopt.global.code.ErrorCode;
+import org.sopt.global.code.SuccessCode;
+import org.springframework.http.ResponseEntity;
 
-    private ApiResponse(boolean success, String message, T data) {
-        this.success = success;
-        this.message = message;
-        this.data = data;
+public record ApiResponse<T>(String code, boolean success, String message, T data) {
+
+    public static <T> ResponseEntity<ApiResponse<T>> success(SuccessCode successCode, T data) {
+        return ResponseEntity
+                .status(successCode.getHttpStatus())
+                .body(new ApiResponse<>(successCode.getCode(), true, successCode.getMessage(), data));
     }
 
-    public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, message, data);
-    }
-
-    public static <T> ApiResponse<T> failure(String message) {
-        return new ApiResponse<>(false, message, null);
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
+    public static <T> ApiResponse<T> failure(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getCode(), false, errorCode.getMessage(), null);
     }
 }
