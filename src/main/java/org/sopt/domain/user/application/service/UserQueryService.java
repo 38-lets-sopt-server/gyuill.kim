@@ -1,4 +1,4 @@
-package org.sopt.domain.user.application;
+package org.sopt.domain.user.application.service;
 
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;

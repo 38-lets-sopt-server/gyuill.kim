@@ -1,9 +1,9 @@
-package org.sopt.domain.user.application;
+package org.sopt.domain.user.application.service;
 
-import org.sopt.domain.post.domain.repository.PostRepository;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
+import org.sopt.domain.user.application.port.PostPort;
 import org.sopt.domain.user.domain.exception.UserHasPostsException;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
@@ -16,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
+    private final PostPort postPort;
 
-    public UserCommandService(UserRepository userRepository, PostRepository postRepository) {
+    public UserCommandService(UserRepository userRepository, PostPort postPort) {
         this.userRepository = userRepository;
-        this.postRepository = postRepository;
+        this.postPort = postPort;
     }
 
     public UserResult createUser(CreateUserCommand command) {
@@ -40,7 +40,7 @@ public class UserCommandService {
 
     public void deleteUser(Long id) {
         findUserOrThrow(id);
-        if (postRepository.existsByAuthorUserId(id)) {
+        if (postPort.existsByAuthorUserId(id)) {
             throw new UserHasPostsException();
         }
         userRepository.deleteById(id);

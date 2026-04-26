@@ -2,8 +2,8 @@ package org.sopt.domain.post.presentation.controller;
 
 import java.util.List;
 
-import org.sopt.domain.post.application.PostCommandService;
-import org.sopt.domain.post.application.PostQueryService;
+import org.sopt.domain.post.application.service.PostCommandService;
+import org.sopt.domain.post.application.service.PostQueryService;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostPageResult;
 import org.sopt.domain.post.application.dto.PostResult;

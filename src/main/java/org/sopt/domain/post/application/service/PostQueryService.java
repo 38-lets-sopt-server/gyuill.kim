@@ -1,4 +1,4 @@
-package org.sopt.domain.post.application;
+package org.sopt.domain.post.application.service;
 
 import org.sopt.domain.post.application.dto.PostPageResult;
 import org.sopt.domain.post.application.dto.PostResult;

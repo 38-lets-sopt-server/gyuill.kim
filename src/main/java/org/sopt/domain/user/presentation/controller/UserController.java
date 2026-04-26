@@ -1,7 +1,7 @@
 package org.sopt.domain.user.presentation.controller;
 
-import org.sopt.domain.user.application.UserCommandService;
-import org.sopt.domain.user.application.UserQueryService;
+import org.sopt.domain.user.application.service.UserCommandService;
+import org.sopt.domain.user.application.service.UserQueryService;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;

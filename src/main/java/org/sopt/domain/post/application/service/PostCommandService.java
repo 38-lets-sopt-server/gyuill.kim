@@ -1,14 +1,13 @@
-package org.sopt.domain.post.application;
+package org.sopt.domain.post.application.service;
 
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
+import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.repository.PostRepository;
-import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
-import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,16 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostCommandService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserPort userPort;
 
-    public PostCommandService(PostRepository postRepository, UserRepository userRepository) {
+    public PostCommandService(PostRepository postRepository, UserPort userPort) {
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
+        this.userPort = userPort;
     }
 
     public PostResult createPost(CreatePostCommand command) {
-        User authorUser = userRepository.findById(command.authorUserId())
-                .orElseThrow(UserNotFoundException::new);
+        User authorUser = userPort.getUser(command.authorUserId());
         Post post = postRepository.save(new Post(
                 command.boardType(),
                 command.title(),
