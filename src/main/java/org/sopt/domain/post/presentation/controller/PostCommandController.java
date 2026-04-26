@@ -46,6 +46,7 @@ public class PostCommandController {
                 result.content(),
                 result.author(),
                 result.likeCount(),
+                result.scrapCount(),
                 result.createdAt()
         ));
     }

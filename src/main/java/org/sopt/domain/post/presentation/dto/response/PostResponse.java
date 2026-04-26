@@ -11,6 +11,7 @@ public record PostResponse(
         String content,
         String author,
         long likeCount,
+        long scrapCount,
         LocalDateTime createdAt
 ) {
 }

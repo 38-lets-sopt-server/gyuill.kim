@@ -49,6 +49,7 @@ public class PostQueryController {
                         postResult.content(),
                         postResult.author(),
                         postResult.likeCount(),
+                        postResult.scrapCount(),
                         postResult.createdAt()
                 ))
                 .toList();
@@ -84,6 +85,7 @@ public class PostQueryController {
                         postResult.content(),
                         postResult.author(),
                         postResult.likeCount(),
+                        postResult.scrapCount(),
                         postResult.createdAt()
                 ))
                 .toList();
@@ -108,6 +110,7 @@ public class PostQueryController {
                 result.content(),
                 result.author(),
                 result.likeCount(),
+                result.scrapCount(),
                 result.createdAt()
         ));
     }
