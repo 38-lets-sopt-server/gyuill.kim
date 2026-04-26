@@ -10,6 +10,7 @@ import org.sopt.domain.post.presentation.dto.request.PostReactionRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.presentation.dto.response.PostReactionToggleResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
+import org.sopt.domain.post.presentation.mapper.PostResponseMapper;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,9 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostCommandController {
 
     private final PostCommandService postCommandService;
+    private final PostResponseMapper postResponseMapper;
 
-    public PostCommandController(PostCommandService postCommandService) {
+    public PostCommandController(PostCommandService postCommandService, PostResponseMapper postResponseMapper) {
         this.postCommandService = postCommandService;
+        this.postResponseMapper = postResponseMapper;
     }
 
     @PostMapping
@@ -39,16 +42,7 @@ public class PostCommandController {
                 request.content(),
                 request.authorUserId()
         ));
-        return CommonApiResponse.success(PostSuccessCode.POST_CREATED, new PostResponse(
-                result.id(),
-                result.boardType(),
-                result.title(),
-                result.content(),
-                result.author(),
-                result.likeCount(),
-                result.scrapCount(),
-                result.createdAt()
-        ));
+        return CommonApiResponse.success(PostSuccessCode.POST_CREATED, postResponseMapper.toResponse(result));
     }
 
     @PatchMapping("/{postId}")

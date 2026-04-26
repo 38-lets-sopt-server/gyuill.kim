@@ -8,6 +8,7 @@ import org.sopt.domain.user.presentation.code.UserSuccessCode;
 import org.sopt.domain.user.presentation.dto.request.CreateUserRequest;
 import org.sopt.domain.user.presentation.dto.request.UpdateUserRequest;
 import org.sopt.domain.user.presentation.dto.response.UserResponse;
+import org.sopt.domain.user.presentation.mapper.UserResponseMapper;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,21 +24,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserCommandController {
 
     private final UserCommandService userCommandService;
+    private final UserResponseMapper userResponseMapper;
 
-    public UserCommandController(UserCommandService userCommandService) {
+    public UserCommandController(UserCommandService userCommandService, UserResponseMapper userResponseMapper) {
         this.userCommandService = userCommandService;
+        this.userResponseMapper = userResponseMapper;
     }
 
     @PostMapping
     public ResponseEntity<CommonApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
         request.validate();
         UserResult result = userCommandService.createUser(new CreateUserCommand(request.nickname()));
-        return CommonApiResponse.success(UserSuccessCode.USER_CREATED, new UserResponse(
-                result.id(),
-                result.nickname(),
-                result.createdAt(),
-                result.updatedAt()
-        ));
+        return CommonApiResponse.success(UserSuccessCode.USER_CREATED, userResponseMapper.toResponse(result));
     }
 
     @PatchMapping("/{userId}")

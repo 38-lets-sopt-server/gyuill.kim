@@ -9,6 +9,7 @@ import org.sopt.domain.post.presentation.dto.request.GetPostsRequest;
 import org.sopt.domain.post.presentation.dto.request.SearchPostsRequest;
 import org.sopt.domain.post.presentation.dto.response.PostCursorPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
+import org.sopt.domain.post.presentation.mapper.PostResponseMapper;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/posts")
 public class PostQueryController {
 
     private final PostQueryService postQueryService;
+    private final PostResponseMapper postResponseMapper;
 
-    public PostQueryController(PostQueryService postQueryService) {
+    public PostQueryController(PostQueryService postQueryService, PostResponseMapper postResponseMapper) {
         this.postQueryService = postQueryService;
+        this.postResponseMapper = postResponseMapper;
     }
 
     @GetMapping
@@ -39,24 +40,7 @@ public class PostQueryController {
         request.validate();
 
         PostCursorResult result = postQueryService.getPosts(request.boardType(), request.cursor(), request.size());
-        List<PostResponse> responses = result.content().stream()
-                .map(postResult -> new PostResponse(
-                        postResult.id(),
-                        postResult.boardType(),
-                        postResult.title(),
-                        postResult.content(),
-                        postResult.author(),
-                        postResult.likeCount(),
-                        postResult.scrapCount(),
-                        postResult.createdAt()
-                ))
-                .toList();
-        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostCursorPageResponse(
-                responses,
-                result.nextCursor(),
-                result.size(),
-                result.hasNext()
-        ));
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, postResponseMapper.toCursorPageResponse(result));
     }
 
     @GetMapping("/search")
@@ -75,39 +59,12 @@ public class PostQueryController {
                 request.cursor(),
                 request.size()
         );
-        List<PostResponse> responses = result.content().stream()
-                .map(postResult -> new PostResponse(
-                        postResult.id(),
-                        postResult.boardType(),
-                        postResult.title(),
-                        postResult.content(),
-                        postResult.author(),
-                        postResult.likeCount(),
-                        postResult.scrapCount(),
-                        postResult.createdAt()
-                ))
-                .toList();
-
-        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostCursorPageResponse(
-                responses,
-                result.nextCursor(),
-                result.size(),
-                result.hasNext()
-        ));
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, postResponseMapper.toCursorPageResponse(result));
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<CommonApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
         PostResult result = postQueryService.getPost(postId);
-        return CommonApiResponse.success(PostSuccessCode.POST_READ, new PostResponse(
-                result.id(),
-                result.boardType(),
-                result.title(),
-                result.content(),
-                result.author(),
-                result.likeCount(),
-                result.scrapCount(),
-                result.createdAt()
-        ));
+        return CommonApiResponse.success(PostSuccessCode.POST_READ, postResponseMapper.toResponse(result));
     }
 }
