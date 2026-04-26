@@ -8,6 +8,7 @@ import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
 import org.sopt.domain.post.presentation.dto.request.PostReactionRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
+import org.sopt.domain.post.presentation.dto.response.PostReactionToggleResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -61,31 +62,23 @@ public class PostCommandController {
         return CommonApiResponse.success(PostSuccessCode.POST_DELETED, null);
     }
 
-    @PostMapping("/{postId}/like")
-    public ResponseEntity<CommonApiResponse<Void>> likePost(@PathVariable Long postId, @RequestBody PostReactionRequest request) {
+    @PostMapping("/{postId}/like/toggle")
+    public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleLikePost(
+            @PathVariable Long postId,
+            @RequestBody PostReactionRequest request
+    ) {
         request.validate();
-        postCommandService.likePost(postId, request.userId());
-        return CommonApiResponse.success(PostSuccessCode.POST_LIKE_CREATED, null);
+        boolean reacted = postCommandService.toggleLikePost(postId, request.userId());
+        return CommonApiResponse.success(PostSuccessCode.POST_LIKE_TOGGLED, new PostReactionToggleResponse(reacted));
     }
 
-    @DeleteMapping("/{postId}/like")
-    public ResponseEntity<CommonApiResponse<Void>> cancelLikePost(@PathVariable Long postId, @RequestBody PostReactionRequest request) {
+    @PostMapping("/{postId}/scrap/toggle")
+    public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleScrapPost(
+            @PathVariable Long postId,
+            @RequestBody PostReactionRequest request
+    ) {
         request.validate();
-        postCommandService.cancelLikePost(postId, request.userId());
-        return CommonApiResponse.success(PostSuccessCode.POST_LIKE_DELETED, null);
-    }
-
-    @PostMapping("/{postId}/scrap")
-    public ResponseEntity<CommonApiResponse<Void>> scrapPost(@PathVariable Long postId, @RequestBody PostReactionRequest request) {
-        request.validate();
-        postCommandService.scrapPost(postId, request.userId());
-        return CommonApiResponse.success(PostSuccessCode.POST_SCRAP_CREATED, null);
-    }
-
-    @DeleteMapping("/{postId}/scrap")
-    public ResponseEntity<CommonApiResponse<Void>> cancelScrapPost(@PathVariable Long postId, @RequestBody PostReactionRequest request) {
-        request.validate();
-        postCommandService.cancelScrapPost(postId, request.userId());
-        return CommonApiResponse.success(PostSuccessCode.POST_SCRAP_DELETED, null);
+        boolean reacted = postCommandService.toggleScrapPost(postId, request.userId());
+        return CommonApiResponse.success(PostSuccessCode.POST_SCRAP_TOGGLED, new PostReactionToggleResponse(reacted));
     }
 }
