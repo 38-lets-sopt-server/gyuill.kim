@@ -9,7 +9,7 @@ public record PostResponse(
         BoardType boardType,
         String title,
         String content,
-        String author,
+        String authorNickname,
         long likeCount,
         long scrapCount,
         LocalDateTime createdAt

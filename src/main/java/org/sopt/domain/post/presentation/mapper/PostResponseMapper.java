@@ -17,7 +17,7 @@ public class PostResponseMapper {
                 result.boardType(),
                 result.title(),
                 result.content(),
-                result.author(),
+                result.authorNickname(),
                 result.likeCount(),
                 result.scrapCount(),
                 result.createdAt()

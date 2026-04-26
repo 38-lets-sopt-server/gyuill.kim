@@ -36,19 +36,24 @@ public class PostCommandController {
     @PostMapping
     public ResponseEntity<CommonApiResponse<PostResponse>> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
-        PostResult result = postCommandService.createPost(new CreatePostCommand(
+        CreatePostCommand command = new CreatePostCommand(
                 request.boardType(),
                 request.title(),
                 request.content(),
                 request.authorUserId()
-        ));
-        return CommonApiResponse.success(PostSuccessCode.POST_CREATED, postResponseMapper.toResponse(result));
+        );
+        PostResult result = postCommandService.createPost(command);
+        PostResponse response = postResponseMapper.toResponse(result);
+
+        return CommonApiResponse.success(PostSuccessCode.POST_CREATED, response);
     }
 
     @PatchMapping("/{postId}")
     public ResponseEntity<CommonApiResponse<Void>> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
         request.validate();
-        postCommandService.updatePost(postId, new UpdatePostCommand(request.title(), request.content()));
+        UpdatePostCommand command = new UpdatePostCommand(request.title(), request.content());
+
+        postCommandService.updatePost(postId, command);
         return CommonApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }
 
@@ -65,7 +70,9 @@ public class PostCommandController {
     ) {
         request.validate();
         boolean reacted = postCommandService.toggleLikePost(postId, request.userId());
-        return CommonApiResponse.success(PostSuccessCode.POST_LIKE_TOGGLED, new PostReactionToggleResponse(reacted));
+        PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
+
+        return CommonApiResponse.success(PostSuccessCode.POST_LIKE_TOGGLED, response);
     }
 
     @PostMapping("/{postId}/scrap/toggle")
@@ -75,6 +82,8 @@ public class PostCommandController {
     ) {
         request.validate();
         boolean reacted = postCommandService.toggleScrapPost(postId, request.userId());
-        return CommonApiResponse.success(PostSuccessCode.POST_SCRAP_TOGGLED, new PostReactionToggleResponse(reacted));
+        PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
+
+        return CommonApiResponse.success(PostSuccessCode.POST_SCRAP_TOGGLED, response);
     }
 }

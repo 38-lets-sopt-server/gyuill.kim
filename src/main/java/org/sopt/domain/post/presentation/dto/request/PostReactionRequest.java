@@ -7,7 +7,7 @@ public record PostReactionRequest(Long userId) {
 
     public void validate() {
         if (userId == null || userId < 1) {
-            throw new BaseException(PostErrorCode.INVALID_POST_AUTHOR);
+            throw new BaseException(PostErrorCode.INVALID_REACTION_USER_ID);
         }
     }
 }
