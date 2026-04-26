@@ -3,8 +3,6 @@ package org.sopt.domain.user.application.service;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
-import org.sopt.domain.user.application.port.PostPort;
-import org.sopt.domain.user.domain.exception.UserHasPostsException;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
@@ -16,11 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
-    private final PostPort postPort;
 
-    public UserCommandService(UserRepository userRepository, PostPort postPort) {
+    public UserCommandService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.postPort = postPort;
     }
 
     public UserResult createUser(CreateUserCommand command) {
@@ -40,9 +36,7 @@ public class UserCommandService {
 
     public void deleteUser(Long id) {
         findUserOrThrow(id);
-        if (postPort.existsByAuthorUserId(id)) {
-            throw new UserHasPostsException();
-        }
+        // TODO: 추후 User soft delete 도입 시 게시글 작성 이력 보존 정책과 함께 삭제 정책을 재설계할 예정입니다. 지금 하기에는 너무 복잡해져서 일단 넘길게요. 과제 범위를 괜히 빡세게 잡았다가 너무 힘드네요 휴
         userRepository.deleteById(id);
     }
 
