@@ -12,12 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import org.sopt.domain.user.domain.model.User;
-
-import java.time.LocalDateTime;
+import org.sopt.global.entity.BaseTimeEntity;
 
 @Entity
 @Table(name = "posts")
-public class Post {
+public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,9 +35,6 @@ public class Post {
     @JoinColumn(name = "author_user_id", nullable = false)
     private User authorUser;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
     protected Post() {
     }
 
@@ -47,7 +43,6 @@ public class Post {
         this.title = title;
         this.content = content;
         this.authorUser = authorUser;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() { return id; }
@@ -55,7 +50,6 @@ public class Post {
     public String getTitle() { return title; }
     public String getContent() { return content; }
     public User getAuthorUser() { return authorUser; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
 
     public void update(String title, String content) {
         this.title = title;

@@ -6,12 +6,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-import java.time.LocalDateTime;
+import org.sopt.global.entity.BaseTimeEntity;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,19 +19,11 @@ public class User {
     @Column(nullable = false, length = 30)
     private String nickname;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
     protected User() {
     }
 
     public User(String nickname) {
         this.nickname = nickname;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
     }
 
     public Long getId() {
@@ -43,16 +34,7 @@ public class User {
         return nickname;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void updateNickname(String nickname) {
         this.nickname = nickname;
-        this.updatedAt = LocalDateTime.now();
     }
 }
