@@ -53,6 +53,7 @@ public class PostCommandService {
                 post.getTitle(),
                 post.getContent(),
                 post.getAuthorUser().getNickname(),
+                post.getLikeCount(),
                 post.getCreatedAt()
         );
     }

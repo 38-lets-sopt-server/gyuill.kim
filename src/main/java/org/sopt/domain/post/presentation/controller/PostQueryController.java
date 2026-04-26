@@ -45,6 +45,7 @@ public class PostQueryController {
                         postResult.title(),
                         postResult.content(),
                         postResult.author(),
+                        postResult.likeCount(),
                         postResult.createdAt()
                 ))
                 .toList();
@@ -67,6 +68,7 @@ public class PostQueryController {
                 result.title(),
                 result.content(),
                 result.author(),
+                result.likeCount(),
                 result.createdAt()
         ));
     }

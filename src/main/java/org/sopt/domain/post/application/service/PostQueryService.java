@@ -37,6 +37,7 @@ public class PostQueryService {
                         post.getTitle(),
                         post.getContent(),
                         post.getAuthorUser().getNickname(),
+                        post.getLikeCount(),
                         post.getCreatedAt()
                 ))
                 .toList();
@@ -60,6 +61,7 @@ public class PostQueryService {
                 post.getTitle(),
                 post.getContent(),
                 post.getAuthorUser().getNickname(),
+                post.getLikeCount(),
                 post.getCreatedAt()
         );
     }

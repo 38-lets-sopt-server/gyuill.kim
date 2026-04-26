@@ -10,6 +10,7 @@ public record PostResult(
         String title,
         String content,
         String author,
+        long likeCount,
         LocalDateTime createdAt
 ) {
 }
