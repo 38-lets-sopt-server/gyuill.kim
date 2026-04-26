@@ -5,11 +5,11 @@ import org.springframework.http.HttpStatus;
 
 public enum UserSuccessCode implements SuccessCode {
 
-    USER_CREATED("USR-201", HttpStatus.CREATED, "사용자 등록 완료"),
-    USER_READ("USR-200", HttpStatus.OK, "사용자 조회 성공"),
-    USER_LIST_READ("USR-202", HttpStatus.OK, "사용자 목록 조회 성공"),
-    USER_UPDATED("USR-203", HttpStatus.OK, "사용자 수정 완료"),
-    USER_DELETED("USR-204", HttpStatus.OK, "사용자 삭제 완료"),
+    USER_CREATED("USR-S001", HttpStatus.CREATED, "사용자 등록 완료"),
+    USER_READ("USR-S002", HttpStatus.OK, "사용자 조회 성공"),
+    USER_LIST_READ("USR-S003", HttpStatus.OK, "사용자 목록 조회 성공"),
+    USER_UPDATED("USR-S004", HttpStatus.OK, "사용자 수정 완료"),
+    USER_DELETED("USR-S005", HttpStatus.NO_CONTENT, "사용자 삭제 완료"),
     ;
 
     private final String code;

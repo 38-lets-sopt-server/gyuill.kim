@@ -5,13 +5,13 @@ import org.springframework.http.HttpStatus;
 
 public enum PostSuccessCode implements SuccessCode {
 
-    POST_CREATED("PST-201", HttpStatus.CREATED, "게시글 등록 완료"),
-    POST_READ("PST-200", HttpStatus.OK, "게시글 조회 성공"),
-    POST_LIST_READ("PST-202", HttpStatus.OK, "게시글 목록 조회 성공"),
-    POST_UPDATED("PST-203", HttpStatus.OK, "게시글 수정 완료"),
-    POST_DELETED("PST-204", HttpStatus.OK, "게시글 삭제 완료"),
-    POST_LIKE_TOGGLED("PST-205", HttpStatus.OK, "게시글 좋아요 토글 완료"),
-    POST_SCRAP_TOGGLED("PST-206", HttpStatus.OK, "게시글 스크랩 토글 완료"),
+    POST_CREATED("PST-S001", HttpStatus.CREATED, "게시글 등록 완료"),
+    POST_READ("PST-S002", HttpStatus.OK, "게시글 조회 성공"),
+    POST_LIST_READ("PST-S003", HttpStatus.OK, "게시글 목록 조회 성공"),
+    POST_UPDATED("PST-S004", HttpStatus.OK, "게시글 수정 완료"),
+    POST_DELETED("PST-S005", HttpStatus.NO_CONTENT, "게시글 삭제 완료"),
+    POST_LIKE_TOGGLED("PST-S006", HttpStatus.OK, "게시글 좋아요 토글 완료"),
+    POST_SCRAP_TOGGLED("PST-S007", HttpStatus.OK, "게시글 스크랩 토글 완료"),
     ;
 
     private final String code;

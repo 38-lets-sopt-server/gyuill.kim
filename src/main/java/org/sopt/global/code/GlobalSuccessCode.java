@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 
 public enum GlobalSuccessCode implements SuccessCode {
 
-    OK("GLB-200", HttpStatus.OK, "요청이 성공했습니다."),
-    CREATED("GLB-201", HttpStatus.CREATED, "리소스가 생성되었습니다."),
-    NO_CONTENT("GLB-204", HttpStatus.NO_CONTENT, "요청이 성공적으로 처리되었습니다."),
+    OK("GLB-S001", HttpStatus.OK, "요청이 성공했습니다."),
+    CREATED("GLB-S002", HttpStatus.CREATED, "리소스가 생성되었습니다."),
+    NO_CONTENT("GLB-S003", HttpStatus.NO_CONTENT, "요청이 성공적으로 처리되었습니다."),
     ;
 
     private final String code;
