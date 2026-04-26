@@ -28,12 +28,16 @@ public class UserQueryController {
 
     @GetMapping
     public ResponseEntity<CommonApiResponse<List<UserResponse>>> getUsers() {
-        return CommonApiResponse.success(UserSuccessCode.USER_LIST_READ, userResponseMapper.toResponses(userQueryService.getUsers()));
+        List<UserResponse> response = userResponseMapper.toResponses(userQueryService.getUsers());
+
+        return CommonApiResponse.success(UserSuccessCode.USER_LIST_READ, response);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<CommonApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
         UserResult result = userQueryService.getUser(userId);
-        return CommonApiResponse.success(UserSuccessCode.USER_READ, userResponseMapper.toResponse(result));
+        UserResponse response = userResponseMapper.toResponse(result);
+
+        return CommonApiResponse.success(UserSuccessCode.USER_READ, response);
     }
 }

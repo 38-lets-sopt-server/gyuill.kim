@@ -34,14 +34,19 @@ public class UserCommandController {
     @PostMapping
     public ResponseEntity<CommonApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
         request.validate();
-        UserResult result = userCommandService.createUser(new CreateUserCommand(request.nickname()));
-        return CommonApiResponse.success(UserSuccessCode.USER_CREATED, userResponseMapper.toResponse(result));
+        CreateUserCommand command = new CreateUserCommand(request.nickname());
+        UserResult result = userCommandService.createUser(command);
+        UserResponse response = userResponseMapper.toResponse(result);
+
+        return CommonApiResponse.success(UserSuccessCode.USER_CREATED, response);
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<CommonApiResponse<Void>> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequest request) {
         request.validate();
-        userCommandService.updateUser(userId, new UpdateUserCommand(request.nickname()));
+        UpdateUserCommand command = new UpdateUserCommand(request.nickname());
+
+        userCommandService.updateUser(userId, command);
         return CommonApiResponse.success(UserSuccessCode.USER_UPDATED, null);
     }
 

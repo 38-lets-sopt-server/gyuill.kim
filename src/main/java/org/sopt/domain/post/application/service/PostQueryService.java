@@ -34,16 +34,7 @@ public class PostQueryService {
 
     private PostCursorResult toPostCursorResult(Slice<Post> posts) {
         List<PostResult> content = posts.getContent().stream()
-                .map(post -> new PostResult(
-                        post.getId(),
-                        post.getBoardType(),
-                        post.getTitle(),
-                        post.getContent(),
-                        post.getAuthorUser().getNickname(),
-                        post.getLikeCount(),
-                        post.getScrapCount(),
-                        post.getCreatedAt()
-                ))
+                .map(this::toPostResult)
                 .toList();
 
         Long nextCursor = posts.hasNext() && !content.isEmpty()
@@ -55,6 +46,10 @@ public class PostQueryService {
     public PostResult getPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
+        return toPostResult(post);
+    }
+
+    private PostResult toPostResult(Post post) {
         return new PostResult(
                 post.getId(),
                 post.getBoardType(),

@@ -21,18 +21,17 @@ public class UserQueryService {
 
     public List<UserResult> getUsers() {
         return userRepository.findAll().stream()
-                .map(user -> new UserResult(
-                        user.getId(),
-                        user.getNickname(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt()
-                ))
+                .map(this::toUserResult)
                 .toList();
     }
 
     public UserResult getUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+        return toUserResult(user);
+    }
+
+    private UserResult toUserResult(User user) {
         return new UserResult(
                 user.getId(),
                 user.getNickname(),

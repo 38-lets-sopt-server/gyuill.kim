@@ -2,6 +2,7 @@ package org.sopt.domain.post.infrastructure;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -26,7 +27,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public Slice<Post> findAllByCursor(org.sopt.domain.post.domain.model.BoardType boardType, Long cursor, int size) {
+    public Slice<Post> findAllByCursor(BoardType boardType, Long cursor, int size) {
         List<Post> posts = queryFactory
                 .selectFrom(post)
                 .join(post.authorUser, user).fetchJoin()
@@ -72,7 +73,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return StringUtils.hasText(titleKeyword) ? post.title.contains(titleKeyword) : null;
     }
 
-    private BooleanExpression boardTypeEq(org.sopt.domain.post.domain.model.BoardType boardType) {
+    private BooleanExpression boardTypeEq(BoardType boardType) {
         return boardType != null ? post.boardType.eq(boardType) : null;
     }
 

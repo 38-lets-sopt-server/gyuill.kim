@@ -40,7 +40,9 @@ public class PostQueryController {
         request.validate();
 
         PostCursorResult result = postQueryService.getPosts(request.boardType(), request.cursor(), request.size());
-        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, postResponseMapper.toCursorPageResponse(result));
+        PostCursorPageResponse response = postResponseMapper.toCursorPageResponse(result);
+
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, response);
     }
 
     @GetMapping("/search")
@@ -59,12 +61,16 @@ public class PostQueryController {
                 request.cursor(),
                 request.size()
         );
-        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, postResponseMapper.toCursorPageResponse(result));
+        PostCursorPageResponse response = postResponseMapper.toCursorPageResponse(result);
+
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, response);
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<CommonApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
         PostResult result = postQueryService.getPost(postId);
-        return CommonApiResponse.success(PostSuccessCode.POST_READ, postResponseMapper.toResponse(result));
+        PostResponse response = postResponseMapper.toResponse(result);
+
+        return CommonApiResponse.success(PostSuccessCode.POST_READ, response);
     }
 }
