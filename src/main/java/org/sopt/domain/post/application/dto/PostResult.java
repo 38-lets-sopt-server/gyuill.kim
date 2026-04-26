@@ -11,6 +11,7 @@ public record PostResult(
         String content,
         String author,
         long likeCount,
+        long scrapCount,
         LocalDateTime createdAt
 ) {
 }

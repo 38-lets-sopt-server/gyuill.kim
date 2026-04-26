@@ -46,6 +46,7 @@ public class PostQueryService {
                         post.getContent(),
                         post.getAuthorUser().getNickname(),
                         post.getLikeCount(),
+                        post.getScrapCount(),
                         post.getCreatedAt()
                 ))
                 .toList();
@@ -65,6 +66,7 @@ public class PostQueryService {
                         post.getContent(),
                         post.getAuthorUser().getNickname(),
                         post.getLikeCount(),
+                        post.getScrapCount(),
                         post.getCreatedAt()
                 ))
                 .toList();
@@ -89,6 +91,7 @@ public class PostQueryService {
                 post.getContent(),
                 post.getAuthorUser().getNickname(),
                 post.getLikeCount(),
+                post.getScrapCount(),
                 post.getCreatedAt()
         );
     }
