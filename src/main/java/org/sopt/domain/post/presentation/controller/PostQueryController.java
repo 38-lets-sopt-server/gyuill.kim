@@ -61,15 +61,21 @@ public class PostQueryController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CommonApiResponse<PostPageResponse>> searchPostsByTitle(
-            @RequestParam String titleKeyword,
+    public ResponseEntity<CommonApiResponse<PostPageResponse>> searchPosts(
+            @RequestParam(required = false) String titleKeyword,
+            @RequestParam(required = false) String authorNickname,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        SearchPostsRequest request = new SearchPostsRequest(titleKeyword, page, size);
+        SearchPostsRequest request = new SearchPostsRequest(titleKeyword, authorNickname, page, size);
         request.validate();
 
-        PostPageResult result = postQueryService.searchPostsByTitle(request.titleKeyword(), request.page(), request.size());
+        PostPageResult result = postQueryService.searchPosts(
+                request.titleKeyword(),
+                request.authorNickname(),
+                request.page(),
+                request.size()
+        );
         List<PostResponse> responses = result.content().stream()
                 .map(postResult -> new PostResponse(
                         postResult.id(),

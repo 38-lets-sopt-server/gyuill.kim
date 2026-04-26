@@ -33,9 +33,9 @@ public class PostQueryService {
         return toPostPageResult(posts);
     }
 
-    public PostPageResult searchPostsByTitle(String titleKeyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt", "id"));
-        Page<Post> posts = postRepository.searchByTitle(titleKeyword, pageable);
+    public PostPageResult searchPosts(String titleKeyword, String authorNickname, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postRepository.search(titleKeyword, authorNickname, pageable);
         return toPostPageResult(posts);
     }
 

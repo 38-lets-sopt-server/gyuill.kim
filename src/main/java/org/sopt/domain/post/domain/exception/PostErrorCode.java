@@ -14,6 +14,7 @@ public enum PostErrorCode implements ErrorCode {
     INVALID_POST_TITLE_LENGTH("PST-007", HttpStatus.BAD_REQUEST, "게시글 제목은 50자 이하여야 합니다."),
     INVALID_POST_CONTENT_LENGTH("PST-008", HttpStatus.BAD_REQUEST, "게시글 내용은 10,000자 이하여야 합니다."),
     POST_LIKE_CONFLICT("PST-009", HttpStatus.CONFLICT, "게시글 좋아요 처리 중 충돌이 발생했습니다. 다시 시도해주세요."),
+    INVALID_POST_SEARCH_CONDITION("PST-010", HttpStatus.BAD_REQUEST, "게시글 검색 조건은 하나 이상 필요합니다."),
     ;
 
     private final String code;

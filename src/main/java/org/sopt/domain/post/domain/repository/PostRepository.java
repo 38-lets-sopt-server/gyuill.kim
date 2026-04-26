@@ -15,7 +15,7 @@ public interface PostRepository {
 
     Page<Post> findAllByBoardType(BoardType boardType, Pageable pageable);
 
-    Page<Post> searchByTitle(String titleKeyword, Pageable pageable);
+    Page<Post> search(String titleKeyword, String authorNickname, Pageable pageable);
 
     Optional<Post> findById(Long id);
 
