@@ -5,6 +5,7 @@ import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -31,6 +32,11 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public Page<Post> findAllByBoardType(BoardType boardType, Pageable pageable) {
         return postJpaRepository.findAllByBoardType(boardType, pageable);
+    }
+
+    @Override
+    public Slice<Post> findAllByCursor(BoardType boardType, Long cursor, int size) {
+        return postJpaRepository.findAllByCursor(boardType, cursor, size);
     }
 
     @Override
