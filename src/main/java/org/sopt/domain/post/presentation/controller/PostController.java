@@ -45,7 +45,7 @@ public class PostController {
                 request.boardType(),
                 request.title(),
                 request.content(),
-                request.author()
+                request.authorUserId()
         ));
         return ApiResponse.success(PostSuccessCode.POST_CREATED, new PostResponse(
                 result.id(),

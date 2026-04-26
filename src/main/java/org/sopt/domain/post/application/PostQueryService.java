@@ -36,7 +36,7 @@ public class PostQueryService {
                         post.getBoardType(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getAuthor(),
+                        post.getAuthorUser().getNickname(),
                         post.getCreatedAt()
                 ))
                 .toList();
@@ -59,7 +59,7 @@ public class PostQueryService {
                 post.getBoardType(),
                 post.getTitle(),
                 post.getContent(),
-                post.getAuthor(),
+                post.getAuthorUser().getNickname(),
                 post.getCreatedAt()
         );
     }

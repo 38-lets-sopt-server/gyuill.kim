@@ -4,7 +4,7 @@ import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.global.exception.BaseException;
 
 public record UpdatePostRequest(String title, String content) {
-    private static final int MAX_TITLE_LENGTH = 100;
+    private static final int MAX_TITLE_LENGTH = 50;
     private static final int MAX_CONTENT_LENGTH = 10_000;
 
     public void validate() {

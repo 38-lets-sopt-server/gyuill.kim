@@ -6,6 +6,9 @@ import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.repository.PostRepository;
+import org.sopt.domain.user.domain.exception.UserNotFoundException;
+import org.sopt.domain.user.domain.model.User;
+import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,24 +17,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostCommandService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    public PostCommandService(PostRepository postRepository) {
+    public PostCommandService(PostRepository postRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
 
     public PostResult createPost(CreatePostCommand command) {
+        User authorUser = userRepository.findById(command.authorUserId())
+                .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.save(new Post(
                 command.boardType(),
                 command.title(),
                 command.content(),
-                command.author()
+                authorUser
         ));
         return new PostResult(
                 post.getId(),
                 post.getBoardType(),
                 post.getTitle(),
                 post.getContent(),
-                post.getAuthor(),
+                post.getAuthorUser().getNickname(),
                 post.getCreatedAt()
         );
     }

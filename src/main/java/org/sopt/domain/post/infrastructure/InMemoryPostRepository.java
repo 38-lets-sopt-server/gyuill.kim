@@ -61,6 +61,12 @@ public class InMemoryPostRepository implements PostRepository {
     }
 
     @Override
+    public synchronized boolean existsByAuthorUserId(Long authorUserId) {
+        return postList.stream()
+                .anyMatch(post -> post.getAuthorUser().getId().equals(authorUserId));
+    }
+
+    @Override
     public synchronized void deleteById(Long id) {
         postList.removeIf(p -> p.getId().equals(id));
     }
