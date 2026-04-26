@@ -2,12 +2,14 @@ package org.sopt.domain.post.application.service;
 
 import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
+import org.sopt.domain.post.domain.exception.PostReactionDuplicateException;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.model.PostReaction;
 import org.sopt.domain.post.domain.model.ReactionType;
 import org.sopt.domain.post.domain.repository.PostReactionRepository;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.sopt.domain.user.domain.model.User;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +49,11 @@ public class PostReactionTransactionExecutor {
 
         if (shouldReact) {
             if (!reacted) {
-                postReactionRepository.save(new PostReaction(post, user, type));
+                try {
+                    postReactionRepository.save(new PostReaction(post, user, type));
+                } catch (DataIntegrityViolationException e) {
+                    throw new PostReactionDuplicateException(postId, userId, type);
+                }
                 post.initializeStats().increaseReactionCount(type);
             }
             return true;
