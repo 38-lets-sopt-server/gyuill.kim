@@ -21,6 +21,10 @@ public class UserCommandService {
 
     public UserResult createUser(CreateUserCommand command) {
         User user = userRepository.save(new User(command.nickname()));
+        return toUserResult(user);
+    }
+
+    private UserResult toUserResult(User user) {
         return new UserResult(
                 user.getId(),
                 user.getNickname(),

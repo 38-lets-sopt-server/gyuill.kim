@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     // JSON 파싱 실패 처리
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public CommonApiResponse<Void> handleMessageNotReadableException(HttpMessageNotReadableException e) {
+    public CommonApiResponse<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.warn("Request body is not readable: {}", e.getMessage());
         return CommonApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
     }
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
             TransactionSystemException.class
     })
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public CommonApiResponse<Void> handlePersistenceSystemException(Exception e) {
+    public CommonApiResponse<Void> handlePersistenceException(Exception e) {
         log.error("Persistence system error occurred", e);
         return CommonApiResponse.failure(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
     // 존재하지 않는 리소스 요청 처리
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public CommonApiResponse<Void> handleNoResourceFound(NoResourceFoundException e) {
+    public CommonApiResponse<Void> handleNoResourceFoundException(NoResourceFoundException e) {
         log.debug("Resource not found: {}", e.getResourcePath());
         return CommonApiResponse.failure(GlobalErrorCode.RESOURCE_NOT_FOUND);
     }
