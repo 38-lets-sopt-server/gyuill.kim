@@ -2,11 +2,12 @@ package org.sopt.domain.post.presentation.controller;
 
 import java.util.List;
 
+import org.sopt.domain.post.application.PostCommandService;
+import org.sopt.domain.post.application.PostQueryService;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostPageResult;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
-import org.sopt.domain.post.application.service.PostService;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
@@ -29,16 +30,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/posts")
 public class PostController {
-    private final PostService postService;
+    private final PostCommandService postCommandService;
+    private final PostQueryService postQueryService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
+    public PostController(PostCommandService postCommandService, PostQueryService postQueryService) {
+        this.postCommandService = postCommandService;
+        this.postQueryService = postQueryService;
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<PostResponse>> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
-        PostResult result = postService.createPost(new CreatePostCommand(
+        PostResult result = postCommandService.createPost(new CreatePostCommand(
                 request.boardType(),
                 request.title(),
                 request.content(),
@@ -63,7 +66,7 @@ public class PostController {
         GetPostsRequest request = new GetPostsRequest(boardType, page, size);
         request.validate();
 
-        PostPageResult result = postService.getPosts(request.boardType(), request.page(), request.size());
+        PostPageResult result = postQueryService.getPosts(request.boardType(), request.page(), request.size());
         List<PostResponse> responses = result.content().stream()
                 .map(postResult -> new PostResponse(
                         postResult.id(),
@@ -86,7 +89,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
-        PostResult result = postService.getPost(postId);
+        PostResult result = postQueryService.getPost(postId);
         return ApiResponse.success(PostSuccessCode.POST_READ, new PostResponse(
                 result.id(),
                 result.boardType(),
@@ -100,13 +103,13 @@ public class PostController {
     @PatchMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
         request.validate();
-        postService.updatePost(postId, new UpdatePostCommand(request.title(), request.content()));
+        postCommandService.updatePost(postId, new UpdatePostCommand(request.title(), request.content()));
         return ApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+        postCommandService.deletePost(postId);
         return ApiResponse.success(PostSuccessCode.POST_DELETED, null);
     }
 }
