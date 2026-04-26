@@ -8,6 +8,7 @@ public record UpdatePostRequest(String title, String content) {
     private static final int MAX_CONTENT_LENGTH = 10_000;
 
     public void validate() {
+        // TODO: CreatePostRequest와 검증 로직이 중복되지만 과제 범위에서는 유지하고 추후 validation annotation 도입 시 정리 예정입니다.
         if (title == null || title.isBlank()) {
             throw new BaseException(PostErrorCode.INVALID_POST_TITLE);
         }
