@@ -33,11 +33,14 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     /**
-     * 과제 요구사항의 좋아요 동시성 제어를 위해 Post 집계 필드를 낙관적 락 대상으로 둔다.
-     * 반응 엔티티는 insert/delete 중심이라 실제 충돌 감지는 집계 루트인 Post에 두는 편이 더 명확하다.
+     * 반응 집계 필드는 Post 집계 루트에 중복 저장하고 충돌 감지는 @Version으로 일괄 처리한다.
+     * 반응 엔티티 자체는 insert/delete 중심이라 충돌 감지는 집계 루트가 더 명확하다.
      */
     @Column(nullable = false)
     private long likeCount;
+
+    @Column(nullable = false)
+    private long scrapCount;
 
     @Version
     private Long version;
@@ -61,6 +64,7 @@ public class Post extends BaseTimeEntity {
     public String getTitle() { return title; }
     public String getContent() { return content; }
     public long getLikeCount() { return likeCount; }
+    public long getScrapCount() { return scrapCount; }
     public User getAuthorUser() { return authorUser; }
 
     public void update(String title, String content) {
@@ -68,13 +72,21 @@ public class Post extends BaseTimeEntity {
         this.content = content;
     }
 
-    public void increaseLikeCount() {
-        this.likeCount++;
+    public void increaseReactionCount(ReactionType type) {
+        switch (type) {
+            case LIKE -> this.likeCount++;
+            case SCRAP -> this.scrapCount++;
+        }
     }
 
-    public void decreaseLikeCount() {
-        if (this.likeCount > 0) {
-            this.likeCount--;
+    public void decreaseReactionCount(ReactionType type) {
+        switch (type) {
+            case LIKE -> {
+                if (this.likeCount > 0) this.likeCount--;
+            }
+            case SCRAP -> {
+                if (this.scrapCount > 0) this.scrapCount--;
+            }
         }
     }
 }
