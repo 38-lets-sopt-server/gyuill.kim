@@ -30,6 +30,16 @@ public class PostQueryService {
         Page<Post> posts = boardType == null
                 ? postRepository.findAll(pageable)
                 : postRepository.findAllByBoardType(boardType, pageable);
+        return toPostPageResult(posts);
+    }
+
+    public PostPageResult searchPostsByTitle(String titleKeyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt", "id"));
+        Page<Post> posts = postRepository.searchByTitle(titleKeyword, pageable);
+        return toPostPageResult(posts);
+    }
+
+    private PostPageResult toPostPageResult(Page<Post> posts) {
         List<PostResult> content = posts.getContent().stream()
                 .map(post -> new PostResult(
                         post.getId(),

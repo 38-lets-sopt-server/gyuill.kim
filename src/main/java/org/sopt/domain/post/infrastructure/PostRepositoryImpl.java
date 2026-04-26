@@ -34,6 +34,11 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
+    public Page<Post> searchByTitle(String titleKeyword, Pageable pageable) {
+        return postJpaRepository.searchByTitle(titleKeyword, pageable);
+    }
+
+    @Override
     public Optional<Post> findById(Long id) {
         return postJpaRepository.findById(id);
     }

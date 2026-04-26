@@ -6,6 +6,7 @@ import org.sopt.domain.post.application.service.PostQueryService;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.GetPostsRequest;
+import org.sopt.domain.post.presentation.dto.request.SearchPostsRequest;
 import org.sopt.domain.post.presentation.dto.response.PostPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.global.response.CommonApiResponse;
@@ -49,6 +50,38 @@ public class PostQueryController {
                         postResult.createdAt()
                 ))
                 .toList();
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostPageResponse(
+                responses,
+                result.page(),
+                result.size(),
+                result.totalElements(),
+                result.totalPages(),
+                result.hasNext()
+        ));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<CommonApiResponse<PostPageResponse>> searchPostsByTitle(
+            @RequestParam String titleKeyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        SearchPostsRequest request = new SearchPostsRequest(titleKeyword, page, size);
+        request.validate();
+
+        PostPageResult result = postQueryService.searchPostsByTitle(request.titleKeyword(), request.page(), request.size());
+        List<PostResponse> responses = result.content().stream()
+                .map(postResult -> new PostResponse(
+                        postResult.id(),
+                        postResult.boardType(),
+                        postResult.title(),
+                        postResult.content(),
+                        postResult.author(),
+                        postResult.likeCount(),
+                        postResult.createdAt()
+                ))
+                .toList();
+
         return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostPageResponse(
                 responses,
                 result.page(),
