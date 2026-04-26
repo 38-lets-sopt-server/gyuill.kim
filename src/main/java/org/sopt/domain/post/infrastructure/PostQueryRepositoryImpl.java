@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.sopt.domain.post.domain.model.QPost.post;
+import static org.sopt.domain.post.domain.model.QPostStats.postStats;
 import static org.sopt.domain.user.domain.model.QUser.user;
 
 @Repository
@@ -29,6 +30,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         List<Post> posts = queryFactory
                 .selectFrom(post)
                 .join(post.authorUser, user).fetchJoin()
+                .leftJoin(post.stats, postStats).fetchJoin()
                 .where(
                         boardTypeEq(boardType),
                         postIdLt(cursor)
@@ -49,6 +51,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         List<Post> posts = queryFactory
                 .selectFrom(post)
                 .join(post.authorUser, user).fetchJoin()
+                .leftJoin(post.stats, postStats).fetchJoin()
                 .where(
                         titleContains(titleKeyword),
                         authorNicknameContains(authorNickname),

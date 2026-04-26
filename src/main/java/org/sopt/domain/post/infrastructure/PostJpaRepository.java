@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface PostJpaRepository extends JpaRepository<Post, Long>, PostQueryRepository {
 
     @Override
-    @EntityGraph(attributePaths = "authorUser")
+    @EntityGraph(attributePaths = {"authorUser", "stats"})
     Optional<Post> findById(Long id);
 
     boolean existsByAuthorUserId(Long authorUserId);

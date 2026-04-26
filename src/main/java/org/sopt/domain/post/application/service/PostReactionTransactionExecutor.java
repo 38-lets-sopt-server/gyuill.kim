@@ -48,14 +48,14 @@ public class PostReactionTransactionExecutor {
         if (shouldReact) {
             if (!reacted) {
                 postReactionRepository.save(new PostReaction(post, user, type));
-                post.increaseReactionCount(type);
+                post.initializeStats().increaseReactionCount(type);
             }
             return true;
         }
 
         if (reacted) {
             postReactionRepository.deleteByPostIdAndUserIdAndType(postId, userId, type);
-            post.decreaseReactionCount(type);
+            post.initializeStats().decreaseReactionCount(type);
         }
         return false;
     }

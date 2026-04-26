@@ -10,8 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
+import jakarta.persistence.CascadeType;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.global.entity.BaseTimeEntity;
 
@@ -32,22 +33,12 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    /**
-     * 반응 집계 필드는 Post 집계 루트에 중복 저장하고 충돌 감지는 @Version으로 일괄 처리한다.
-     * 반응 엔티티 자체는 insert/delete 중심이라 충돌 감지는 집계 루트가 더 명확하다.
-     */
-    @Column(nullable = false)
-    private long likeCount;
-
-    @Column(nullable = false)
-    private long scrapCount;
-
-    @Version
-    private Long version;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_user_id", nullable = false)
     private User authorUser;
+
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private PostStats stats;
 
     protected Post() {
     }
@@ -57,36 +48,27 @@ public class Post extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.authorUser = authorUser;
+        this.stats = new PostStats(this);
     }
 
     public Long getId() { return id; }
     public BoardType getBoardType() { return boardType; }
     public String getTitle() { return title; }
     public String getContent() { return content; }
-    public long getLikeCount() { return likeCount; }
-    public long getScrapCount() { return scrapCount; }
     public User getAuthorUser() { return authorUser; }
+    public PostStats getStats() { return stats; }
+    public long getLikeCount() { return stats == null ? 0 : stats.getLikeCount(); }
+    public long getScrapCount() { return stats == null ? 0 : stats.getScrapCount(); }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
     }
 
-    public void increaseReactionCount(ReactionType type) {
-        switch (type) {
-            case LIKE -> this.likeCount++;
-            case SCRAP -> this.scrapCount++;
+    public PostStats initializeStats() {
+        if (this.stats == null) {
+            this.stats = new PostStats(this);
         }
-    }
-
-    public void decreaseReactionCount(ReactionType type) {
-        switch (type) {
-            case LIKE -> {
-                if (this.likeCount > 0) this.likeCount--;
-            }
-            case SCRAP -> {
-                if (this.scrapCount > 0) this.scrapCount--;
-            }
-        }
+        return this.stats;
     }
 }
