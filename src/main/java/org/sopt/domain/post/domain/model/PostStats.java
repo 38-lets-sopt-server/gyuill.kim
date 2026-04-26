@@ -63,12 +63,20 @@ public class PostStats {
 
     public void decreaseReactionCount(ReactionType type) {
         switch (type) {
-            case LIKE -> {
-                if (this.likeCount > 0) this.likeCount--;
-            }
-            case SCRAP -> {
-                if (this.scrapCount > 0) this.scrapCount--;
-            }
+            case LIKE -> decreaseLikeCount();
+            case SCRAP -> decreaseScrapCount();
+        }
+    }
+
+    private void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
+
+    private void decreaseScrapCount() {
+        if (this.scrapCount > 0) {
+            this.scrapCount--;
         }
     }
 }

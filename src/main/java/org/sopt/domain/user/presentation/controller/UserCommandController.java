@@ -38,7 +38,7 @@ public class UserCommandController {
         UserResult result = userCommandService.createUser(command);
         UserResponse response = userResponseMapper.toResponse(result);
 
-        return CommonApiResponse.success(UserSuccessCode.USER_CREATED, response);
+        return CommonApiResponse.successResponse(UserSuccessCode.USER_CREATED, response);
     }
 
     @PatchMapping("/{userId}")
@@ -47,12 +47,12 @@ public class UserCommandController {
         UpdateUserCommand command = new UpdateUserCommand(request.nickname());
 
         userCommandService.updateUser(userId, command);
-        return CommonApiResponse.success(UserSuccessCode.USER_UPDATED, null);
+        return CommonApiResponse.successResponse(UserSuccessCode.USER_UPDATED, null);
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<CommonApiResponse<Void>> deleteUser(@PathVariable Long userId) {
         userCommandService.deleteUser(userId);
-        return CommonApiResponse.success(UserSuccessCode.USER_DELETED, null);
+        return CommonApiResponse.successResponse(UserSuccessCode.USER_DELETED, null);
     }
 }

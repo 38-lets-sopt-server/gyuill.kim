@@ -45,7 +45,7 @@ public class PostCommandController {
         PostResult result = postCommandService.createPost(command);
         PostResponse response = postResponseMapper.toResponse(result);
 
-        return CommonApiResponse.success(PostSuccessCode.POST_CREATED, response);
+        return CommonApiResponse.successResponse(PostSuccessCode.POST_CREATED, response);
     }
 
     @PatchMapping("/{postId}")
@@ -54,13 +54,13 @@ public class PostCommandController {
         UpdatePostCommand command = new UpdatePostCommand(request.title(), request.content());
 
         postCommandService.updatePost(postId, command);
-        return CommonApiResponse.success(PostSuccessCode.POST_UPDATED, null);
+        return CommonApiResponse.successResponse(PostSuccessCode.POST_UPDATED, null);
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<CommonApiResponse<Void>> deletePost(@PathVariable Long postId) {
         postCommandService.deletePost(postId);
-        return CommonApiResponse.success(PostSuccessCode.POST_DELETED, null);
+        return CommonApiResponse.successResponse(PostSuccessCode.POST_DELETED, null);
     }
 
     @PostMapping("/{postId}/like/toggle")
@@ -72,7 +72,7 @@ public class PostCommandController {
         boolean reacted = postCommandService.toggleLikePost(postId, request.userId());
         PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
 
-        return CommonApiResponse.success(PostSuccessCode.POST_LIKE_TOGGLED, response);
+        return CommonApiResponse.successResponse(PostSuccessCode.POST_LIKE_TOGGLED, response);
     }
 
     @PostMapping("/{postId}/scrap/toggle")
@@ -84,6 +84,6 @@ public class PostCommandController {
         boolean reacted = postCommandService.toggleScrapPost(postId, request.userId());
         PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
 
-        return CommonApiResponse.success(PostSuccessCode.POST_SCRAP_TOGGLED, response);
+        return CommonApiResponse.successResponse(PostSuccessCode.POST_SCRAP_TOGGLED, response);
     }
 }

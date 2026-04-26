@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
         log.warn("Business exception: {}", errorCode.getMessage());
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(CommonApiResponse.failure(errorCode, e.getDetails()));
+                .body(CommonApiResponse.failureBody(errorCode, e.getDetails()));
     }
 
     // JSON 파싱 실패 처리
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonApiResponse<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.warn("Request body is not readable: {}", e.getMessage());
-        return CommonApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
+        return CommonApiResponse.failureBody(GlobalErrorCode.INVALID_REQUEST);
     }
 
     // 입력값 검증 실패 처리
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn("Validation failed: {}", e.getMessage());
-        return CommonApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
+        return CommonApiResponse.failureBody(GlobalErrorCode.INVALID_REQUEST);
     }
 
     // DB 제약조건 위반 처리
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonApiResponse<Void> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.warn("Database constraint violation: {}", e.getMessage());
-        return CommonApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
+        return CommonApiResponse.failureBody(GlobalErrorCode.INVALID_REQUEST);
     }
 
     // JPA/트랜잭션 시스템 오류 처리
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public CommonApiResponse<Void> handlePersistenceException(Exception e) {
         log.error("Persistence system error occurred", e);
-        return CommonApiResponse.failure(GlobalErrorCode.INTERNAL_SERVER_ERROR);
+        return CommonApiResponse.failureBody(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     // 존재하지 않는 리소스 요청 처리
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public CommonApiResponse<Void> handleNoResourceFoundException(NoResourceFoundException e) {
         log.debug("Resource not found: {}", e.getResourcePath());
-        return CommonApiResponse.failure(GlobalErrorCode.RESOURCE_NOT_FOUND);
+        return CommonApiResponse.failureBody(GlobalErrorCode.RESOURCE_NOT_FOUND);
     }
 
     // 그 외 모든 예외 처리
@@ -79,6 +79,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public CommonApiResponse<Void> handleException(Exception e) {
         log.error("Unexpected error occurred", e);
-        return CommonApiResponse.failure(GlobalErrorCode.INTERNAL_SERVER_ERROR);
+        return CommonApiResponse.failureBody(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 }

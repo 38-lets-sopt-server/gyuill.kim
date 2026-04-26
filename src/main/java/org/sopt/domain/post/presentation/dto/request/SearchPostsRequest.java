@@ -7,7 +7,9 @@ import org.springframework.util.StringUtils;
 public record SearchPostsRequest(String titleKeyword, String authorNickname, Long cursor, int size) {
 
     public void validate() {
-        if (!StringUtils.hasText(titleKeyword) && !StringUtils.hasText(authorNickname)) {
+        boolean hasSearchCondition = StringUtils.hasText(titleKeyword) || StringUtils.hasText(authorNickname);
+
+        if (!hasSearchCondition) {
             throw new BaseException(PostErrorCode.INVALID_POST_SEARCH_CONDITION);
         }
         if (cursor != null && cursor < 1) {

@@ -51,14 +51,37 @@ public class Post extends BaseTimeEntity {
         this.stats = new PostStats(this);
     }
 
-    public Long getId() { return id; }
-    public BoardType getBoardType() { return boardType; }
-    public String getTitle() { return title; }
-    public String getContent() { return content; }
-    public User getAuthorUser() { return authorUser; }
-    public PostStats getStats() { return stats; }
-    public long getLikeCount() { return stats == null ? 0 : stats.getLikeCount(); }
-    public long getScrapCount() { return stats == null ? 0 : stats.getScrapCount(); }
+    public Long getId() {
+        return id;
+    }
+
+    public BoardType getBoardType() {
+        return boardType;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public User getAuthorUser() {
+        return authorUser;
+    }
+
+    public PostStats getStats() {
+        return stats;
+    }
+
+    public long getLikeCount() {
+        return stats == null ? 0 : stats.getLikeCount();
+    }
+
+    public long getScrapCount() {
+        return stats == null ? 0 : stats.getScrapCount();
+    }
 
     public void update(String title, String content) {
         this.title = title;
