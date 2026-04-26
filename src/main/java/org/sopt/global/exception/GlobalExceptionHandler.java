@@ -5,9 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.sopt.global.code.ErrorCode;
 import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -42,6 +45,25 @@ public class GlobalExceptionHandler {
     public ApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn("Validation failed: {}", e.getMessage());
         return ApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
+    }
+
+    // DB 제약조건 위반 처리
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.warn("Database constraint violation: {}", e.getMessage());
+        return ApiResponse.failure(GlobalErrorCode.INVALID_REQUEST);
+    }
+
+    // JPA/트랜잭션 시스템 오류 처리
+    @ExceptionHandler({
+            JpaSystemException.class,
+            TransactionSystemException.class
+    })
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponse<Void> handlePersistenceSystemException(Exception e) {
+        log.error("Persistence system error occurred", e);
+        return ApiResponse.failure(GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     // 존재하지 않는 리소스 요청 처리
