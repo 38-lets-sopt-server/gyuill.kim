@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 public class PostQueryService {
@@ -28,9 +30,19 @@ public class PostQueryService {
         Page<Post> posts = boardType == null
                 ? postRepository.findAll(pageable)
                 : postRepository.findAllByBoardType(boardType, pageable);
+        List<PostResult> content = posts.getContent().stream()
+                .map(post -> new PostResult(
+                        post.getId(),
+                        post.getBoardType(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getAuthor(),
+                        post.getCreatedAt()
+                ))
+                .toList();
 
         return new PostPageResult(
-                posts.getContent().stream().map(this::toPostResult).toList(),
+                content,
                 posts.getNumber(),
                 posts.getSize(),
                 posts.getTotalElements(),
@@ -40,11 +52,8 @@ public class PostQueryService {
     }
 
     public PostResult getPost(Long id) {
-        return toPostResult(postRepository.findById(id)
-                .orElseThrow(PostNotFoundException::new));
-    }
-
-    private PostResult toPostResult(Post post) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(PostNotFoundException::new);
         return new PostResult(
                 post.getId(),
                 post.getBoardType(),
