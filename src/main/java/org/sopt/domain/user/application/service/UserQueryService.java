@@ -32,7 +32,7 @@ public class UserQueryService {
 
     public UserResult getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException(id));
         return new UserResult(
                 user.getId(),
                 user.getNickname(),

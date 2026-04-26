@@ -18,6 +18,6 @@ public class UserPortAdapter implements UserPort {
     @Override
     public User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

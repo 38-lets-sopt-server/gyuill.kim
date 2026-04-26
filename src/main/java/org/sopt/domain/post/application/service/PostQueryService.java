@@ -53,7 +53,7 @@ public class PostQueryService {
 
     public PostResult getPost(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new PostNotFoundException(id));
         return new PostResult(
                 post.getId(),
                 post.getBoardType(),

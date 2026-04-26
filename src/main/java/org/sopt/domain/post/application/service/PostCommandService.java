@@ -53,6 +53,6 @@ public class PostCommandService {
 
     private Post findPostOrThrow(Long id) {
         return postRepository.findById(id)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new PostNotFoundException(id));
     }
 }

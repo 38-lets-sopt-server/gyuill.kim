@@ -15,7 +15,7 @@ import org.sopt.domain.post.presentation.dto.request.GetPostsRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.presentation.dto.response.PostPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
-import org.sopt.global.response.ApiResponse;
+import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +39,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PostResponse>> createPost(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<CommonApiResponse<PostResponse>> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
         PostResult result = postCommandService.createPost(new CreatePostCommand(
                 request.boardType(),
@@ -47,7 +47,7 @@ public class PostController {
                 request.content(),
                 request.authorUserId()
         ));
-        return ApiResponse.success(PostSuccessCode.POST_CREATED, new PostResponse(
+        return CommonApiResponse.success(PostSuccessCode.POST_CREATED, new PostResponse(
                 result.id(),
                 result.boardType(),
                 result.title(),
@@ -58,7 +58,7 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PostPageResponse>> getAllPosts(
+    public ResponseEntity<CommonApiResponse<PostPageResponse>> getAllPosts(
             @RequestParam(required = false) BoardType boardType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -77,7 +77,7 @@ public class PostController {
                         postResult.createdAt()
                 ))
                 .toList();
-        return ApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostPageResponse(
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostPageResponse(
                 responses,
                 result.page(),
                 result.size(),
@@ -88,9 +88,9 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
+    public ResponseEntity<CommonApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
         PostResult result = postQueryService.getPost(postId);
-        return ApiResponse.success(PostSuccessCode.POST_READ, new PostResponse(
+        return CommonApiResponse.success(PostSuccessCode.POST_READ, new PostResponse(
                 result.id(),
                 result.boardType(),
                 result.title(),
@@ -101,15 +101,15 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}")
-    public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
+    public ResponseEntity<CommonApiResponse<Void>> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
         request.validate();
         postCommandService.updatePost(postId, new UpdatePostCommand(request.title(), request.content()));
-        return ApiResponse.success(PostSuccessCode.POST_UPDATED, null);
+        return CommonApiResponse.success(PostSuccessCode.POST_UPDATED, null);
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId) {
+    public ResponseEntity<CommonApiResponse<Void>> deletePost(@PathVariable Long postId) {
         postCommandService.deletePost(postId);
-        return ApiResponse.success(PostSuccessCode.POST_DELETED, null);
+        return CommonApiResponse.success(PostSuccessCode.POST_DELETED, null);
     }
 }

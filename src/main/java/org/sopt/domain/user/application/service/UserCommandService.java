@@ -48,6 +48,6 @@ public class UserCommandService {
 
     private User findUserOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 }
