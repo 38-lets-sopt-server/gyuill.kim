@@ -3,8 +3,6 @@ package org.sopt.domain.post.infrastructure;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.repository.PostRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
@@ -25,23 +23,13 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Page<Post> findAll(Pageable pageable) {
-        return postJpaRepository.findAll(pageable);
-    }
-
-    @Override
-    public Page<Post> findAllByBoardType(BoardType boardType, Pageable pageable) {
-        return postJpaRepository.findAllByBoardType(boardType, pageable);
-    }
-
-    @Override
     public Slice<Post> findAllByCursor(BoardType boardType, Long cursor, int size) {
         return postJpaRepository.findAllByCursor(boardType, cursor, size);
     }
 
     @Override
-    public Page<Post> search(String titleKeyword, String authorNickname, Pageable pageable) {
-        return postJpaRepository.search(titleKeyword, authorNickname, pageable);
+    public Slice<Post> search(String titleKeyword, String authorNickname, Long cursor, int size) {
+        return postJpaRepository.search(titleKeyword, authorNickname, cursor, size);
     }
 
     @Override

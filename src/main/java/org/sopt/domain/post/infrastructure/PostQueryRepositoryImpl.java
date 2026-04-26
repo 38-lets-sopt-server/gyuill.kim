@@ -1,13 +1,9 @@
 package org.sopt.domain.post.infrastructure;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.sopt.domain.post.domain.model.Post;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
@@ -49,32 +45,24 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public Page<Post> search(String titleKeyword, String authorNickname, Pageable pageable) {
-        List<Post> content = queryFactory
+    public Slice<Post> search(String titleKeyword, String authorNickname, Long cursor, int size) {
+        List<Post> posts = queryFactory
                 .selectFrom(post)
                 .join(post.authorUser, user).fetchJoin()
                 .where(
                         titleContains(titleKeyword),
-                        authorNicknameContains(authorNickname)
+                        authorNicknameContains(authorNickname),
+                        postIdLt(cursor)
                 )
-                .orderBy(post.createdAt.desc(), post.id.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .orderBy(post.id.desc())
+                .limit(size + 1L)
                 .fetch();
 
-        Long total = countQuery(titleKeyword, authorNickname).fetchOne();
-        return new PageImpl<>(content, pageable, total == null ? 0 : total);
-    }
-
-    private JPAQuery<Long> countQuery(String titleKeyword, String authorNickname) {
-        return queryFactory
-                .select(post.count())
-                .from(post)
-                .join(post.authorUser, user)
-                .where(
-                        titleContains(titleKeyword),
-                        authorNicknameContains(authorNickname)
-                );
+        boolean hasNext = posts.size() > size;
+        List<Post> content = hasNext
+                ? new ArrayList<>(posts.subList(0, size))
+                : posts;
+        return new SliceImpl<>(content, PageRequest.of(0, size), hasNext);
     }
 
     private BooleanExpression titleContains(String titleKeyword) {

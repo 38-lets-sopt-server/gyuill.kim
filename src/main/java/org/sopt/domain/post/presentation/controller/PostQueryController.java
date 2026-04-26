@@ -1,7 +1,6 @@
 package org.sopt.domain.post.presentation.controller;
 
 import org.sopt.domain.post.application.dto.PostCursorResult;
-import org.sopt.domain.post.application.dto.PostPageResult;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.service.PostQueryService;
 import org.sopt.domain.post.domain.model.BoardType;
@@ -9,7 +8,6 @@ import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.GetPostsRequest;
 import org.sopt.domain.post.presentation.dto.request.SearchPostsRequest;
 import org.sopt.domain.post.presentation.dto.response.PostCursorPageResponse;
-import org.sopt.domain.post.presentation.dto.response.PostPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -62,19 +60,19 @@ public class PostQueryController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CommonApiResponse<PostPageResponse>> searchPosts(
+    public ResponseEntity<CommonApiResponse<PostCursorPageResponse>> searchPosts(
             @RequestParam(required = false) String titleKeyword,
             @RequestParam(required = false) String authorNickname,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") int size
     ) {
-        SearchPostsRequest request = new SearchPostsRequest(titleKeyword, authorNickname, page, size);
+        SearchPostsRequest request = new SearchPostsRequest(titleKeyword, authorNickname, cursor, size);
         request.validate();
 
-        PostPageResult result = postQueryService.searchPosts(
+        PostCursorResult result = postQueryService.searchPosts(
                 request.titleKeyword(),
                 request.authorNickname(),
-                request.page(),
+                request.cursor(),
                 request.size()
         );
         List<PostResponse> responses = result.content().stream()
@@ -90,12 +88,10 @@ public class PostQueryController {
                 ))
                 .toList();
 
-        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostPageResponse(
+        return CommonApiResponse.success(PostSuccessCode.POST_LIST_READ, new PostCursorPageResponse(
                 responses,
-                result.page(),
+                result.nextCursor(),
                 result.size(),
-                result.totalElements(),
-                result.totalPages(),
                 result.hasNext()
         ));
     }
