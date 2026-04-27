@@ -12,6 +12,7 @@ public enum PostSuccessCode implements SuccessCode {
     POST_DELETED("PST-S005", HttpStatus.NO_CONTENT, "게시글 삭제 완료"),
     POST_LIKE_TOGGLED("PST-S006", HttpStatus.OK, "게시글 좋아요 토글 완료"),
     POST_SCRAP_TOGGLED("PST-S007", HttpStatus.OK, "게시글 스크랩 토글 완료"),
+    POST_HIDDEN_READ("PST-S008", HttpStatus.OK, "숨김 게시글 조회 성공"),
     ;
 
     private final String code;

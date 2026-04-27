@@ -12,3 +12,11 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+
+springdoc:
+  swagger-ui:
+    operations-sorter: alpha
+    tags-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+    try-it-out-enabled: true

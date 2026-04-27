@@ -6,6 +6,7 @@ import org.sopt.domain.post.domain.exception.PostNotAccessibleException;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
+import org.sopt.domain.post.domain.model.PostStatus;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -53,11 +54,11 @@ public class PostQueryService {
         return toPostResult(post);
     }
 
-    public PostResult getPostPreview(Long id) {
+    public PostResult getHiddenPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
-        if (post.getStatus() == org.sopt.domain.post.domain.model.PostStatus.DELETED
-                || post.getStatus() == org.sopt.domain.post.domain.model.PostStatus.BLOCKED) {
+        if (post.getStatus() == PostStatus.DELETED
+                || post.getStatus() == PostStatus.BLOCKED) {
             throw new PostNotAccessibleException(post);
         }
         return toPostResult(post);

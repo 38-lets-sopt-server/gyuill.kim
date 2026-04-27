@@ -63,11 +63,34 @@ public class SwaggerErrorExampleGenerator {
         body.put("success", false);
         body.put("message", errorCode.getMessage());
         body.put("data", null);
-        body.put("details", null);
+        body.put("details", createDetailsExample(errorCode));
 
         Example example = new Example();
         example.setSummary(errorCode.getMessage());
         example.setValue(body);
         return example;
+    }
+
+    private Object createDetailsExample(ErrorCode errorCode) {
+        return switch (errorCode.getCode()) {
+            case "PST-E001", "PST-E015" -> Map.of(
+                    "postId", 1
+            );
+            case "PST-E009" -> Map.of(
+                    "postId", 1,
+                    "userId", 1,
+                    "reactionType", "LIKE",
+                    "maxRetryCount", 3
+            );
+            case "PST-E016", "PST-E017" -> Map.of(
+                    "postId", 1,
+                    "currentStatus", "HIDDEN",
+                    "statusReason", "정책 검수 결과 숨김 처리됨"
+            );
+            case "USR-E001" -> Map.of(
+                    "userId", 1
+            );
+            default -> null;
+        };
     }
 }
