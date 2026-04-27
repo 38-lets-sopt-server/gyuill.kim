@@ -7,6 +7,7 @@ import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.application.service.PostCommandService;
+import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
 import org.sopt.domain.post.presentation.dto.request.PostReactionRequest;
@@ -14,6 +15,8 @@ import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.presentation.dto.response.PostReactionToggleResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.domain.post.presentation.mapper.PostResponseMapper;
+import org.sopt.global.annotation.ApiExceptions;
+import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,6 +42,7 @@ public class PostCommandController {
 
     @PostMapping
     @Operation(summary = "게시글 작성", description = "새 게시글을 생성합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> createPost(@RequestBody CreatePostRequest request) {
         request.validate();
         CreatePostCommand command = new CreatePostCommand(
@@ -56,6 +60,7 @@ public class PostCommandController {
 
     @PatchMapping("/{postId}")
     @Operation(summary = "게시글 수정", description = "기존 게시글의 제목과 본문을 수정합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<Void>> updatePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
@@ -70,6 +75,7 @@ public class PostCommandController {
 
     @DeleteMapping("/{postId}")
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<Void>> deletePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId
@@ -80,6 +86,7 @@ public class PostCommandController {
 
     @PostMapping("/{postId}/like/toggle")
     @Operation(summary = "게시글 공감 토글", description = "게시글 공감 상태를 토글합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleLikePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
@@ -94,6 +101,7 @@ public class PostCommandController {
 
     @PostMapping("/{postId}/scrap/toggle")
     @Operation(summary = "게시글 스크랩 토글", description = "게시글 스크랩 상태를 토글합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleScrapPost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,

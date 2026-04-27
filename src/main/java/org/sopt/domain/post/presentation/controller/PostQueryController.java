@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.post.application.dto.PostCursorResult;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.service.PostQueryService;
+import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.GetPostsRequest;
@@ -13,6 +14,8 @@ import org.sopt.domain.post.presentation.dto.request.SearchPostsRequest;
 import org.sopt.domain.post.presentation.dto.response.PostCursorPageResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.domain.post.presentation.mapper.PostResponseMapper;
+import org.sopt.global.annotation.ApiExceptions;
+import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +39,7 @@ public class PostQueryController {
 
     @GetMapping
     @Operation(summary = "게시글 목록 조회", description = "게시판 타입과 커서 기반 페이징으로 게시글 목록을 조회합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostCursorPageResponse>> getAllPosts(
             @Parameter(description = "게시판 타입", example = "FREE")
             @RequestParam(required = false) BoardType boardType,
@@ -55,6 +59,7 @@ public class PostQueryController {
 
     @GetMapping("/search")
     @Operation(summary = "게시글 검색", description = "키워드와 커서 기반 페이징으로 게시글을 검색합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostCursorPageResponse>> searchPosts(
             @Parameter(description = "검색 키워드", example = "스프링")
             @RequestParam(required = false) String keyword,
@@ -78,6 +83,7 @@ public class PostQueryController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "게시글 상세 조회", description = "게시글 상세 정보를 조회합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> getPost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId
@@ -90,6 +96,7 @@ public class PostQueryController {
 
     @GetMapping("/{postId}/preview")
     @Operation(summary = "게시글 미리보기 조회", description = "게시글 미리보기 정보를 조회합니다.")
+    @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> getPostPreview(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId
