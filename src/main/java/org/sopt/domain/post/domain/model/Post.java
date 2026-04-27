@@ -33,6 +33,9 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
+    private boolean anonymous;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_user_id", nullable = false)
     private User authorUser;
@@ -43,10 +46,11 @@ public class Post extends BaseTimeEntity {
     protected Post() {
     }
 
-    public Post(BoardType boardType, String title, String content, User authorUser) {
+    public Post(BoardType boardType, String title, String content, boolean anonymous, User authorUser) {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
+        this.anonymous = anonymous;
         this.authorUser = authorUser;
         this.stats = new PostStats(this);
     }
@@ -67,6 +71,10 @@ public class Post extends BaseTimeEntity {
         return content;
     }
 
+    public boolean isAnonymous() {
+        return anonymous;
+    }
+
     public User getAuthorUser() {
         return authorUser;
     }
@@ -81,6 +89,10 @@ public class Post extends BaseTimeEntity {
 
     public long getScrapCount() {
         return stats == null ? 0 : stats.getScrapCount();
+    }
+
+    public String getDisplayAuthorName() {
+        return anonymous ? "익명" : authorUser.getNickname();
     }
 
     public void update(String title, String content) {

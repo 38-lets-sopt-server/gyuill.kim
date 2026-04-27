@@ -82,6 +82,8 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     private BooleanExpression authorNicknameContains(String authorNickname) {
-        return StringUtils.hasText(authorNickname) ? user.nickname.contains(authorNickname) : null;
+        return StringUtils.hasText(authorNickname)
+                ? post.anonymous.isFalse().and(user.nickname.contains(authorNickname))
+                : null;
     }
 }

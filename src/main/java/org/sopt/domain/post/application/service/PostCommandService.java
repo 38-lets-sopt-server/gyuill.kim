@@ -44,6 +44,7 @@ public class PostCommandService {
                 command.boardType(),
                 command.title(),
                 command.content(),
+                command.isAnonymous(),
                 authorUser
         ));
         return new PostResult(
@@ -51,7 +52,8 @@ public class PostCommandService {
                 post.getBoardType(),
                 post.getTitle(),
                 post.getContent(),
-                post.getAuthorUser().getNickname(),
+                post.isAnonymous(),
+                post.getDisplayAuthorName(),
                 post.getLikeCount(),
                 post.getScrapCount(),
                 post.getCreatedAt()

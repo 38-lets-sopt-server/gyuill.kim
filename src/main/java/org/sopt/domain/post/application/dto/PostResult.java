@@ -9,6 +9,7 @@ public record PostResult(
         BoardType boardType,
         String title,
         String content,
+        boolean isAnonymous,
         String authorNickname,
         long likeCount,
         long scrapCount,

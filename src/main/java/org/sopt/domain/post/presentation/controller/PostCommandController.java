@@ -40,7 +40,8 @@ public class PostCommandController {
                 request.boardType(),
                 request.title(),
                 request.content(),
-                request.authorUserId()
+                request.authorUserId(),
+                request.isAnonymous()
         );
         PostResult result = postCommandService.createPost(command);
         PostResponse response = postResponseMapper.toResponse(result);

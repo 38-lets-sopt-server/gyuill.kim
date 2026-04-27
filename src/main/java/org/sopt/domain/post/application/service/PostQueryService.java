@@ -55,7 +55,8 @@ public class PostQueryService {
                 post.getBoardType(),
                 post.getTitle(),
                 post.getContent(),
-                post.getAuthorUser().getNickname(),
+                post.isAnonymous(),
+                post.getDisplayAuthorName(),
                 post.getLikeCount(),
                 post.getScrapCount(),
                 post.getCreatedAt()

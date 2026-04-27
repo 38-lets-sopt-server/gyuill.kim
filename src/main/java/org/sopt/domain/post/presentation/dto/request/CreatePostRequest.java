@@ -4,7 +4,7 @@ import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.global.exception.BaseException;
 
-public record CreatePostRequest(BoardType boardType, String title, String content, Long authorUserId) {
+public record CreatePostRequest(BoardType boardType, String title, String content, Long authorUserId, boolean isAnonymous) {
     private static final int MAX_TITLE_LENGTH = 50;
     private static final int MAX_CONTENT_LENGTH = 10_000;
 
