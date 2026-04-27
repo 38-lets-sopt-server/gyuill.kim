@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @Schema(description = "공통 API 응답 래퍼")
 public record CommonApiResponse<T>(
-        @Schema(description = "응답 코드", example = "POST-201")
+        @Schema(description = "응답 코드", example = "GLB-S001")
         String code,
         @Schema(description = "성공 여부", example = "true")
         boolean success,
