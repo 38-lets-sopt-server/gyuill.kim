@@ -15,6 +15,4 @@ public interface PostRepository {
     Slice<Post> search(String keyword, Long cursor, int size);
 
     Optional<Post> findById(Long id);
-
-    void deleteById(Long id);
 }

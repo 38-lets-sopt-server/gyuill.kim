@@ -116,10 +116,6 @@ public class Post extends BaseTimeEntity {
         return authorUser.isDeleted() ? "탈퇴한 사용자" : authorUser.getNickname();
     }
 
-    public boolean isPublished() {
-        return status == PostStatus.PUBLISHED;
-    }
-
     public boolean isVisibleToPublic() {
         return status == PostStatus.PUBLISHED;
     }
@@ -155,6 +151,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public void markBlocked(String reason) {
+        // 관리자 차단 기능이 추가되면 이 전이를 실제 운영 플로우에서 사용한다.
         if (status == PostStatus.DELETED) {
             throw new PostNotUpdatableException(this);
         }
