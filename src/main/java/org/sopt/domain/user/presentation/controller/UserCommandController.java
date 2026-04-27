@@ -1,5 +1,8 @@
 package org.sopt.domain.user.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User Command", description = "사용자 생성, 수정, 삭제 API")
 public class UserCommandController {
 
     private final UserCommandService userCommandService;
@@ -32,6 +36,7 @@ public class UserCommandController {
     }
 
     @PostMapping
+    @Operation(summary = "사용자 생성", description = "새 사용자를 생성합니다.")
     public ResponseEntity<CommonApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
         request.validate();
         CreateUserCommand command = new CreateUserCommand(request.nickname());
@@ -42,7 +47,12 @@ public class UserCommandController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<CommonApiResponse<Void>> updateUser(@PathVariable Long userId, @RequestBody UpdateUserRequest request) {
+    @Operation(summary = "사용자 수정", description = "사용자 닉네임을 수정합니다.")
+    public ResponseEntity<CommonApiResponse<Void>> updateUser(
+            @Parameter(description = "사용자 ID", example = "1")
+            @PathVariable Long userId,
+            @RequestBody UpdateUserRequest request
+    ) {
         request.validate();
         UpdateUserCommand command = new UpdateUserCommand(request.nickname());
 
@@ -51,7 +61,11 @@ public class UserCommandController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<CommonApiResponse<Void>> deleteUser(@PathVariable Long userId) {
+    @Operation(summary = "사용자 삭제", description = "사용자를 삭제합니다.")
+    public ResponseEntity<CommonApiResponse<Void>> deleteUser(
+            @Parameter(description = "사용자 ID", example = "1")
+            @PathVariable Long userId
+    ) {
         userCommandService.deleteUser(userId);
         return CommonApiResponse.successResponse(UserSuccessCode.USER_DELETED, null);
     }

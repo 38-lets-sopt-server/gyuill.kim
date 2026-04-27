@@ -1,10 +1,19 @@
 package org.sopt.domain.post.presentation.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.global.exception.BaseException;
 import org.springframework.util.StringUtils;
 
-public record SearchPostsRequest(String keyword, Long cursor, int size) {
+@Schema(description = "게시글 검색 요청")
+public record SearchPostsRequest(
+        @Schema(description = "검색 키워드", example = "스프링")
+        String keyword,
+        @Schema(description = "다음 페이지 조회용 커서", example = "10", nullable = true)
+        Long cursor,
+        @Schema(description = "페이지 크기", example = "10")
+        int size
+) {
     private static final int MAX_PAGE_SIZE = 100;
     private static final int MAX_KEYWORD_LENGTH = 100;
 

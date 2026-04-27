@@ -1,10 +1,19 @@
 package org.sopt.domain.post.presentation.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.global.exception.BaseException;
 
-public record GetPostsRequest(BoardType boardType, Long cursor, int size) {
+@Schema(description = "게시글 목록 조회 요청")
+public record GetPostsRequest(
+        @Schema(description = "게시판 타입", example = "FREE")
+        BoardType boardType,
+        @Schema(description = "다음 페이지 조회용 커서", example = "10", nullable = true)
+        Long cursor,
+        @Schema(description = "페이지 크기", example = "10")
+        int size
+) {
     private static final int MAX_CURSOR_SIZE = 100;
 
     public void validate() {

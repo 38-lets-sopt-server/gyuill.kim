@@ -1,9 +1,16 @@
 package org.sopt.domain.post.presentation.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.global.exception.BaseException;
 
-public record UpdatePostRequest(String title, String content) {
+@Schema(description = "게시글 수정 요청")
+public record UpdatePostRequest(
+        @Schema(description = "게시글 제목", example = "수정된 제목")
+        String title,
+        @Schema(description = "게시글 본문", example = "수정된 본문입니다.")
+        String content
+) {
     private static final int MAX_TITLE_LENGTH = 50;
     private static final int MAX_CONTENT_LENGTH = 10_000;
 

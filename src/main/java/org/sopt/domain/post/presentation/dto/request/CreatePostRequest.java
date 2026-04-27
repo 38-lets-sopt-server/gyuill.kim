@@ -1,10 +1,23 @@
 package org.sopt.domain.post.presentation.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.global.exception.BaseException;
 
-public record CreatePostRequest(BoardType boardType, String title, String content, Long authorUserId, boolean isAnonymous) {
+@Schema(description = "게시글 생성 요청")
+public record CreatePostRequest(
+        @Schema(description = "게시판 타입", example = "FREE")
+        BoardType boardType,
+        @Schema(description = "게시글 제목", example = "점심 메뉴 추천 받습니다")
+        String title,
+        @Schema(description = "게시글 본문", example = "학교 근처에서 먹을만한 곳 있나요?")
+        String content,
+        @Schema(description = "작성자 사용자 ID", example = "1")
+        Long authorUserId,
+        @Schema(description = "익명 여부", example = "true")
+        boolean isAnonymous
+) {
     private static final int MAX_TITLE_LENGTH = 50;
     private static final int MAX_CONTENT_LENGTH = 10_000;
 

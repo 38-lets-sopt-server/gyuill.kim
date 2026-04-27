@@ -1,5 +1,8 @@
 package org.sopt.domain.user.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.application.service.UserQueryService;
 import org.sopt.domain.user.presentation.code.UserSuccessCode;
@@ -16,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User Query", description = "사용자 조회 API")
 public class UserQueryController {
 
     private final UserQueryService userQueryService;
@@ -27,6 +31,7 @@ public class UserQueryController {
     }
 
     @GetMapping
+    @Operation(summary = "사용자 목록 조회", description = "전체 사용자 목록을 조회합니다.")
     public ResponseEntity<CommonApiResponse<List<UserResponse>>> getUsers() {
         List<UserResponse> response = userResponseMapper.toResponses(userQueryService.getUsers());
 
@@ -34,7 +39,11 @@ public class UserQueryController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<CommonApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
+    @Operation(summary = "사용자 상세 조회", description = "사용자 상세 정보를 조회합니다.")
+    public ResponseEntity<CommonApiResponse<UserResponse>> getUser(
+            @Parameter(description = "사용자 ID", example = "1")
+            @PathVariable Long userId
+    ) {
         UserResult result = userQueryService.getUser(userId);
         UserResponse response = userResponseMapper.toResponse(result);
 

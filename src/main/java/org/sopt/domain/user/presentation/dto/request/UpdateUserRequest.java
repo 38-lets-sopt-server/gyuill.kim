@@ -1,9 +1,14 @@
 package org.sopt.domain.user.presentation.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.global.exception.BaseException;
 
-public record UpdateUserRequest(String nickname) {
+@Schema(description = "사용자 수정 요청")
+public record UpdateUserRequest(
+        @Schema(description = "사용자 닉네임", example = "updated-gyuill")
+        String nickname
+) {
     private static final int MAX_NICKNAME_LENGTH = 30;
 
     public void validate() {
