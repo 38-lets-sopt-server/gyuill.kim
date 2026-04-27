@@ -106,7 +106,7 @@ public class PostQueryController {
     }
 
     @GetMapping("/{postId}/hidden")
-    @Operation(summary = "숨김 게시글 조회", description = "일반 공개 조회 대상이 아닌 숨김 게시글을 조회합니다.")
+    @Operation(summary = "숨김 게시글 조회", description = "일반 공개 상세 조회와 달리 숨김 상태 게시글 확인에 사용합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "숨김 게시글 조회 성공")
     })

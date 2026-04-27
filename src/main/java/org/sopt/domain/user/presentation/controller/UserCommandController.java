@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +46,9 @@ public class UserCommandController {
             @ApiResponse(responseCode = "201", description = "사용자 생성 성공")
     })
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
-    public ResponseEntity<CommonApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<CommonApiResponse<UserResponse>> createUser(
+            @org.springframework.web.bind.annotation.RequestBody CreateUserRequest request
+    ) {
         request.validate();
         CreateUserCommand command = new CreateUserCommand(request.nickname());
         UserResult result = userCommandService.createUser(command);
@@ -65,7 +66,7 @@ public class UserCommandController {
     public ResponseEntity<CommonApiResponse<Void>> updateUser(
             @Parameter(description = "사용자 ID", example = "1")
             @PathVariable Long userId,
-            @RequestBody UpdateUserRequest request
+            @org.springframework.web.bind.annotation.RequestBody UpdateUserRequest request
     ) {
         request.validate();
         UpdateUserCommand command = new UpdateUserCommand(request.nickname());
