@@ -8,5 +8,5 @@ public interface PostQueryRepository {
 
     Slice<Post> findAllByCursor(BoardType boardType, Long cursor, int size);
 
-    Slice<Post> search(String titleKeyword, String authorNickname, Long cursor, int size);
+    Slice<Post> search(String keyword, Long cursor, int size);
 }

@@ -27,8 +27,8 @@ public class PostQueryService {
         return toPostCursorResult(posts);
     }
 
-    public PostCursorResult searchPosts(String titleKeyword, String authorNickname, Long cursor, int size) {
-        Slice<Post> posts = postRepository.search(titleKeyword, authorNickname, cursor, size);
+    public PostCursorResult searchPosts(String keyword, Long cursor, int size) {
+        Slice<Post> posts = postRepository.search(keyword, cursor, size);
         return toPostCursorResult(posts);
     }
 

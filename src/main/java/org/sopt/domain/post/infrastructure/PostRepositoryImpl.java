@@ -28,8 +28,8 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Slice<Post> search(String titleKeyword, String authorNickname, Long cursor, int size) {
-        return postJpaRepository.search(titleKeyword, authorNickname, cursor, size);
+    public Slice<Post> search(String keyword, Long cursor, int size) {
+        return postJpaRepository.search(keyword, cursor, size);
     }
 
     @Override

@@ -47,17 +47,15 @@ public class PostQueryController {
 
     @GetMapping("/search")
     public ResponseEntity<CommonApiResponse<PostCursorPageResponse>> searchPosts(
-            @RequestParam(required = false) String titleKeyword,
-            @RequestParam(required = false) String authorNickname,
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") int size
     ) {
-        SearchPostsRequest request = new SearchPostsRequest(titleKeyword, authorNickname, cursor, size);
+        SearchPostsRequest request = new SearchPostsRequest(keyword, cursor, size);
         request.validate();
 
         PostCursorResult result = postQueryService.searchPosts(
-                request.titleKeyword(),
-                request.authorNickname(),
+                request.keyword(),
                 request.cursor(),
                 request.size()
         );

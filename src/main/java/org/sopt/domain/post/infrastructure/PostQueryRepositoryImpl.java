@@ -1,6 +1,7 @@
 package org.sopt.domain.post.infrastructure;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
@@ -48,14 +49,13 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public Slice<Post> search(String titleKeyword, String authorNickname, Long cursor, int size) {
+    public Slice<Post> search(String keyword, Long cursor, int size) {
         List<Post> posts = queryFactory
                 .selectFrom(post)
                 .join(post.authorUser, user).fetchJoin()
                 .leftJoin(post.stats, postStats).fetchJoin()
                 .where(
-                        titleContains(titleKeyword),
-                        authorNicknameContains(authorNickname),
+                        keywordContainedInTitleOrContent(keyword),
                         postIdLt(cursor)
                 )
                 .orderBy(post.id.desc())
@@ -69,8 +69,14 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
         return new SliceImpl<>(content, PageRequest.of(0, size), hasNext);
     }
 
-    private BooleanExpression titleContains(String titleKeyword) {
-        return StringUtils.hasText(titleKeyword) ? post.title.contains(titleKeyword) : null;
+    private BooleanExpression keywordContainedInTitleOrContent(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return null;
+        }
+        return Expressions.anyOf(
+                post.title.contains(keyword),
+                post.content.contains(keyword)
+        );
     }
 
     private BooleanExpression boardTypeEq(BoardType boardType) {
@@ -79,11 +85,5 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private BooleanExpression postIdLt(Long cursor) {
         return cursor != null ? post.id.lt(cursor) : null;
-    }
-
-    private BooleanExpression authorNicknameContains(String authorNickname) {
-        return StringUtils.hasText(authorNickname)
-                ? post.anonymous.isFalse().and(user.nickname.contains(authorNickname))
-                : null;
     }
 }

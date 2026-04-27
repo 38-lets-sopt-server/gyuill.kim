@@ -34,7 +34,7 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
-    private boolean anonymous;
+    private boolean isAnonymous;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_user_id", nullable = false)
@@ -50,7 +50,7 @@ public class Post extends BaseTimeEntity {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
-        this.anonymous = anonymous;
+        this.isAnonymous = anonymous;
         this.authorUser = authorUser;
         this.stats = new PostStats(this);
     }
@@ -72,7 +72,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public boolean isAnonymous() {
-        return anonymous;
+        return isAnonymous;
     }
 
     public User getAuthorUser() {
@@ -92,7 +92,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public String getDisplayAuthorName() {
-        return anonymous ? "익명" : authorUser.getNickname();
+        return isAnonymous ? "익명" : authorUser.getNickname();
     }
 
     public void update(String title, String content) {
