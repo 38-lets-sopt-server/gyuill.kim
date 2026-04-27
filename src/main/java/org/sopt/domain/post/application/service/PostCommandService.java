@@ -5,6 +5,7 @@ import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.application.service.validator.PostContentPolicyValidator;
+import org.sopt.domain.post.application.service.validator.PostModerationResult;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.exception.PostReactionOptimisticLockException;
 import org.sopt.domain.post.domain.model.Post;
@@ -43,7 +44,7 @@ public class PostCommandService {
     }
 
     public PostResult createPost(CreatePostCommand command) {
-        postContentPolicyValidator.validate(command.title(), command.content());
+        PostModerationResult moderationResult = postContentPolicyValidator.validate(command.title(), command.content());
         User authorUser = userPort.getUser(command.authorUserId());
         Post post = postRepository.save(new Post(
                 command.boardType(),
@@ -52,9 +53,12 @@ public class PostCommandService {
                 command.isAnonymous(),
                 authorUser
         ));
+        applyModerationResult(post, moderationResult);
         return new PostResult(
                 post.getId(),
                 post.getBoardType(),
+                post.getStatus(),
+                post.getStatusReason(),
                 post.getTitle(),
                 post.getContent(),
                 post.isAnonymous(),
@@ -66,14 +70,15 @@ public class PostCommandService {
     }
 
     public void updatePost(Long id, UpdatePostCommand command) {
-        postContentPolicyValidator.validate(command.title(), command.content());
+        PostModerationResult moderationResult = postContentPolicyValidator.validate(command.title(), command.content());
         Post post = findPostOrThrow(id);
         post.update(command.title(), command.content());
+        applyModerationResult(post, moderationResult);
     }
 
     public void deletePost(Long id) {
-        findPostOrThrow(id);
-        postRepository.deleteById(id);
+        Post post = findPostOrThrow(id);
+        post.markDeleted();
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -89,6 +94,14 @@ public class PostCommandService {
     private Post findPostOrThrow(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
+    }
+
+    private void applyModerationResult(Post post, PostModerationResult moderationResult) {
+        if (moderationResult.shouldHide()) {
+            post.markHidden(moderationResult.reason());
+        }
+        // TODO: 숨김 게시글을 수정한 뒤 정상 내용이면 자동 복구할지, 별도 검수/관리자 복구가 필요한지는
+        // 게시글 운영 정책이 아직 확정되지 않아 현재는 HIDDEN 상태를 유지한다.
     }
 
     /**

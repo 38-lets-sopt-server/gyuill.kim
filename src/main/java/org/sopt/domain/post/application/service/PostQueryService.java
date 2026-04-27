@@ -2,6 +2,7 @@ package org.sopt.domain.post.application.service;
 
 import org.sopt.domain.post.application.dto.PostCursorResult;
 import org.sopt.domain.post.application.dto.PostResult;
+import org.sopt.domain.post.domain.exception.PostNotAccessibleException;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
@@ -46,6 +47,19 @@ public class PostQueryService {
     public PostResult getPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
+        if (!post.isVisibleToPublic()) {
+            throw new PostNotAccessibleException(post);
+        }
+        return toPostResult(post);
+    }
+
+    public PostResult getPostPreview(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
+        if (post.getStatus() == org.sopt.domain.post.domain.model.PostStatus.DELETED
+                || post.getStatus() == org.sopt.domain.post.domain.model.PostStatus.BLOCKED) {
+            throw new PostNotAccessibleException(post);
+        }
         return toPostResult(post);
     }
 
@@ -53,6 +67,8 @@ public class PostQueryService {
         return new PostResult(
                 post.getId(),
                 post.getBoardType(),
+                post.getStatus(),
+                post.getStatusReason(),
                 post.getTitle(),
                 post.getContent(),
                 post.isAnonymous(),

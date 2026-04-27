@@ -15,6 +15,8 @@ public class PostResponseMapper {
         return new PostResponse(
                 result.id(),
                 result.boardType(),
+                result.status(),
+                result.statusReason(),
                 result.title(),
                 result.content(),
                 result.isAnonymous(),

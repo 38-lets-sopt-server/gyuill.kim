@@ -71,4 +71,12 @@ public class PostQueryController {
 
         return CommonApiResponse.successResponse(PostSuccessCode.POST_READ, response);
     }
+
+    @GetMapping("/{postId}/preview")
+    public ResponseEntity<CommonApiResponse<PostResponse>> getPostPreview(@PathVariable Long postId) {
+        PostResult result = postQueryService.getPostPreview(postId);
+        PostResponse response = postResponseMapper.toResponse(result);
+
+        return CommonApiResponse.successResponse(PostSuccessCode.POST_READ, response);
+    }
 }

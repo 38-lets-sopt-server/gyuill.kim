@@ -44,6 +44,7 @@ public class PostReactionTransactionExecutor {
     public boolean applyReactionState(Long postId, Long userId, ReactionType type, boolean shouldReact) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
+        post.ensureReactable();
         User user = userPort.getUser(userId);
         boolean reacted = postReactionRepository.existsByPostIdAndUserIdAndType(postId, userId, type);
 

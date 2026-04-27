@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
+import org.sopt.domain.post.domain.model.PostStatus;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -34,6 +35,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .join(post.authorUser, user).fetchJoin()
                 .leftJoin(post.stats, postStats).fetchJoin()
                 .where(
+                        publishedPost(),
                         boardTypeEq(boardType),
                         postIdLt(cursor)
                 )
@@ -55,6 +57,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .join(post.authorUser, user).fetchJoin()
                 .leftJoin(post.stats, postStats).fetchJoin()
                 .where(
+                        publishedPost(),
                         keywordContainedInTitleOrContent(keyword),
                         postIdLt(cursor)
                 )
@@ -81,6 +84,10 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private BooleanExpression boardTypeEq(BoardType boardType) {
         return boardType != null ? post.boardType.eq(boardType) : null;
+    }
+
+    private BooleanExpression publishedPost() {
+        return post.status.eq(PostStatus.PUBLISHED);
     }
 
     private BooleanExpression postIdLt(Long cursor) {

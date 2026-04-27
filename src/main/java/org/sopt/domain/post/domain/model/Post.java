@@ -13,6 +13,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
+import org.sopt.domain.post.domain.exception.PostNotReactableException;
+import org.sopt.domain.post.domain.exception.PostNotUpdatableException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.global.entity.BaseTimeEntity;
 
@@ -33,6 +35,13 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PostStatus status;
+
+    @Column(length = 255)
+    private String statusReason;
+
     @Column(nullable = false)
     private boolean isAnonymous;
 
@@ -50,6 +59,7 @@ public class Post extends BaseTimeEntity {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
+        this.status = PostStatus.PUBLISHED;
         this.isAnonymous = anonymous;
         this.authorUser = authorUser;
         this.stats = new PostStats(this);
@@ -69,6 +79,14 @@ public class Post extends BaseTimeEntity {
 
     public String getContent() {
         return content;
+    }
+
+    public PostStatus getStatus() {
+        return status;
+    }
+
+    public String getStatusReason() {
+        return statusReason;
     }
 
     public boolean isAnonymous() {
@@ -98,9 +116,62 @@ public class Post extends BaseTimeEntity {
         return authorUser.isDeleted() ? "탈퇴한 사용자" : authorUser.getNickname();
     }
 
+    public boolean isPublished() {
+        return status == PostStatus.PUBLISHED;
+    }
+
+    public boolean isVisibleToPublic() {
+        return status == PostStatus.PUBLISHED;
+    }
+
+    public boolean canUpdate() {
+        return status == PostStatus.PUBLISHED || status == PostStatus.HIDDEN;
+    }
+
+    public boolean canReact() {
+        return status == PostStatus.PUBLISHED;
+    }
+
     public void update(String title, String content) {
+        ensureUpdatable();
         this.title = title;
         this.content = content;
+    }
+
+    public void markDeleted() {
+        if (status == PostStatus.DELETED) {
+            return;
+        }
+        this.status = PostStatus.DELETED;
+        this.statusReason = "사용자 삭제 요청";
+    }
+
+    public void markHidden(String reason) {
+        if (status == PostStatus.DELETED) {
+            throw new PostNotUpdatableException(this);
+        }
+        this.status = PostStatus.HIDDEN;
+        this.statusReason = reason;
+    }
+
+    public void markBlocked(String reason) {
+        if (status == PostStatus.DELETED) {
+            throw new PostNotUpdatableException(this);
+        }
+        this.status = PostStatus.BLOCKED;
+        this.statusReason = reason;
+    }
+
+    public void ensureUpdatable() {
+        if (!canUpdate()) {
+            throw new PostNotUpdatableException(this);
+        }
+    }
+
+    public void ensureReactable() {
+        if (!canReact()) {
+            throw new PostNotReactableException(this);
+        }
     }
 
     public PostStats initializeStats() {

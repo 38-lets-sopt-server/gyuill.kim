@@ -1,7 +1,5 @@
 package org.sopt.domain.post.application.service.validator;
 
-import org.sopt.domain.post.domain.exception.PostErrorCode;
-import org.sopt.global.exception.BaseException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,25 +40,18 @@ public class PostContentPolicyValidator {
      * 허용 태그/속성 정책을 더 정교하게 관리하는 방향을 고려하고있습니다.
      * 개인정보 탐지도 현재는 하드코딩된 정규식 최소 목록으로 유지하지만 추후에는 설정 파일/전문 탐지 라이브러리로 전환,
      * 분리해 정책 정밀도와 갱신 편의성을 높이는 방향을 고려합니다.
-     * 추가로 스토리보드를 충실히 따른다면 작성을 막는게 아닌 숨김처리를 하는게 맞지만 아직 게시글 상태 로직이 구현되지 않았기 때문에 보류합니다.
+     * 현재는 정책 위반 시 예외로 차단하지 않고 HIDDEN 상태로 전환할지 여부만 반환한다.
      * 원래는 부적절한 언어에 대한 필터링도 해야 하지만 한국의 욕은 너무 다채로워서 지금처럼 직접 구현을 하게 됐을 때
      * 욕설 패턴 정의만으로 책 한권을 쓰게 될 것 같기에 보류했습니다.
      */
-    public void validate(String title, String content) {
-        validateTitle(title);
-        validateContent(content);
-    }
-
-    public void validateTitle(String title) {
-        if (containsDangerousPattern(title) || containsPersonalInformation(title)) {
-            throw new BaseException(PostErrorCode.UNSAFE_POST_TITLE);
+    public PostModerationResult validate(String title, String content) {
+        if (containsDangerousPattern(title) || containsDangerousPattern(content)) {
+            return PostModerationResult.hidden("허용되지 않는 HTML 또는 스크립트 패턴이 감지되었습니다.");
         }
-    }
-
-    public void validateContent(String content) {
-        if (containsDangerousPattern(content) || containsPersonalInformation(content)) {
-            throw new BaseException(PostErrorCode.UNSAFE_POST_CONTENT);
+        if (containsPersonalInformation(title) || containsPersonalInformation(content)) {
+            return PostModerationResult.hidden("개인정보로 추정되는 표현이 감지되었습니다.");
         }
+        return PostModerationResult.published();
     }
 
     private boolean containsDangerousPattern(String value) {
