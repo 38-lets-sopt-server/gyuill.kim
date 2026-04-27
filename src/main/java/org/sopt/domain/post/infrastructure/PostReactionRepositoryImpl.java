@@ -5,7 +5,6 @@ import org.sopt.domain.post.domain.model.ReactionType;
 import org.sopt.domain.post.domain.repository.PostReactionRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
 /**
  * 게시글 반응 저장소를 JPA 구현체에 연결하는 어댑터.
  * 이 클래스도 현재 하는 역할만 보면 구현체라기보다는 JPA repository에 작업을 위임하는 어댑터에 더 가까운데요.
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
  * RepositoryImpl 네이밍을 공통으로 쓰고 있고 향후 반응 저장소 쪽 책임이 더 늘어나면 구현체 성격이 지금보다 강해질 수도 있다고 생각했습니다.
  * 그래서 지금은 역할만 보고 이름을 바꾸기보다는 프로젝트 전반의 네이밍 일관성을 유지하는 쪽으로 두었습니다.
  */
+@Repository
 public class PostReactionRepositoryImpl implements PostReactionRepository {
 
     private final PostReactionJpaRepository postReactionJpaRepository;

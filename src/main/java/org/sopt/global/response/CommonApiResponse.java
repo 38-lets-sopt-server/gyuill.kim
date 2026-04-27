@@ -8,11 +8,11 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-@Schema(description = "공통 API 응답 래퍼")
 /**
  * 모든 API가 공통 형식으로 응답하도록 감싸는 래퍼.
  * 과제 설명과 테스트에서 일관된 응답 구조를 보여주기 위해 도메인별 응답도 동일 포맷을 사용한다.
  */
+@Schema(description = "공통 API 응답 래퍼")
 public record CommonApiResponse<T>(
         @Schema(description = "응답 코드", example = "POST-201")
         String code,

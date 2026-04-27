@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 /**
  * 사용자 애플리케이션 결과를 API 응답 모델로 변환하는 매퍼.
  */
+@Component
 public class UserResponseMapper {
 
     /**

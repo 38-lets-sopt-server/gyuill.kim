@@ -10,12 +10,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
-@Entity
-@Table(name = "post_stats")
 /**
- * 게시글 반응 수 집계를 관리하는 1:1 통계 엔티티.
- * 과제 요구사항의 낙관적 락 재시도를 보여주기 위해 좋아요/스크랩 집계를 한 행에 모아 관리합니다.
- *
  * PostReaction과 별도 테이블로 분리한 이유는 다음과 같은데요
  * - PostReaction은 "사용자-게시글-반응 타입" 원본 이력을 저장하는 조인 엔티티다.
  * - likeCount/scrapCount는 원본 반응을 빠르게 조회하기 위해 둔 집계 데이터다.
@@ -24,7 +19,12 @@ import jakarta.persistence.Version;
  * - 특히 과제 요구사항처럼 좋아요/스크랩 반응에 동시성이 몰리는 상황을 가정하면
  *   집계 row를 명시적으로 두고 @Version으로 보호하는 편이 충돌 지점을 설명하기 쉽다고 생각했습니다.
  *
+ * 게시글 반응 수 집계를 관리하는 1:1 통계 엔티티.
+ * 과제 요구사항의 낙관적 락 재시도를 보여주기 위해 좋아요/스크랩 집계를 한 행에 모아 관리합니다.
+ *
  */
+@Entity
+@Table(name = "post_stats")
 public class PostStats {
 
     @Id

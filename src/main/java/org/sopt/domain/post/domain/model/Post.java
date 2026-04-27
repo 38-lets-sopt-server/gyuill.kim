@@ -19,8 +19,10 @@ import org.sopt.domain.user.domain.model.User;
 import org.sopt.global.entity.BaseTimeEntity;
 
 /**
+ * 지금 Post가 너무 뚱뚱해졌다고 느껴질 수도 있는데
+ * getter 때문인 것 같습니다. lombok을 쓸 수 있다면 코드가 훨씬 줄어줄텐데 아쉽네요.
  * 게시글 aggregate root.
- * 작성자 연관관계와 통계 엔티티를 함께 들고 있으며, 게시글 상태 전이 규칙도 이 엔티티가 책임진다.
+ * 작성자 연관관계와 통계 엔티티를 함께 들고 있으며 게시글 상태 전이 규칙도 이 엔티티가 책임진다.
  */
 @Entity
 @Table(name = "posts")

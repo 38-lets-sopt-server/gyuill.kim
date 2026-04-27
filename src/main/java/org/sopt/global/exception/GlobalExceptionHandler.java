@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-@RestControllerAdvice
 /**
  * 애플리케이션 전역 예외를 공통 응답 형식으로 변환하는 핸들러.
  * DB 제약 위반과 JPA 시스템 오류를 같은 400으로 묶지 않고 성격에 따라 분리하였습니다.
  */
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // TODO: 롬복이 있었다면 그냥 slf4j를 썻지만 그러지 못하지 직접 추가합니다. 롬복 풀리면 변경 예정!

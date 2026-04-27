@@ -9,12 +9,12 @@ import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@Transactional
 /**
  * 사용자 생성, 수정, 삭제를 담당하는 command 서비스.
  * 과제 범위에서는 인증/인가 없이 사용자 자체 생명주기만 다룬다.
  */
+@Service
+@Transactional
 public class UserCommandService {
 
     private final UserRepository userRepository;

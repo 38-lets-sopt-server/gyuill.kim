@@ -6,12 +6,12 @@ import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
-@Component
 /**
  * Post 도메인용 {@link UserPort} 구현체.
  * 추가적인 설명은 UserPort.java에 적어놨습니다.
  * User 저장소를 직접 노출하지 않고 필요한 조회 기능만 어댑터를 통해 제공한다.
  */
+@Component
 public class UserPortAdapter implements UserPort {
 
     private final UserRepository userRepository;

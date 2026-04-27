@@ -1,7 +1,7 @@
 package org.sopt.domain.post.application.service.validator;
 
 /**
- * 게시글 정책 검사 결과.
+ * 게시글 정책 검사 결과 VO.
  */
 public record PostModerationResult(boolean shouldHide, String reason) {
 

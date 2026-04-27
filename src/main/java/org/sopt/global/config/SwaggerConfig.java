@@ -11,10 +11,10 @@ import org.sopt.global.swagger.SwaggerOperationCustomizer;
 
 import java.util.List;
 
-@Configuration
 /**
  * OpenAPI 메타데이터와 예외 응답 커스터마이저를 등록하는 Swagger 설정.
  */
+@Configuration
 public class SwaggerConfig {
 
     /**

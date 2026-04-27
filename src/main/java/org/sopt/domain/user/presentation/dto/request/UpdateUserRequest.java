@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.global.exception.BaseException;
 
-@Schema(description = "사용자 수정 요청")
 /**
  * 사용자 수정 요청 본문.
  */
+@Schema(description = "사용자 수정 요청")
 public record UpdateUserRequest(
         @Schema(description = "사용자 닉네임", example = "updated-gyuill")
         String nickname

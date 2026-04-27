@@ -8,12 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.sopt.global.entity.SoftDeleteBaseEntity;
 
-@Entity
-@Table(name = "users")
 /**
  * 게시글 작성 주체가 되는 사용자 엔티티.
  * 과제 범위에서는 인증 주체라기보다 게시글 작성자 식별과 표시 이름 제공 역할에 집중한다.
  */
+@Entity
+@Table(name = "users")
 public class User extends SoftDeleteBaseEntity {
 
     @Id

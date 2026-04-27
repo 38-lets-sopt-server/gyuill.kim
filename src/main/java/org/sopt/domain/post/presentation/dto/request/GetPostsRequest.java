@@ -5,10 +5,10 @@ import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.global.exception.BaseException;
 
-@Schema(description = "게시글 목록 조회 요청")
 /**
  * 게시글 목록 조회 요청 파라미터 모델.
  */
+@Schema(description = "게시글 목록 조회 요청")
 public record GetPostsRequest(
         @Schema(description = "게시판 타입", example = "FREE")
         BoardType boardType,

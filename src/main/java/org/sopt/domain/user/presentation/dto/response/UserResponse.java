@@ -3,10 +3,10 @@ package org.sopt.domain.user.presentation.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
-@Schema(description = "사용자 응답")
 /**
  * 사용자 API 응답 모델.
  */
+@Schema(description = "사용자 응답")
 public record UserResponse(
         @Schema(description = "사용자 ID", example = "1")
         Long id,

@@ -6,7 +6,7 @@ import org.sopt.domain.post.domain.model.PostStatus;
 import java.time.LocalDateTime;
 
 /**
- * 게시글 서비스가 프레젠테이션 계층에 전달하는 결과 모델.
+ * 게시글 서비스가 프레젠테이션 계층에 전달하는 결과 모델 VO.
  */
 public record PostResult(
         Long id,

@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.global.exception.BaseException;
 
-@Schema(description = "게시글 수정 요청")
 /**
  * 게시글 수정 요청 본문.
  */
+@Schema(description = "게시글 수정 요청")
 public record UpdatePostRequest(
         @Schema(description = "게시글 제목", example = "수정된 제목")
         String title,

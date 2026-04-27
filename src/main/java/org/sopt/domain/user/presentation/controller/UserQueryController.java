@@ -22,12 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/users")
-@Tag(name = "User", description = "사용자 조회 API")
 /**
  * 사용자 읽기 API를 제공하는 컨트롤러.
  */
+@RestController
+@RequestMapping("/users")
+@Tag(name = "User", description = "사용자 조회 API")
 public class UserQueryController {
 
     private final UserQueryService userQueryService;

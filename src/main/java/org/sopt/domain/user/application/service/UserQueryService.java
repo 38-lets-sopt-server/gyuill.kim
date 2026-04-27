@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional(readOnly = true)
 /**
  * 사용자 조회를 담당하는 query 서비스.
  */
+@Service
+@Transactional(readOnly = true)
 public class UserQueryService {
 
     private final UserRepository userRepository;

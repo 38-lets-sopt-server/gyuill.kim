@@ -7,11 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 /**
  * User 도메인 저장소를 JPA 구현체에 연결하는 어댑터.
  * 여기도 현재 역할이 구현체보다는 어댑터에 가깝지만 확장성과 일관성을 고려해 impl이라 지었습니다.
  */
+@Repository
 public class UserRepositoryImpl implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;

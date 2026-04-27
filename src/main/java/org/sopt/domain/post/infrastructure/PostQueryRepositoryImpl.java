@@ -19,11 +19,11 @@ import static org.sopt.domain.post.domain.model.QPost.post;
 import static org.sopt.domain.post.domain.model.QPostStats.postStats;
 import static org.sopt.domain.user.domain.model.QUser.user;
 
-@Repository
 /**
  * Querydsl 기반 게시글 조회 구현체.
  * 현재 과제 규모에서는 작성자와 통계만 함께 로딩하면 되므로 fetch join으로 쿼리를 단순하게 유지합니다.
  */
+@Repository
 public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private final JPAQueryFactory queryFactory;

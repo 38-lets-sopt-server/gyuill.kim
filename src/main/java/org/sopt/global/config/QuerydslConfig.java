@@ -5,10 +5,10 @@ import jakarta.persistence.EntityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 /**
  * Querydsl 쿼리 조립에 사용하는 {@link JPAQueryFactory} 등록 설정.
  */
+@Configuration
 public class QuerydslConfig {
 
     /**

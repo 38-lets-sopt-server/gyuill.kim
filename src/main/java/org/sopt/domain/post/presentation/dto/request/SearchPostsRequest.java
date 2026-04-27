@@ -5,10 +5,10 @@ import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.global.exception.BaseException;
 import org.springframework.util.StringUtils;
 
-@Schema(description = "게시글 검색 요청")
 /**
  * 게시글 검색 요청 파라미터 모델.
  */
+@Schema(description = "게시글 검색 요청")
 public record SearchPostsRequest(
         @Schema(description = "검색 키워드", example = "스프링")
         String keyword,
