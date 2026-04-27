@@ -3,7 +3,6 @@ package org.sopt.domain.post.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.post.application.dto.PostCursorResult;
 import org.sopt.domain.post.application.dto.PostResult;
@@ -52,9 +51,7 @@ public class PostQueryController {
      */
     @GetMapping
     @Operation(summary = "게시글 목록 조회", description = "게시판 타입과 커서 기반 페이징으로 게시글 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공")
-    })
+    @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공")
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostCursorPageResponse>> getAllPosts(
             @Parameter(description = "게시판 타입", example = "FREE")
@@ -83,9 +80,7 @@ public class PostQueryController {
      */
     @GetMapping("/search")
     @Operation(summary = "게시글 검색", description = "키워드와 커서 기반 페이징으로 게시글을 검색합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "게시글 검색 성공")
-    })
+    @ApiResponse(responseCode = "200", description = "게시글 검색 성공")
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostCursorPageResponse>> searchPosts(
             @Parameter(description = "검색 키워드", example = "스프링")
@@ -116,9 +111,7 @@ public class PostQueryController {
      */
     @GetMapping("/{postId}")
     @Operation(summary = "게시글 상세 조회", description = "게시글 상세 정보를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공")
-    })
+    @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공")
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> getPost(
             @Parameter(description = "게시글 ID", example = "1")
@@ -138,9 +131,7 @@ public class PostQueryController {
      */
     @GetMapping("/{postId}/hidden")
     @Operation(summary = "숨김 게시글 조회", description = "일반 공개 상세 조회와 달리 숨김 상태 게시글 확인에 사용합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "숨김 게시글 조회 성공")
-    })
+    @ApiResponse(responseCode = "200", description = "숨김 게시글 조회 성공")
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> getHiddenPost(
             @Parameter(description = "게시글 ID", example = "1")

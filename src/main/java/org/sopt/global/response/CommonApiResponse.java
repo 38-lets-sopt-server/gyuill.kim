@@ -18,7 +18,7 @@ public record CommonApiResponse<T>(
         String code,
         @Schema(description = "성공 여부", example = "true")
         boolean success,
-        @Schema(description = "응답 메시지", example = "게시글 생성 성공")
+        @Schema(description = "응답 메시지", example = "요청 성공")
         String message,
         @Schema(description = "응답 데이터")
         T data,

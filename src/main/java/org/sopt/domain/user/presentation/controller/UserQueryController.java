@@ -3,7 +3,6 @@ package org.sopt.domain.user.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.application.service.UserQueryService;
@@ -45,9 +44,7 @@ public class UserQueryController {
      */
     @GetMapping
     @Operation(summary = "사용자 목록 조회", description = "전체 사용자 목록을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용자 목록 조회 성공")
-    })
+    @ApiResponse(responseCode = "200", description = "사용자 목록 조회 성공")
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<List<UserResponse>>> getUsers() {
         List<UserResponse> response = userResponseMapper.toResponses(userQueryService.getUsers());
@@ -63,9 +60,7 @@ public class UserQueryController {
      */
     @GetMapping("/{userId}")
     @Operation(summary = "사용자 상세 조회", description = "사용자 상세 정보를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용자 상세 조회 성공")
-    })
+    @ApiResponse(responseCode = "200", description = "사용자 상세 조회 성공")
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<UserResponse>> getUser(
             @Parameter(description = "사용자 ID", example = "1")
