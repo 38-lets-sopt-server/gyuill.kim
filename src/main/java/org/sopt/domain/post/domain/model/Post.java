@@ -161,22 +161,20 @@ public class Post extends BaseTimeEntity {
 
     /**
      * 좋아요 수를 반환한다.
-     * 통계가 아직 초기화되지 않은 경우 0으로 간주한다.
      *
      * @return 좋아요 수
      */
     public long getLikeCount() {
-        return stats == null ? 0 : stats.getLikeCount();
+        return stats.getLikeCount();
     }
 
     /**
      * 스크랩 수를 반환한다.
-     * 통계가 아직 초기화되지 않은 경우 0으로 간주한다.
      *
      * @return 스크랩 수
      */
     public long getScrapCount() {
-        return stats == null ? 0 : stats.getScrapCount();
+        return stats.getScrapCount();
     }
 
     /**
@@ -288,16 +286,4 @@ public class Post extends BaseTimeEntity {
         }
     }
 
-    /**
-     * 반응 통계 엔티티가 없으면 생성하고 반환한다.
-     * 영속화 이전 시점에도 카운터 집계를 안전하게 다루기 위한 방어 코드다.
-     *
-     * @return 초기화된 통계 엔티티
-     */
-    public PostStats initializeStats() {
-        if (this.stats == null) {
-            this.stats = new PostStats(this);
-        }
-        return this.stats;
-    }
 }

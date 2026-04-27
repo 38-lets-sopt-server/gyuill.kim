@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 게시글 애플리케이션 결과를 API 응답 모델로 변환하는 매퍼.
+ * 컨트롤러가 너무 지저분해져서 따로 빼게 됐습니다.
  */
 @Component
 public class PostResponseMapper {

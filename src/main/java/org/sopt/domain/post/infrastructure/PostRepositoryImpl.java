@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 /**
  * Post 도메인 저장소를 JPA/Querydsl 구현체에 연결하는 어댑터.
+ * 여기도 {@PostReactionRepositoryImpl.java}의 설명처럼 네이밍을 같이 고민했습니다.
  */
 public class PostRepositoryImpl implements PostRepository {
 

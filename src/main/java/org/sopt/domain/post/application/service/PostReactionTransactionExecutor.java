@@ -66,14 +66,14 @@ public class PostReactionTransactionExecutor {
                 } catch (DataIntegrityViolationException e) {
                     throw new PostReactionDuplicateException(postId, userId, type);
                 }
-                post.initializeStats().increaseReactionCount(type);
+                post.getStats().increaseReactionCount(type);
             }
             return true;
         }
 
         if (reacted) {
             postReactionRepository.deleteByPostIdAndUserIdAndType(postId, userId, type);
-            post.initializeStats().decreaseReactionCount(type);
+            post.getStats().decreaseReactionCount(type);
         }
         return false;
     }
