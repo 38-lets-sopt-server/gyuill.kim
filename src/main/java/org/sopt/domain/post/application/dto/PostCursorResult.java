@@ -2,12 +2,13 @@ package org.sopt.domain.post.application.dto;
 
 import java.util.List;
 
-public record PostPageResult(
+/**
+ * 커서 기반 게시글 조회 결과 모델 VO.
+ */
+public record PostCursorResult(
         List<PostResult> content,
-        int page,
+        Long nextCursor,
         int size,
-        long totalElements,
-        int totalPages,
         boolean hasNext
 ) {
 }
