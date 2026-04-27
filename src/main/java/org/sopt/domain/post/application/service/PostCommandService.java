@@ -4,6 +4,7 @@ import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
 import org.sopt.domain.post.application.port.UserPort;
+import org.sopt.domain.post.application.service.validator.PostContentPolicyValidator;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.exception.PostReactionOptimisticLockException;
 import org.sopt.domain.post.domain.model.Post;
@@ -24,21 +25,25 @@ public class PostCommandService {
     private final PostRepository postRepository;
     private final PostReactionRepository postReactionRepository;
     private final PostReactionTransactionExecutor postReactionTransactionExecutor;
+    private final PostContentPolicyValidator postContentPolicyValidator;
     private final UserPort userPort;
 
     public PostCommandService(
             PostRepository postRepository,
             PostReactionRepository postReactionRepository,
             PostReactionTransactionExecutor postReactionTransactionExecutor,
+            PostContentPolicyValidator postContentPolicyValidator,
             UserPort userPort
     ) {
         this.postRepository = postRepository;
         this.postReactionRepository = postReactionRepository;
         this.postReactionTransactionExecutor = postReactionTransactionExecutor;
+        this.postContentPolicyValidator = postContentPolicyValidator;
         this.userPort = userPort;
     }
 
     public PostResult createPost(CreatePostCommand command) {
+        postContentPolicyValidator.validate(command.title(), command.content());
         User authorUser = userPort.getUser(command.authorUserId());
         Post post = postRepository.save(new Post(
                 command.boardType(),
@@ -61,6 +66,7 @@ public class PostCommandService {
     }
 
     public void updatePost(Long id, UpdatePostCommand command) {
+        postContentPolicyValidator.validate(command.title(), command.content());
         Post post = findPostOrThrow(id);
         post.update(command.title(), command.content());
     }

@@ -17,6 +17,8 @@ public enum PostErrorCode implements ErrorCode {
     INVALID_POST_SEARCH_KEYWORD("PST-E010", HttpStatus.BAD_REQUEST, "검색어는 필수입니다."),
     INVALID_REACTION_USER_ID("PST-E011", HttpStatus.BAD_REQUEST, "게시글 반응 사용자 ID는 필수입니다."),
     INVALID_POST_SEARCH_KEYWORD_LENGTH("PST-E012", HttpStatus.BAD_REQUEST, "검색어는 100자 이하여야 합니다."),
+    UNSAFE_POST_TITLE("PST-E013", HttpStatus.BAD_REQUEST, "게시글 제목에 허용되지 않는 입력이 포함되어 있습니다."),
+    UNSAFE_POST_CONTENT("PST-E014", HttpStatus.BAD_REQUEST, "게시글 본문에 허용되지 않는 입력이 포함되어 있습니다."),
     ;
 
     private final String code;
