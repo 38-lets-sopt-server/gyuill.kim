@@ -14,10 +14,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 에러 코드 enum 정의를 Swagger 실패 응답 예시로 변환하는 클래스.
+ * 과제 리뷰 시 예외 응답 구조를 문서에서 바로 확인할 수 있도록 상태 코드별 예시를 자동 생성한다.
+ * 이것두 제가 개발 할 때마다 가져다 쓰는 템플릿입니다.
+ */
 public class SwaggerErrorExampleGenerator {
 
     private static final String APPLICATION_JSON = "application/json";
 
+    /**
+     * 컨트롤러 메서드에 선언된 에러 enum 목록을 읽어 OpenAPI 응답 예시를 추가한다.
+     *
+     * @param operation 대상 Swagger operation
+     * @param errorEnums 에러 코드 enum 목록
+     */
     public void addErrorResponses(Operation operation, Class<? extends Enum<?>>[] errorEnums) {
         ApiResponses responses = operation.getResponses();
         List<ErrorCode> errorCodes = extractErrorCodes(errorEnums);
@@ -33,6 +44,12 @@ public class SwaggerErrorExampleGenerator {
         );
     }
 
+    /**
+     * enum 상수를 {@link ErrorCode} 목록으로 변환한다.
+     *
+     * @param errorEnums 에러 코드 enum 목록
+     * @return 에러 코드 목록
+     */
     private List<ErrorCode> extractErrorCodes(Class<? extends Enum<?>>[] errorEnums) {
         return Arrays.stream(errorEnums)
                 .filter(ErrorCode.class::isAssignableFrom)
@@ -41,6 +58,12 @@ public class SwaggerErrorExampleGenerator {
                 .toList();
     }
 
+    /**
+     * 같은 HTTP 상태를 공유하는 에러 코드 목록으로 Swagger 응답 하나를 만든다.
+     *
+     * @param errorCodes 상태 코드가 같은 에러 코드 목록
+     * @return Swagger 응답 객체
+     */
     private ApiResponse createApiResponse(List<ErrorCode> errorCodes) {
         MediaType mediaType = new MediaType();
         errorCodes.forEach(errorCode -> mediaType.addExamples(
@@ -57,40 +80,23 @@ public class SwaggerErrorExampleGenerator {
         return apiResponse;
     }
 
+    /**
+     * 개별 에러 코드에 대한 예시 본문을 만든다.
+     *
+     * @param errorCode 에러 코드
+     * @return Swagger example
+     */
     private Example createExample(ErrorCode errorCode) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("code", errorCode.getCode());
         body.put("success", false);
         body.put("message", errorCode.getMessage());
         body.put("data", null);
-        body.put("details", createDetailsExample(errorCode));
+        body.put("details", null);
 
         Example example = new Example();
         example.setSummary(errorCode.getMessage());
         example.setValue(body);
         return example;
-    }
-
-    private Object createDetailsExample(ErrorCode errorCode) {
-        return switch (errorCode.getCode()) {
-            case "PST-E001", "PST-E015" -> Map.of(
-                    "postId", 1
-            );
-            case "PST-E009" -> Map.of(
-                    "postId", 1,
-                    "userId", 1,
-                    "reactionType", "LIKE",
-                    "maxRetryCount", 3
-            );
-            case "PST-E016", "PST-E017" -> Map.of(
-                    "postId", 1,
-                    "currentStatus", "HIDDEN",
-                    "statusReason", "정책 검수 결과 숨김 처리됨"
-            );
-            case "USR-E001" -> Map.of(
-                    "userId", 1
-            );
-            default -> null;
-        };
     }
 }

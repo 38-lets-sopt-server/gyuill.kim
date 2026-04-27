@@ -3,6 +3,9 @@ package org.sopt.domain.post.domain.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "게시판 유형")
+/**
+ * 게시글이 속하는 게시판 종류.
+ */
 public enum BoardType {
     @Schema(description = "자유게시판")
     FREE,

@@ -3,6 +3,9 @@ package org.sopt.domain.user.presentation.code;
 import org.sopt.global.code.SuccessCode;
 import org.springframework.http.HttpStatus;
 
+/**
+ * User API 성공 코드 모음.
+ */
 public enum UserSuccessCode implements SuccessCode {
 
     USER_CREATED("USR-S001", HttpStatus.CREATED, "사용자 등록 완료"),

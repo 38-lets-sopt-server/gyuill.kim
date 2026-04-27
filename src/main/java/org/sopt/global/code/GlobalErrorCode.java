@@ -2,6 +2,9 @@ package org.sopt.global.code;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * 특정 도메인에 속하지 않는 전역 오류 코드 모음.
+ */
 public enum GlobalErrorCode implements ErrorCode {
 
     INVALID_REQUEST("GLB-E001", HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),

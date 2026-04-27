@@ -6,6 +6,9 @@ import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.global.exception.BaseException;
 
 @Schema(description = "게시글 생성 요청")
+/**
+ * 게시글 생성 요청 본문.
+ */
 public record CreatePostRequest(
         @Schema(description = "게시판 타입", example = "FREE")
         BoardType boardType,
@@ -21,6 +24,11 @@ public record CreatePostRequest(
     private static final int MAX_TITLE_LENGTH = 50;
     private static final int MAX_CONTENT_LENGTH = 10_000;
 
+    /**
+     * 과제 범위에서 필요한 기본 생성 입력값을 검증한다.
+     *
+     * @throws BaseException 입력값이 비어 있거나 길이 제한을 넘는 경우
+     */
     public void validate() {
         // TODO: UpdatePostRequest와 검증 로직이 중복되지만 과제 범위에서는 유지하고 추후 validation annotation 도입 시 정리예정입니다.
         if (boardType == null) {

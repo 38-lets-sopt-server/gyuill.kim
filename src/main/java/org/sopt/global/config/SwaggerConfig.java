@@ -12,8 +12,16 @@ import org.sopt.global.swagger.SwaggerOperationCustomizer;
 import java.util.List;
 
 @Configuration
+/**
+ * OpenAPI 메타데이터와 예외 응답 커스터마이저를 등록하는 Swagger 설정.
+ */
 public class SwaggerConfig {
 
+    /**
+     * 과제 제출용 OpenAPI 문서 기본 정보를 정의한다.
+     *
+     * @return OpenAPI 설정
+     */
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
@@ -26,6 +34,11 @@ public class SwaggerConfig {
                 ));
     }
 
+    /**
+     * {@link ApiExceptions} 선언을 읽어 상태 코드별 실패 예시를 붙이는 커스터마이저를 등록한다.
+     *
+     * @return Swagger operation customizer
+     */
     @Bean
     public OperationCustomizer swaggerOperationCustomizer() {
         return new SwaggerOperationCustomizer(new SwaggerErrorExampleGenerator());

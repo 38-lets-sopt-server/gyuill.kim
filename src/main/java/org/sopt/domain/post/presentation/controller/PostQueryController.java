@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 게시글 읽기 API를 제공하는 컨트롤러.
+ */
 @RestController
 @RequestMapping("/posts")
 @Tag(name = "Post", description = "게시글 조회 API")
@@ -39,6 +42,14 @@ public class PostQueryController {
         this.postResponseMapper = postResponseMapper;
     }
 
+    /**
+     * 게시글 목록을 커서 기반으로 조회한다.
+     *
+     * @param boardType 게시판 타입
+     * @param cursor 다음 페이지 조회용 커서
+     * @param size 페이지 크기
+     * @return 게시글 페이지 응답
+     */
     @GetMapping
     @Operation(summary = "게시글 목록 조회", description = "게시판 타입과 커서 기반 페이징으로 게시글 목록을 조회합니다.")
     @ApiResponses({
@@ -62,6 +73,14 @@ public class PostQueryController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_LIST_READ, response);
     }
 
+    /**
+     * 키워드로 게시글을 검색한다.
+     *
+     * @param keyword 검색 키워드
+     * @param cursor 다음 페이지 조회용 커서
+     * @param size 페이지 크기
+     * @return 검색 결과 페이지 응답
+     */
     @GetMapping("/search")
     @Operation(summary = "게시글 검색", description = "키워드와 커서 기반 페이징으로 게시글을 검색합니다.")
     @ApiResponses({
@@ -89,6 +108,12 @@ public class PostQueryController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_LIST_READ, response);
     }
 
+    /**
+     * 일반 공개 가능한 게시글 상세를 조회한다.
+     *
+     * @param postId 게시글 ID
+     * @return 게시글 상세 응답
+     */
     @GetMapping("/{postId}")
     @Operation(summary = "게시글 상세 조회", description = "게시글 상세 정보를 조회합니다.")
     @ApiResponses({
@@ -105,6 +130,12 @@ public class PostQueryController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_READ, response);
     }
 
+    /**
+     * 숨김 게시글 확인용 상세를 조회한다.
+     *
+     * @param postId 게시글 ID
+     * @return 게시글 상세 응답
+     */
     @GetMapping("/{postId}/hidden")
     @Operation(summary = "숨김 게시글 조회", description = "일반 공개 상세 조회와 달리 숨김 상태 게시글 확인에 사용합니다.")
     @ApiResponses({

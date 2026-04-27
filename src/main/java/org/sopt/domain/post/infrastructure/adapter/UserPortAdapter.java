@@ -7,6 +7,10 @@ import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 @Component
+/**
+ * Post 도메인용 {@link UserPort} 구현체.
+ * User 저장소를 직접 노출하지 않고 필요한 조회 기능만 어댑터를 통해 제공한다.
+ */
 public class UserPortAdapter implements UserPort {
 
     private final UserRepository userRepository;
@@ -15,6 +19,12 @@ public class UserPortAdapter implements UserPort {
         this.userRepository = userRepository;
     }
 
+    /**
+     * 사용자를 조회하거나 예외를 던진다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자 엔티티
+     */
     @Override
     public User getUser(Long userId) {
         return userRepository.findById(userId)

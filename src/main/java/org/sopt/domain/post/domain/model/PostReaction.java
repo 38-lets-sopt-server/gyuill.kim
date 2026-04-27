@@ -16,8 +16,7 @@ import org.sopt.global.entity.BaseTimeEntity;
 
 /**
  * 게시글에 대한 사용자 반응을 저장하는 조인 엔티티.
- * 과제 필수 구현 범위는 아니지만 화면 설계서에 공감/스크랩이 포함되어 있어
- * 추후 기능 확장을 고려해 선제적으로 추가했습니다.
+ * 좋아요와 스크랩을 분리 엔티티로 두지 않고 type으로 일반화해 중복 구조를 줄였다.
  */
 @Entity
 @Table(
@@ -46,24 +45,51 @@ public class PostReaction extends BaseTimeEntity {
     protected PostReaction() {
     }
 
+    /**
+     * 게시글 반응을 생성한다.
+     *
+     * @param post 대상 게시글
+     * @param user 반응 사용자
+     * @param type 반응 타입
+     */
     public PostReaction(Post post, User user, ReactionType type) {
         this.post = post;
         this.user = user;
         this.type = type;
     }
 
+    /**
+     * 반응 ID를 반환한다.
+     *
+     * @return 반응 ID
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * 대상 게시글을 반환한다.
+     *
+     * @return 게시글
+     */
     public Post getPost() {
         return post;
     }
 
+    /**
+     * 반응 사용자를 반환한다.
+     *
+     * @return 사용자
+     */
     public User getUser() {
         return user;
     }
 
+    /**
+     * 반응 타입을 반환한다.
+     *
+     * @return 반응 타입
+     */
     public ReactionType getType() {
         return type;
     }

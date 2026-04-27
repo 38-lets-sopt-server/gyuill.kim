@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "게시글 커서 페이지 응답")
+/**
+ * 게시글 커서 페이지 응답 모델.
+ */
 public record PostCursorPageResponse(
         @Schema(description = "게시글 목록")
         List<PostResponse> content,

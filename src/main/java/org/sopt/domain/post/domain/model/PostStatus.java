@@ -3,6 +3,9 @@ package org.sopt.domain.post.domain.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "게시글 상태")
+/**
+ * 게시글 공개/운영 상태.
+ */
 public enum PostStatus {
     @Schema(description = "정상 공개 상태")
     PUBLISHED,

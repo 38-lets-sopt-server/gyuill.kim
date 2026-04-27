@@ -29,6 +29,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 게시글 쓰기 API를 제공하는 컨트롤러.
+ * 생성/수정/삭제와 반응 토글을 같은 command 책임으로 묶는다.
+ */
 @RestController
 @RequestMapping("/posts")
 @Tag(name = "Post", description = "게시글 생성, 수정, 삭제 및 반응 처리 API")
@@ -42,6 +46,12 @@ public class PostCommandController {
         this.postResponseMapper = postResponseMapper;
     }
 
+    /**
+     * 게시글을 생성한다.
+     *
+     * @param request 게시글 생성 요청
+     * @return 생성된 게시글 응답
+     */
     @PostMapping
     @Operation(summary = "게시글 작성", description = "새 게시글을 생성합니다.")
     @ApiResponses({
@@ -65,6 +75,13 @@ public class PostCommandController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_CREATED, response);
     }
 
+    /**
+     * 게시글 제목과 본문을 수정한다.
+     *
+     * @param postId 게시글 ID
+     * @param request 게시글 수정 요청
+     * @return 공통 성공 응답
+     */
     @PatchMapping("/{postId}")
     @Operation(summary = "게시글 수정", description = "기존 게시글의 제목과 본문을 수정합니다.")
     @ApiResponses({
@@ -83,6 +100,12 @@ public class PostCommandController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_UPDATED, null);
     }
 
+    /**
+     * 게시글을 삭제한다.
+     *
+     * @param postId 게시글 ID
+     * @return 공통 성공 응답
+     */
     @DeleteMapping("/{postId}")
     @Operation(summary = "게시글 삭제", description = "게시글을 삭제합니다.")
     @ApiResponses({
@@ -97,6 +120,13 @@ public class PostCommandController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_DELETED, null);
     }
 
+    /**
+     * 게시글 좋아요 상태를 토글한다.
+     *
+     * @param postId 게시글 ID
+     * @param request 반응 요청
+     * @return 토글 후 반응 상태
+     */
     @PostMapping("/{postId}/like/toggle")
     @Operation(summary = "게시글 공감 토글", description = "게시글 공감 상태를 토글합니다.")
     @ApiResponses({
@@ -115,6 +145,13 @@ public class PostCommandController {
         return CommonApiResponse.successResponse(PostSuccessCode.POST_LIKE_TOGGLED, response);
     }
 
+    /**
+     * 게시글 스크랩 상태를 토글한다.
+     *
+     * @param postId 게시글 ID
+     * @param request 반응 요청
+     * @return 토글 후 반응 상태
+     */
     @PostMapping("/{postId}/scrap/toggle")
     @Operation(summary = "게시글 스크랩 토글", description = "게시글 스크랩 상태를 토글합니다.")
     @ApiResponses({

@@ -3,6 +3,9 @@ package org.sopt.domain.post.presentation.code;
 import org.sopt.global.code.SuccessCode;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Post API 성공 코드 모음.
+ */
 public enum PostSuccessCode implements SuccessCode {
 
     POST_CREATED("PST-S001", HttpStatus.CREATED, "게시글 등록 완료"),

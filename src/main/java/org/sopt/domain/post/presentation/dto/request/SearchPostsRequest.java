@@ -6,6 +6,9 @@ import org.sopt.global.exception.BaseException;
 import org.springframework.util.StringUtils;
 
 @Schema(description = "게시글 검색 요청")
+/**
+ * 게시글 검색 요청 파라미터 모델.
+ */
 public record SearchPostsRequest(
         @Schema(description = "검색 키워드", example = "스프링")
         String keyword,
@@ -17,6 +20,11 @@ public record SearchPostsRequest(
     private static final int MAX_PAGE_SIZE = 100;
     private static final int MAX_KEYWORD_LENGTH = 100;
 
+    /**
+     * 검색어와 페이징 요청값을 검증한다.
+     *
+     * @throws BaseException 검색어가 비어 있거나 길이 제한을 넘는 경우
+     */
     public void validate() {
         if (!StringUtils.hasText(keyword)) {
             throw new BaseException(PostErrorCode.INVALID_POST_SEARCH_KEYWORD);

@@ -7,6 +7,9 @@ import org.sopt.domain.post.domain.model.PostStatus;
 import java.time.LocalDateTime;
 
 @Schema(description = "게시글 응답")
+/**
+ * 게시글 API 응답 모델.
+ */
 public record PostResponse(
         @Schema(description = "게시글 ID", example = "1")
         Long id,

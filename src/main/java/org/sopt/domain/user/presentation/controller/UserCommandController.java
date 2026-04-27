@@ -30,6 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 @Tag(name = "User", description = "사용자 생성, 수정, 삭제 API")
+/**
+ * 사용자 쓰기 API를 제공하는 컨트롤러.
+ * 서비스 계층의 command/query 분리 의도를 HTTP 계층에도 그대로 반영한다.
+ */
 public class UserCommandController {
 
     private final UserCommandService userCommandService;
@@ -40,6 +44,12 @@ public class UserCommandController {
         this.userResponseMapper = userResponseMapper;
     }
 
+    /**
+     * 사용자를 생성한다.
+     *
+     * @param request 사용자 생성 요청
+     * @return 생성된 사용자 응답
+     */
     @PostMapping
     @Operation(summary = "사용자 생성", description = "새 사용자를 생성합니다.")
     @ApiResponses({
@@ -57,6 +67,13 @@ public class UserCommandController {
         return CommonApiResponse.successResponse(UserSuccessCode.USER_CREATED, response);
     }
 
+    /**
+     * 사용자 닉네임을 수정한다.
+     *
+     * @param userId 사용자 ID
+     * @param request 사용자 수정 요청
+     * @return 공통 성공 응답
+     */
     @PatchMapping("/{userId}")
     @Operation(summary = "사용자 수정", description = "사용자 닉네임을 수정합니다.")
     @ApiResponses({
@@ -75,6 +92,12 @@ public class UserCommandController {
         return CommonApiResponse.successResponse(UserSuccessCode.USER_UPDATED, null);
     }
 
+    /**
+     * 사용자를 삭제한다.
+     *
+     * @param userId 사용자 ID
+     * @return 공통 성공 응답
+     */
     @DeleteMapping("/{userId}")
     @Operation(summary = "사용자 삭제", description = "사용자를 삭제합니다.")
     @ApiResponses({

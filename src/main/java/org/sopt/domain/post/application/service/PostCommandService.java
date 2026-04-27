@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 게시글 생성, 수정, 삭제와 반응 토글을 담당하는 command 서비스.
+ * 조회 책임과 분리해 트랜잭션 의도를 명확히 유지한다.
+ */
 @Service
 @Transactional
 public class PostCommandService {
@@ -43,6 +47,12 @@ public class PostCommandService {
         this.userPort = userPort;
     }
 
+    /**
+     * 게시글을 생성하고 간단한 운영 정책 검사 결과를 반영한다.
+     *
+     * @param command 게시글 생성 입력값
+     * @return 생성된 게시글 결과
+     */
     public PostResult createPost(CreatePostCommand command) {
         PostModerationResult moderationResult = postContentPolicyValidator.validate(command.title(), command.content());
         User authorUser = userPort.getUser(command.authorUserId());
@@ -69,6 +79,12 @@ public class PostCommandService {
         );
     }
 
+    /**
+     * 게시글 내용을 수정하고 정책 검사를 적용한다.
+     *
+     * @param id 게시글 ID
+     * @param command 수정 입력값
+     */
     public void updatePost(Long id, UpdatePostCommand command) {
         PostModerationResult moderationResult = postContentPolicyValidator.validate(command.title(), command.content());
         Post post = findPostOrThrow(id);
@@ -76,31 +92,63 @@ public class PostCommandService {
         applyModerationResult(post, moderationResult);
     }
 
+    /**
+     * 게시글을 삭제 상태로 전환한다.
+     *
+     * @param id 게시글 ID
+     */
     public void deletePost(Long id) {
         Post post = findPostOrThrow(id);
         post.markDeleted();
     }
 
+    /**
+     * 좋아요 토글을 재시도 가능한 비트랜잭션 진입점에서 시작한다.
+     *
+     * @param postId 게시글 ID
+     * @param userId 사용자 ID
+     * @return 최종 좋아요 적용 여부
+     */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public boolean toggleLikePost(Long postId, Long userId) {
         return toggleReactionWithRetry(postId, userId, ReactionType.LIKE);
     }
 
+    /**
+     * 스크랩 토글을 재시도 가능한 비트랜잭션 진입점에서 시작한다.
+     *
+     * @param postId 게시글 ID
+     * @param userId 사용자 ID
+     * @return 최종 스크랩 적용 여부
+     */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public boolean toggleScrapPost(Long postId, Long userId) {
         return toggleReactionWithRetry(postId, userId, ReactionType.SCRAP);
     }
 
+    /**
+     * 게시글을 조회하거나 예외를 던진다.
+     *
+     * @param id 게시글 ID
+     * @return 게시글 엔티티
+     */
     private Post findPostOrThrow(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
     }
 
+    /**
+     * 검수 결과가 숨김인 경우 게시글 상태에 반영한다.
+     * 정상 판정이더라도 숨김 게시글 자동 복구 정책은 아직 정해지지 않아 현재 상태를 유지한다.
+     *
+     * @param post 대상 게시글
+     * @param moderationResult 검수 결과
+     */
     private void applyModerationResult(Post post, PostModerationResult moderationResult) {
         if (moderationResult.shouldHide()) {
             post.markHidden(moderationResult.reason());
         }
-        // TODO: 숨김 게시글을 수정한 뒤 정상 내용이면 자동 복구할지, 별도 검수/관리자 복구가 필요한지는
+        // TODO: 숨김 게시글을 수정한 뒤 정상 내용이면 자동 복구할지 별도 검수/관리자 복구가 필요한지는
         // 게시글 운영 정책이 아직 확정되지 않아 현재는 HIDDEN 상태를 유지한다.
     }
 
@@ -118,9 +166,12 @@ public class PostCommandService {
      * 단일 서비스 과제 범위에서 구현 복잡도와 운영 개념까지 함께 끌어오는 부담이 커 구현할 엄두가 나지 않네요.. 리뷰해주시는 분들께도 죄송하고요...
      * 따라서 현재는 과제 요구사항과 구현 복잡도의 균형을 위해 PostStats 하나에 좋아요/스크랩 집계를 함께 두고
      * @Version + 재시도 구조를 공용으로 유지하는 방향으로 정했습니다.
-     * 의도 상태(shouldReact)는 루프 진입 전에 결정해 재시도 중 상태가 뒤집히지 않도록 멱등성을 보장 하게 적용한다.
-     * 이후 인증/인가와 멱등 정책이 구체화되면 등록/취소 분리로 재검토해볼듯??
+     * 의도 상태(shouldReact)는 루프 진입 전에 결정해 재시도 중 상태가 뒤집히지 않도록 멱등성을 보장하게 적용합니다.
+     * 이후 인증/인가와 멱등 정책이 구체화되면 등록/취소 분리 여부를 다시 검토할 수 있습니다.
      *
+     * @param postId 게시글 ID
+     * @param userId 사용자 ID
+     * @param type 반응 타입
      * @return 토글 후 반응이 활성화된 상태면 {@code true}, 해제된 상태면 {@code false}
      */
     private boolean toggleReactionWithRetry(Long postId, Long userId, ReactionType type) {

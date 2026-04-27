@@ -25,6 +25,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Tag(name = "User", description = "사용자 조회 API")
+/**
+ * 사용자 읽기 API를 제공하는 컨트롤러.
+ */
 public class UserQueryController {
 
     private final UserQueryService userQueryService;
@@ -35,6 +38,11 @@ public class UserQueryController {
         this.userResponseMapper = userResponseMapper;
     }
 
+    /**
+     * 전체 사용자 목록을 조회한다.
+     *
+     * @return 사용자 목록 응답
+     */
     @GetMapping
     @Operation(summary = "사용자 목록 조회", description = "전체 사용자 목록을 조회합니다.")
     @ApiResponses({
@@ -47,6 +55,12 @@ public class UserQueryController {
         return CommonApiResponse.successResponse(UserSuccessCode.USER_LIST_READ, response);
     }
 
+    /**
+     * 사용자 상세 정보를 조회한다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자 상세 응답
+     */
     @GetMapping("/{userId}")
     @Operation(summary = "사용자 상세 조회", description = "사용자 상세 정보를 조회합니다.")
     @ApiResponses({
