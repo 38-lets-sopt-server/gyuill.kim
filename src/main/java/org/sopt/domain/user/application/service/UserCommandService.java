@@ -39,9 +39,8 @@ public class UserCommandService {
     }
 
     public void deleteUser(Long id) {
-        findUserOrThrow(id);
-        // TODO: 추후 User soft delete 도입 시 게시글 작성 이력 보존 정책과 함께 삭제 정책을 재설계할 예정입니다. 지금 하기에는 너무 복잡해져서 일단 넘길게요. 과제 범위를 괜히 빡세게 잡았다가 너무 힘드네요 휴
-        userRepository.deleteById(id);
+        User user = findUserOrThrow(id);
+        user.markDeleted();
     }
 
     private User findUserOrThrow(Long id) {

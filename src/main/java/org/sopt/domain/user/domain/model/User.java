@@ -6,11 +6,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.sopt.global.entity.BaseTimeEntity;
+import org.sopt.global.entity.SoftDeleteBaseEntity;
 
 @Entity
 @Table(name = "users")
-public class User extends BaseTimeEntity {
+public class User extends SoftDeleteBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +36,9 @@ public class User extends BaseTimeEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public boolean isDeleted() {
+        return getDeletedAt() != null;
     }
 }

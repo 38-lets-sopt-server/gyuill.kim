@@ -92,7 +92,10 @@ public class Post extends BaseTimeEntity {
     }
 
     public String getDisplayAuthorName() {
-        return isAnonymous ? "익명" : authorUser.getNickname();
+        if (isAnonymous) {
+            return "익명";
+        }
+        return authorUser.isDeleted() ? "탈퇴한 사용자" : authorUser.getNickname();
     }
 
     public void update(String title, String content) {

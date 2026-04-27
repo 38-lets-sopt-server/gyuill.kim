@@ -38,11 +38,6 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public boolean existsByAuthorUserId(Long authorUserId) {
-        return postJpaRepository.existsByAuthorUserId(authorUserId);
-    }
-
-    @Override
     public void deleteById(Long id) {
         postJpaRepository.deleteById(id);
     }

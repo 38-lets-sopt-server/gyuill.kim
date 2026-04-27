@@ -16,7 +16,5 @@ public interface PostRepository {
 
     Optional<Post> findById(Long id);
 
-    boolean existsByAuthorUserId(Long authorUserId);
-
     void deleteById(Long id);
 }

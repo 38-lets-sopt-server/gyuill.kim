@@ -1,6 +1,5 @@
 package org.sopt.domain.post.infrastructure;
 
-import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +11,4 @@ public interface PostJpaRepository extends JpaRepository<Post, Long>, PostQueryR
     @Override
     @EntityGraph(attributePaths = {"authorUser", "stats"})
     Optional<Post> findById(Long id);
-
-    boolean existsByAuthorUserId(Long authorUserId);
 }
