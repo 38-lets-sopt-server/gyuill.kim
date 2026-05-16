@@ -1,7 +1,6 @@
 package org.sopt.global.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.global.code.ErrorCode;
 import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.CommonApiResponse;
@@ -11,20 +10,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 애플리케이션 전역 예외를 공통 응답 형식으로 변환하는 핸들러.
  * DB 제약 위반과 JPA 시스템 오류를 같은 400으로 묶지 않고 성격에 따라 분리하였습니다.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    // TODO: 롬복이 있었다면 그냥 slf4j를 썻지만 그러지 못하지 직접 추가합니다. 롬복 풀리면 변경 예정!
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * 도메인 비즈니스 예외를 각 에러 코드에 맞는 응답으로 변환한다.
@@ -39,6 +42,37 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(CommonApiResponse.failureBody(errorCode, e.getDetails()));
+    }
+
+    /**
+     * Bean Validation 실패(@RequestBody @Valid)를 400 응답으로 변환한다.
+     * 어떤 필드가 어떤 이유로 실패했는지 details에 함께 담아 디버깅을 돕는다.
+     *
+     * @param e 검증 실패 예외
+     * @return 공통 실패 응답
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonApiResponse<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        Map<String, Object> details = new LinkedHashMap<>();
+        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+            details.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        log.warn("Request validation failed: {}", details);
+        return CommonApiResponse.failureBody(GlobalErrorCode.INVALID_REQUEST, details);
+    }
+
+    /**
+     * 쿼리 파라미터(@ModelAttribute @Valid) 검증 실패를 400 응답으로 변환한다.
+     *
+     * @param e 핸들러 메서드 검증 실패 예외
+     * @return 공통 실패 응답
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonApiResponse<Void> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+        log.warn("Request parameter validation failed: {}", e.getMessage());
+        return CommonApiResponse.failureBody(GlobalErrorCode.INVALID_REQUEST);
     }
 
     /**

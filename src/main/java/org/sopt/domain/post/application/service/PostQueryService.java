@@ -1,5 +1,6 @@
 package org.sopt.domain.post.application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.PostCursorResult;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.domain.exception.PostNotAccessibleException;
@@ -19,14 +20,11 @@ import java.util.List;
  * 공개 조회와 숨김 조회를 분리해 상태별 접근 정책을 명확히 드러낸다.
  */
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostQueryService {
 
     private final PostRepository postRepository;
-
-    public PostQueryService(PostRepository postRepository) {
-        this.postRepository = postRepository;
-    }
 
     /**
      * 게시판 타입과 커서를 기준으로 공개 게시글 목록을 조회한다.

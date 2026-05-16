@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.application.service.UserQueryService;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
@@ -26,16 +27,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 @Tag(name = "User", description = "사용자 조회 API")
 public class UserQueryController {
 
     private final UserQueryService userQueryService;
     private final UserResponseMapper userResponseMapper;
-
-    public UserQueryController(UserQueryService userQueryService, UserResponseMapper userResponseMapper) {
-        this.userQueryService = userQueryService;
-        this.userResponseMapper = userResponseMapper;
-    }
 
     /**
      * 전체 사용자 목록을 조회한다.

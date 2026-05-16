@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
@@ -32,16 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 @Tag(name = "User", description = "사용자 생성, 수정, 삭제 API")
 public class UserCommandController {
 
     private final UserCommandService userCommandService;
     private final UserResponseMapper userResponseMapper;
-
-    public UserCommandController(UserCommandService userCommandService, UserResponseMapper userResponseMapper) {
-        this.userCommandService = userCommandService;
-        this.userResponseMapper = userResponseMapper;
-    }
 
     /**
      * 사용자를 생성한다.
@@ -54,9 +52,8 @@ public class UserCommandController {
     @ApiResponse(responseCode = "201", description = "사용자 생성 성공")
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<UserResponse>> createUser(
-            @RequestBody CreateUserRequest request
+            @Valid @RequestBody CreateUserRequest request
     ) {
-        request.validate();
         CreateUserCommand command = new CreateUserCommand(request.nickname());
         UserResult result = userCommandService.createUser(command);
         UserResponse response = userResponseMapper.toResponse(result);
@@ -78,9 +75,8 @@ public class UserCommandController {
     public ResponseEntity<CommonApiResponse<Void>> updateUser(
             @Parameter(description = "사용자 ID", example = "1")
             @PathVariable Long userId,
-            @RequestBody UpdateUserRequest request
+            @Valid @RequestBody UpdateUserRequest request
     ) {
-        request.validate();
         UpdateUserCommand command = new UpdateUserCommand(request.nickname());
 
         userCommandService.updateUser(userId, command);

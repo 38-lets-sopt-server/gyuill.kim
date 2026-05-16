@@ -1,5 +1,6 @@
 package org.sopt.domain.post.infrastructure.adapter;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
@@ -12,13 +13,10 @@ import org.springframework.stereotype.Component;
  * User 저장소를 직접 노출하지 않고 필요한 조회 기능만 어댑터를 통해 제공한다.
  */
 @Component
+@RequiredArgsConstructor
 public class UserPortAdapter implements UserPort {
 
     private final UserRepository userRepository;
-
-    public UserPortAdapter(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     /**
      * 사용자를 조회하거나 예외를 던진다.

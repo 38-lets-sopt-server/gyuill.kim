@@ -1,5 +1,6 @@
 package org.sopt.domain.user.infrastructure;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Repository;
@@ -12,13 +13,10 @@ import java.util.Optional;
  * 여기도 현재 역할이 구현체보다는 어댑터에 가깝지만 확장성과 일관성을 고려해 impl이라 지었습니다.
  */
 @Repository
+@RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;
-
-    public UserRepositoryImpl(UserJpaRepository userJpaRepository) {
-        this.userJpaRepository = userJpaRepository;
-    }
 
     /**
      * 사용자를 저장한다.

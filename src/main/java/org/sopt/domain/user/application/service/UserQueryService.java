@@ -1,5 +1,6 @@
 package org.sopt.domain.user.application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
@@ -13,14 +14,11 @@ import java.util.List;
  * 사용자 조회를 담당하는 query 서비스.
  */
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserQueryService {
 
     private final UserRepository userRepository;
-
-    public UserQueryService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     /**
      * 삭제되지 않은 전체 사용자 목록을 조회한다.

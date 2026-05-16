@@ -1,5 +1,6 @@
 package org.sopt.domain.post.application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.exception.PostReactionDuplicateException;
@@ -25,21 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
  * 바깥 서비스는 retry만 담당하고 실제 DB 반영은 이 클래스가 새 트랜잭션에서 수행합니다.
  */
 @Service
+@RequiredArgsConstructor
 public class PostReactionTransactionExecutor {
 
     private final PostRepository postRepository;
     private final PostReactionRepository postReactionRepository;
     private final UserPort userPort;
-
-    public PostReactionTransactionExecutor(
-            PostRepository postRepository,
-            PostReactionRepository postReactionRepository,
-            UserPort userPort
-    ) {
-        this.postRepository = postRepository;
-        this.postReactionRepository = postReactionRepository;
-        this.userPort = userPort;
-    }
 
     /**
      * 외부 재시도 루프에서 호출되는 단일 시도용 트랜잭션.

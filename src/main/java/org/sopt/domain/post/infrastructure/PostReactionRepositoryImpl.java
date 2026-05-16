@@ -1,5 +1,6 @@
 package org.sopt.domain.post.infrastructure;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.domain.model.PostReaction;
 import org.sopt.domain.post.domain.model.ReactionType;
 import org.sopt.domain.post.domain.repository.PostReactionRepository;
@@ -13,13 +14,10 @@ import org.springframework.stereotype.Repository;
  * 그래서 지금은 역할만 보고 이름을 바꾸기보다는 프로젝트 전반의 네이밍 일관성을 유지하는 쪽으로 두었습니다.
  */
 @Repository
+@RequiredArgsConstructor
 public class PostReactionRepositoryImpl implements PostReactionRepository {
 
     private final PostReactionJpaRepository postReactionJpaRepository;
-
-    public PostReactionRepositoryImpl(PostReactionJpaRepository postReactionJpaRepository) {
-        this.postReactionJpaRepository = postReactionJpaRepository;
-    }
 
     /**
      * 게시글 반응을 저장한다.

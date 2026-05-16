@@ -1,5 +1,6 @@
 package org.sopt.domain.user.application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
@@ -14,14 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
  * 과제 범위에서는 인증/인가 없이 사용자 자체 생명주기만 다룬다.
  */
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class UserCommandService {
 
     private final UserRepository userRepository;
-
-    public UserCommandService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     /**
      * 사용자를 생성한다.

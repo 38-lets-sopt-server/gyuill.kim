@@ -1,5 +1,6 @@
 package org.sopt.domain.post.application.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 조회 책임과 분리해 트랜잭션 의도를 명확히 유지한다.
  */
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class PostCommandService {
     private static final int POST_REACTION_MAX_RETRY_COUNT = 3;
@@ -32,20 +34,6 @@ public class PostCommandService {
     private final PostReactionTransactionExecutor postReactionTransactionExecutor;
     private final PostContentPolicyValidator postContentPolicyValidator;
     private final UserPort userPort;
-
-    public PostCommandService(
-            PostRepository postRepository,
-            PostReactionRepository postReactionRepository,
-            PostReactionTransactionExecutor postReactionTransactionExecutor,
-            PostContentPolicyValidator postContentPolicyValidator,
-            UserPort userPort
-    ) {
-        this.postRepository = postRepository;
-        this.postReactionRepository = postReactionRepository;
-        this.postReactionTransactionExecutor = postReactionTransactionExecutor;
-        this.postContentPolicyValidator = postContentPolicyValidator;
-        this.userPort = userPort;
-    }
 
     /**
      * 게시글을 생성하고 간단한 운영 정책 검사 결과를 반영한다.

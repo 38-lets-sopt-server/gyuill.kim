@@ -1,8 +1,8 @@
 package org.sopt.domain.post.presentation.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.sopt.domain.post.domain.exception.PostErrorCode;
-import org.sopt.global.exception.BaseException;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * 게시글 수정 요청 본문.
@@ -10,31 +10,13 @@ import org.sopt.global.exception.BaseException;
 @Schema(description = "게시글 수정 요청")
 public record UpdatePostRequest(
         @Schema(description = "게시글 제목", example = "수정된 제목")
+        @NotBlank(message = "게시글 제목은 필수입니다.")
+        @Size(max = 50, message = "게시글 제목은 50자 이하여야 합니다.")
         String title,
+
         @Schema(description = "게시글 본문", example = "수정된 본문입니다.")
+        @NotBlank(message = "게시글 내용은 필수입니다.")
+        @Size(max = 10_000, message = "게시글 내용은 10,000자 이하여야 합니다.")
         String content
 ) {
-    private static final int MAX_TITLE_LENGTH = 50;
-    private static final int MAX_CONTENT_LENGTH = 10_000;
-
-    /**
-     * 과제 범위에서 필요한 기본 수정 입력값을 검증한다.
-     *
-     * @throws BaseException 입력값이 비어 있거나 길이 제한을 넘는 경우
-     */
-    public void validate() {
-        // TODO: CreatePostRequest와 검증 로직이 중복되지만 과제 범위에서는 유지하고 추후 validation annotation 도입 시 정리 예정입니다.
-        if (title == null || title.isBlank()) {
-            throw new BaseException(PostErrorCode.INVALID_POST_TITLE);
-        }
-        if (title.length() > MAX_TITLE_LENGTH) {
-            throw new BaseException(PostErrorCode.INVALID_POST_TITLE_LENGTH);
-        }
-        if (content == null || content.isBlank()) {
-            throw new BaseException(PostErrorCode.INVALID_POST_CONTENT);
-        }
-        if (content.length() > MAX_CONTENT_LENGTH) {
-            throw new BaseException(PostErrorCode.INVALID_POST_CONTENT_LENGTH);
-        }
-    }
 }
