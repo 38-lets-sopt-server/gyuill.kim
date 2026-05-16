@@ -8,13 +8,11 @@ import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.application.service.validator.PostContentPolicyValidator;
 import org.sopt.domain.post.application.service.validator.PostModerationResult;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
-import org.sopt.domain.post.domain.exception.PostReactionOptimisticLockException;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.model.ReactionType;
 import org.sopt.domain.post.domain.repository.PostReactionRepository;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.sopt.domain.user.domain.model.User;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class PostCommandService {
-    private static final int POST_REACTION_MAX_RETRY_COUNT = 3;
 
     private final PostRepository postRepository;
     private final PostReactionRepository postReactionRepository;
@@ -91,7 +88,8 @@ public class PostCommandService {
     }
 
     /**
-     * 좋아요 토글을 재시도 가능한 비트랜잭션 진입점에서 시작한다.
+     * 좋아요 토글을 비트랜잭션 진입점에서 시작한다.
+     * 실제 반응 적용과 낙관적 락 재시도는 {@link PostReactionTransactionExecutor}가 담당한다.
      *
      * @param postId 게시글 ID
      * @param userId 사용자 ID
@@ -99,11 +97,12 @@ public class PostCommandService {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public boolean toggleLikePost(Long postId, Long userId) {
-        return toggleReactionWithRetry(postId, userId, ReactionType.LIKE);
+        return toggleReaction(postId, userId, ReactionType.LIKE);
     }
 
     /**
-     * 스크랩 토글을 재시도 가능한 비트랜잭션 진입점에서 시작한다.
+     * 스크랩 토글을 비트랜잭션 진입점에서 시작한다.
+     * 실제 반응 적용과 낙관적 락 재시도는 {@link PostReactionTransactionExecutor}가 담당한다.
      *
      * @param postId 게시글 ID
      * @param userId 사용자 ID
@@ -111,7 +110,7 @@ public class PostCommandService {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public boolean toggleScrapPost(Long postId, Long userId) {
-        return toggleReactionWithRetry(postId, userId, ReactionType.SCRAP);
+        return toggleReaction(postId, userId, ReactionType.SCRAP);
     }
 
     /**
@@ -154,7 +153,7 @@ public class PostCommandService {
      * 단일 서비스 과제 범위에서 구현 복잡도와 운영 개념까지 함께 끌어오는 부담이 커 구현할 엄두가 나지 않네요.. 리뷰해주시는 분들께도 죄송하고요...
      * 따라서 현재는 과제 요구사항과 구현 복잡도의 균형을 위해 PostStats 하나에 좋아요/스크랩 집계를 함께 두고
      * @Version + 재시도 구조를 공용으로 유지하는 방향으로 정했습니다.
-     * 의도 상태(shouldReact)는 루프 진입 전에 결정해 재시도 중 상태가 뒤집히지 않도록 멱등성을 보장하게 적용합니다.
+     * 의도 상태(shouldReact)는 재시도 진입 전에 결정해 재시도 중 상태가 뒤집히지 않도록 멱등성을 보장하게 적용합니다.
      * 이후 인증/인가와 멱등 정책이 구체화되면 등록/취소 분리 여부를 다시 검토할 수 있습니다.
      *
      * @param postId 게시글 ID
@@ -162,17 +161,8 @@ public class PostCommandService {
      * @param type 반응 타입
      * @return 토글 후 반응이 활성화된 상태면 {@code true}, 해제된 상태면 {@code false}
      */
-    private boolean toggleReactionWithRetry(Long postId, Long userId, ReactionType type) {
+    private boolean toggleReaction(Long postId, Long userId, ReactionType type) {
         boolean shouldReact = !postReactionRepository.existsByPostIdAndUserIdAndType(postId, userId, type);
-        for (int attempt = 1; attempt <= POST_REACTION_MAX_RETRY_COUNT; attempt++) {
-            try {
-                return postReactionTransactionExecutor.applyReactionState(postId, userId, type, shouldReact);
-            } catch (OptimisticLockingFailureException e) {
-                if (attempt == POST_REACTION_MAX_RETRY_COUNT) {
-                    throw new PostReactionOptimisticLockException(postId, userId, type, POST_REACTION_MAX_RETRY_COUNT);
-                }
-            }
-        }
-        throw new PostReactionOptimisticLockException(postId, userId, type, POST_REACTION_MAX_RETRY_COUNT);
+        return postReactionTransactionExecutor.applyReactionState(postId, userId, type, shouldReact);
     }
 }
