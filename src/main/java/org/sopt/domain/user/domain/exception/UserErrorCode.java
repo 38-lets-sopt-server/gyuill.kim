@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum UserErrorCode implements ErrorCode {
 
     USER_NOT_FOUND("USR-E001", HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
+    USER_LOGIN_ID_DUPLICATED("USR-E002", HttpStatus.BAD_REQUEST, "이미 가입된 유저입니다."),
+    INVALID_LOGIN_CREDENTIALS("USR-E003", HttpStatus.UNAUTHORIZED, "로그인 정보가 올바르지 않습니다."),
     ;
 
     private final String code;

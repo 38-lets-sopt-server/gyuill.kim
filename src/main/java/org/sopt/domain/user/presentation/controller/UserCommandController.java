@@ -54,7 +54,7 @@ public class UserCommandController {
     public ResponseEntity<CommonApiResponse<UserResponse>> createUser(
             @Valid @RequestBody CreateUserRequest request
     ) {
-        CreateUserCommand command = new CreateUserCommand(request.nickname());
+        CreateUserCommand command = new CreateUserCommand(request.loginId(), request.nickname(), request.password());
         UserResult result = userCommandService.createUser(command);
         UserResponse response = userResponseMapper.toResponse(result);
 

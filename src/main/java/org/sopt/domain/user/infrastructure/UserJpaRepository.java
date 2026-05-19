@@ -25,4 +25,20 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
      * @return 사용자 조회 결과
      */
     Optional<User> findByIdAndDeletedAtIsNull(Long id);
+
+    /**
+     * 소프트 삭제되지 않은 사용자를 로그인 ID로 조회한다.
+     *
+     * @param loginId 로그인 ID
+     * @return 사용자 조회 결과
+     */
+    Optional<User> findByLoginIdAndDeletedAtIsNull(String loginId);
+
+    /**
+     * 로그인 ID 존재 여부를 조회한다.
+     *
+     * @param loginId 로그인 ID
+     * @return 존재 여부
+     */
+    boolean existsByLoginId(String loginId);
 }

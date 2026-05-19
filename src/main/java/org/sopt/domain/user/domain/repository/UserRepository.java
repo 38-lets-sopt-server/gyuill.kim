@@ -32,4 +32,20 @@ public interface UserRepository {
      * @return 사용자 조회 결과
      */
     Optional<User> findById(Long id);
+
+    /**
+     * 삭제되지 않은 사용자를 로그인 ID로 조회한다.
+     *
+     * @param loginId 로그인 ID
+     * @return 사용자 조회 결과
+     */
+    Optional<User> findByLoginId(String loginId);
+
+    /**
+     * 로그인 ID 중복 여부를 조회한다.
+     *
+     * @param loginId 로그인 ID
+     * @return 존재 여부
+     */
+    boolean existsByLoginId(String loginId);
 }

@@ -5,9 +5,12 @@ import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.application.mapper.UserResultMapper;
+import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
+import org.sopt.global.exception.BaseException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 사용자를 생성한다.
@@ -29,7 +33,11 @@ public class UserCommandService {
      * @return 생성된 사용자 결과
      */
     public UserResult createUser(CreateUserCommand command) {
-        User user = userRepository.save(new User(command.nickname()));
+        if (userRepository.existsByLoginId(command.loginId())) {
+            throw new BaseException(UserErrorCode.USER_LOGIN_ID_DUPLICATED);
+        }
+        String encodedPassword = passwordEncoder.encode(command.password());
+        User user = userRepository.save(new User(command.loginId(), command.nickname(), encodedPassword));
         return UserResultMapper.toResult(user);
     }
 

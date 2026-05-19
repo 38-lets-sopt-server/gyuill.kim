@@ -20,19 +20,29 @@ public class User extends SoftDeleteBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true, length = 50)
+    private String loginId;
+
     @Column(nullable = false, length = 30)
     private String nickname;
+
+    @Column(nullable = false, length = 100)
+    private String password;
 
     protected User() {
     }
 
     /**
-     * 닉네임으로 사용자를 생성한다.
+     * 로그인 ID, 닉네임, 암호화된 비밀번호로 사용자를 생성한다.
      *
+     * @param loginId 로그인 ID
      * @param nickname 사용자 닉네임
+     * @param password 암호화된 비밀번호
      */
-    public User(String nickname) {
+    public User(String loginId, String nickname, String password) {
+        this.loginId = loginId;
         this.nickname = nickname;
+        this.password = password;
     }
 
     /**
@@ -45,12 +55,30 @@ public class User extends SoftDeleteBaseEntity {
     }
 
     /**
+     * 로그인 ID를 반환한다.
+     *
+     * @return 로그인 ID
+     */
+    public String getLoginId() {
+        return loginId;
+    }
+
+    /**
      * 현재 닉네임을 반환한다.
      *
      * @return 닉네임
      */
     public String getNickname() {
         return nickname;
+    }
+
+    /**
+     * 암호화된 비밀번호를 반환한다.
+     *
+     * @return 암호화된 비밀번호
+     */
+    public String getPassword() {
+        return password;
     }
 
     /**
