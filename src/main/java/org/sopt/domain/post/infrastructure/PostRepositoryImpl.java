@@ -1,5 +1,6 @@
 package org.sopt.domain.post.infrastructure;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.repository.PostRepository;
@@ -13,13 +14,10 @@ import java.util.Optional;
  * 여기도 {@link PostReactionRepositoryImpl}의 설명처럼 네이밍을 같이 고민했습니다.
  */
 @Repository
+@RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepository {
 
     private final PostJpaRepository postJpaRepository;
-
-    public PostRepositoryImpl(PostJpaRepository postJpaRepository) {
-        this.postJpaRepository = postJpaRepository;
-    }
 
     /**
      * 게시글을 저장한다.

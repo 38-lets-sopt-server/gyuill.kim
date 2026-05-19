@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
@@ -34,16 +36,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 @Tag(name = "Post", description = "게시글 생성, 수정, 삭제 및 반응 처리 API")
 public class PostCommandController {
 
     private final PostCommandService postCommandService;
     private final PostResponseMapper postResponseMapper;
-
-    public PostCommandController(PostCommandService postCommandService, PostResponseMapper postResponseMapper) {
-        this.postCommandService = postCommandService;
-        this.postResponseMapper = postResponseMapper;
-    }
 
     /**
      * 게시글을 생성한다.
@@ -56,9 +54,8 @@ public class PostCommandController {
     @ApiResponse(responseCode = "201", description = "게시글 생성 성공")
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> createPost(
-            @RequestBody CreatePostRequest request
+            @Valid @RequestBody CreatePostRequest request
     ) {
-        request.validate();
         CreatePostCommand command = new CreatePostCommand(
                 request.boardType(),
                 request.title(),
@@ -86,9 +83,8 @@ public class PostCommandController {
     public ResponseEntity<CommonApiResponse<Void>> updatePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
-            @RequestBody UpdatePostRequest request
+            @Valid @RequestBody UpdatePostRequest request
     ) {
-        request.validate();
         UpdatePostCommand command = new UpdatePostCommand(request.title(), request.content());
 
         postCommandService.updatePost(postId, command);
@@ -127,9 +123,8 @@ public class PostCommandController {
     public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleLikePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
-            @RequestBody PostReactionRequest request
+            @Valid @RequestBody PostReactionRequest request
     ) {
-        request.validate();
         boolean reacted = postCommandService.toggleLikePost(postId, request.userId());
         PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
 
@@ -150,9 +145,8 @@ public class PostCommandController {
     public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleScrapPost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
-            @RequestBody PostReactionRequest request
+            @Valid @RequestBody PostReactionRequest request
     ) {
-        request.validate();
         boolean reacted = postCommandService.toggleScrapPost(postId, request.userId());
         PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
 

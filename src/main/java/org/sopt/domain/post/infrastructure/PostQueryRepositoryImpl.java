@@ -3,6 +3,7 @@ package org.sopt.domain.post.infrastructure;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.domain.model.BoardType;
 import org.sopt.domain.post.domain.model.Post;
 import org.sopt.domain.post.domain.model.PostStatus;
@@ -24,13 +25,10 @@ import static org.sopt.domain.user.domain.model.QUser.user;
  * 현재 과제 규모에서는 작성자와 통계만 함께 로딩하면 되므로 fetch join으로 쿼리를 단순하게 유지합니다.
  */
 @Repository
+@RequiredArgsConstructor
 public class PostQueryRepositoryImpl implements PostQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    public PostQueryRepositoryImpl(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
-    }
 
     /**
      * 공개 게시글 목록을 커서 기반으로 조회한다.
