@@ -12,7 +12,7 @@ import org.sopt.domain.user.presentation.dto.request.UpdateUserRequest;
 import org.sopt.domain.user.presentation.dto.response.UserResponse;
 import org.sopt.domain.user.presentation.mapper.UserResponseMapper;
 import org.sopt.global.response.CommonApiResponse;
-import org.sopt.global.security.AuthenticatedUser;
+import org.sopt.global.security.authentication.AuthenticatedUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;

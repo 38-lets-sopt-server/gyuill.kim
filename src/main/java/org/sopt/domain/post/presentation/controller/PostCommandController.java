@@ -13,7 +13,7 @@ import org.sopt.domain.post.presentation.dto.response.PostReactionToggleResponse
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
 import org.sopt.domain.post.presentation.mapper.PostResponseMapper;
 import org.sopt.global.response.CommonApiResponse;
-import org.sopt.global.security.AuthenticatedUser;
+import org.sopt.global.security.authentication.AuthenticatedUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;

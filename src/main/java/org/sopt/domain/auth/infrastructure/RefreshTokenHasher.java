@@ -1,4 +1,4 @@
-package org.sopt.global.security;
+package org.sopt.domain.auth.infrastructure;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

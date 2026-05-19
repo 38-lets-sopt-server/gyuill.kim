@@ -1,4 +1,4 @@
-package org.sopt.global.security;
+package org.sopt.global.security.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

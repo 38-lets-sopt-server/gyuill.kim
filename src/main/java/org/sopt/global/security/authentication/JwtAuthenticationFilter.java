@@ -1,10 +1,13 @@
-package org.sopt.global.security;
+package org.sopt.global.security.authentication;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.sopt.global.security.exception.JwtAuthenticationException;
+import org.sopt.global.security.jwt.JwtTokenProvider;
+import org.sopt.global.security.jwt.JwtTokenType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;

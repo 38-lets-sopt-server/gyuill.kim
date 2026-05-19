@@ -1,4 +1,4 @@
-package org.sopt.global.security;
+package org.sopt.global.security.jwt;
 
 /**
  * JWT 토큰 용도.

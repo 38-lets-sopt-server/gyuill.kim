@@ -1,9 +1,9 @@
 package org.sopt.global.config;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.global.security.JwtAuthenticationFilter;
-import org.sopt.global.security.RestAccessDeniedHandler;
-import org.sopt.global.security.RestAuthenticationEntryPoint;
+import org.sopt.global.security.authentication.JwtAuthenticationFilter;
+import org.sopt.global.security.handler.RestAccessDeniedHandler;
+import org.sopt.global.security.handler.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
