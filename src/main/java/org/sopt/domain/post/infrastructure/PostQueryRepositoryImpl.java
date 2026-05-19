@@ -53,11 +53,7 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .limit(size + 1L)
                 .fetch();
 
-        boolean hasNext = posts.size() > size;
-        List<Post> content = hasNext
-                ? new ArrayList<>(posts.subList(0, size))
-                : posts;
-        return new SliceImpl<>(content, PageRequest.of(0, size), hasNext);
+        return toSlice(posts, size);
     }
 
     /**
@@ -83,6 +79,17 @@ public class PostQueryRepositoryImpl implements PostQueryRepository {
                 .limit(size + 1L)
                 .fetch();
 
+        return toSlice(posts, size);
+    }
+
+    /**
+     * 조회된 목록을 Slice로 변환한다.
+     *
+     * @param posts 페이지 크기보다 1개 더 조회한 게시글 목록
+     * @param size 페이지 크기
+     * @return 게시글 Slice
+     */
+    private Slice<Post> toSlice(List<Post> posts, int size) {
         boolean hasNext = posts.size() > size;
         List<Post> content = hasNext
                 ? new ArrayList<>(posts.subList(0, size))
