@@ -2,6 +2,7 @@ package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.application.dto.UserResult;
+import org.sopt.domain.user.application.mapper.UserResultMapper;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
@@ -27,7 +28,7 @@ public class UserQueryService {
      */
     public List<UserResult> getUsers() {
         return userRepository.findAll().stream()
-                .map(this::toUserResult)
+                .map(UserResultMapper::toResult)
                 .toList();
     }
 
@@ -40,21 +41,6 @@ public class UserQueryService {
     public UserResult getUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
-        return toUserResult(user);
-    }
-
-    /**
-     * 사용자 엔티티를 조회 응답용 결과 모델로 변환한다.
-     *
-     * @param user 사용자 엔티티
-     * @return 사용자 결과
-     */
-    private UserResult toUserResult(User user) {
-        return new UserResult(
-                user.getId(),
-                user.getNickname(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
+        return UserResultMapper.toResult(user);
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
+import org.sopt.domain.user.application.mapper.UserResultMapper;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
@@ -29,22 +30,7 @@ public class UserCommandService {
      */
     public UserResult createUser(CreateUserCommand command) {
         User user = userRepository.save(new User(command.nickname()));
-        return toUserResult(user);
-    }
-
-    /**
-     * 사용자 응답용 결과 모델로 변환한다.
-     *
-     * @param user 사용자 엔티티
-     * @return 사용자 결과
-     */
-    private UserResult toUserResult(User user) {
-        return new UserResult(
-                user.getId(),
-                user.getNickname(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
+        return UserResultMapper.toResult(user);
     }
 
     /**
