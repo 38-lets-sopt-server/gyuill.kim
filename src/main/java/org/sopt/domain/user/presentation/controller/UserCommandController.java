@@ -1,7 +1,6 @@
 package org.sopt.domain.user.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,10 +18,11 @@ import org.sopt.domain.user.presentation.mapper.UserResponseMapper;
 import org.sopt.global.annotation.ApiExceptions;
 import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.CommonApiResponse;
+import org.sopt.global.security.AuthenticatedUser;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,42 +62,40 @@ public class UserCommandController {
     }
 
     /**
-     * 사용자 닉네임을 수정한다.
+     * 인증된 사용자 본인의 닉네임을 수정한다.
      *
-     * @param userId 사용자 ID
      * @param request 사용자 수정 요청
+     * @param authenticatedUser 인증 사용자
      * @return 공통 성공 응답
      */
-    @PatchMapping("/{userId}")
-    @Operation(summary = "사용자 수정", description = "사용자 닉네임을 수정합니다.")
+    @PatchMapping("/me")
+    @Operation(summary = "내 사용자 정보 수정", description = "인증된 사용자 본인의 닉네임을 수정합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 수정 성공")
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<Void>> updateUser(
-            @Parameter(description = "사용자 ID", example = "1")
-            @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserRequest request
+            @Valid @RequestBody UpdateUserRequest request,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         UpdateUserCommand command = new UpdateUserCommand(request.nickname());
 
-        userCommandService.updateUser(userId, command);
+        userCommandService.updateUser(authenticatedUser.userId(), command);
         return CommonApiResponse.successResponse(UserSuccessCode.USER_UPDATED, null);
     }
 
     /**
-     * 사용자를 삭제한다.
+     * 인증된 사용자 본인을 삭제한다.
      *
-     * @param userId 사용자 ID
+     * @param authenticatedUser 인증 사용자
      * @return 공통 성공 응답
      */
-    @DeleteMapping("/{userId}")
-    @Operation(summary = "사용자 삭제", description = "사용자를 삭제합니다.")
+    @DeleteMapping("/me")
+    @Operation(summary = "내 사용자 삭제", description = "인증된 사용자 본인을 삭제합니다.")
     @ApiResponse(responseCode = "204", description = "사용자 삭제 성공")
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<Void>> deleteUser(
-            @Parameter(description = "사용자 ID", example = "1")
-            @PathVariable Long userId
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
-        userCommandService.deleteUser(userId);
+        userCommandService.deleteUser(authenticatedUser.userId());
         return CommonApiResponse.successResponse(UserSuccessCode.USER_DELETED, null);
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 사용자 생성, 수정, 삭제를 담당하는 command 서비스.
- * 과제 범위에서는 인증/인가 없이 사용자 자체 생명주기만 다룬다.
+ * 사용자 본인에 대한 수정/삭제는 인증 사용자 ID를 기준으로 처리한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -42,23 +42,23 @@ public class UserCommandService {
     }
 
     /**
-     * 사용자 닉네임을 수정한다.
+     * 인증된 사용자 본인의 닉네임을 수정한다.
      *
-     * @param id 사용자 ID
+     * @param authenticatedUserId 인증 사용자 ID
      * @param command 수정 입력값
      */
-    public void updateUser(Long id, UpdateUserCommand command) {
-        User user = findUserOrThrow(id);
+    public void updateUser(Long authenticatedUserId, UpdateUserCommand command) {
+        User user = findUserOrThrow(authenticatedUserId);
         user.updateNickname(command.nickname());
     }
 
     /**
-     * 사용자를 소프트 삭제한다.
+     * 인증된 사용자 본인을 소프트 삭제한다.
      *
-     * @param id 사용자 ID
+     * @param authenticatedUserId 인증 사용자 ID
      */
-    public void deleteUser(Long id) {
-        User user = findUserOrThrow(id);
+    public void deleteUser(Long authenticatedUserId) {
+        User user = findUserOrThrow(authenticatedUserId);
         user.markDeleted();
     }
 

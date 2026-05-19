@@ -77,7 +77,11 @@ public class JwtTokenProvider {
      */
     public Long getUserId(String token, JwtTokenType expectedType) {
         Claims claims = validateClaims(token, expectedType);
-        return Long.valueOf(claims.getSubject());
+        try {
+            return Long.valueOf(claims.getSubject());
+        } catch (NumberFormatException e) {
+            throw new JwtAuthenticationException("Token subject is invalid.");
+        }
     }
 
     private JwtToken createToken(Long userId, JwtTokenType tokenType, long validityInMilliseconds) {
