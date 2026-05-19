@@ -2,6 +2,9 @@ package org.sopt.domain.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.application.dto.AuthTokenResult;
+import org.sopt.domain.auth.domain.exception.AuthErrorCode;
+import org.sopt.domain.auth.domain.model.RefreshToken;
+import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
@@ -11,6 +14,8 @@ import org.sopt.global.security.JwtTokenType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * 로그인과 토큰 재발급을 담당하는 인증 서비스.
@@ -23,6 +28,7 @@ public class AuthService {
     private static final String BEARER_TYPE = "Bearer";
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -33,6 +39,7 @@ public class AuthService {
      * @param password 평문 비밀번호
      * @return 발급된 토큰
      */
+    @Transactional
     public AuthTokenResult login(String loginId, String password) {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
@@ -40,7 +47,7 @@ public class AuthService {
             throw new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS);
         }
 
-        return issueTokens(user.getId());
+        return issueAndSaveTokens(user);
     }
 
     /**
@@ -49,18 +56,39 @@ public class AuthService {
      * @param refreshToken refresh token
      * @return 새로 발급된 토큰
      */
+    @Transactional
     public AuthTokenResult reissue(String refreshToken) {
         Long userId = jwtTokenProvider.getUserId(refreshToken, JwtTokenType.REFRESH);
-        userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
-        return issueTokens(userId);
+        RefreshToken savedRefreshToken = refreshTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+        if (!savedRefreshToken.matches(refreshToken) || savedRefreshToken.isExpired()) {
+            throw new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        return issueAndSaveTokens(user);
     }
 
-    private AuthTokenResult issueTokens(Long userId) {
+    private AuthTokenResult issueAndSaveTokens(User user) {
+        Long userId = user.getId();
+        String accessToken = jwtTokenProvider.createAccessToken(userId);
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+        saveRefreshToken(user, refreshToken);
+
         return new AuthTokenResult(
                 BEARER_TYPE,
-                jwtTokenProvider.createAccessToken(userId),
-                jwtTokenProvider.createRefreshToken(userId)
+                accessToken,
+                refreshToken
         );
+    }
+
+    private void saveRefreshToken(User user, String token) {
+        LocalDateTime expiresAt = jwtTokenProvider.getExpiresAt(token, JwtTokenType.REFRESH);
+        refreshTokenRepository.findByUserId(user.getId())
+                .ifPresentOrElse(
+                        refreshToken -> refreshToken.updateToken(token, expiresAt),
+                        () -> refreshTokenRepository.save(new RefreshToken(user, token, expiresAt))
+                );
     }
 }

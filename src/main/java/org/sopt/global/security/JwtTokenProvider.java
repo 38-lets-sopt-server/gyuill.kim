@@ -12,9 +12,12 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 외부 JWT 라이브러리 없이 HMAC-SHA256 기반 JWT를 생성하고 검증한다.
@@ -27,6 +30,7 @@ public class JwtTokenProvider {
     private static final String SUBJECT_CLAIM = "sub";
     private static final String ISSUED_AT_CLAIM = "iat";
     private static final String EXPIRES_AT_CLAIM = "exp";
+    private static final String JWT_ID_CLAIM = "jti";
 
     private final ObjectMapper objectMapper;
     private final byte[] secret;
@@ -73,6 +77,24 @@ public class JwtTokenProvider {
      * @return 사용자 ID
      */
     public Long getUserId(String token, JwtTokenType expectedType) {
+        Map<String, Object> claims = validateClaims(token, expectedType);
+        return Long.valueOf(String.valueOf(claims.get(SUBJECT_CLAIM)));
+    }
+
+    /**
+     * 토큰을 검증하고 만료 시각을 반환한다.
+     *
+     * @param token JWT
+     * @param expectedType 기대하는 토큰 타입
+     * @return 만료 시각
+     */
+    public LocalDateTime getExpiresAt(String token, JwtTokenType expectedType) {
+        Map<String, Object> claims = validateClaims(token, expectedType);
+        long expiresAt = ((Number) claims.get(EXPIRES_AT_CLAIM)).longValue();
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(expiresAt), ZoneId.systemDefault());
+    }
+
+    private Map<String, Object> validateClaims(String token, JwtTokenType expectedType) {
         Map<String, Object> claims = parseClaims(token);
         String tokenType = String.valueOf(claims.get(TOKEN_TYPE_CLAIM));
         if (!expectedType.name().equals(tokenType)) {
@@ -84,7 +106,7 @@ public class JwtTokenProvider {
             throw new JwtAuthenticationException("Token is expired.");
         }
 
-        return Long.valueOf(String.valueOf(claims.get(SUBJECT_CLAIM)));
+        return claims;
     }
 
     private String createToken(Long userId, JwtTokenType tokenType, long validityInMilliseconds) {
@@ -98,6 +120,7 @@ public class JwtTokenProvider {
         claims.put(TOKEN_TYPE_CLAIM, tokenType.name());
         claims.put(ISSUED_AT_CLAIM, now.getEpochSecond());
         claims.put(EXPIRES_AT_CLAIM, now.plusMillis(validityInMilliseconds).getEpochSecond());
+        claims.put(JWT_ID_CLAIM, UUID.randomUUID().toString());
 
         String encodedHeader = base64UrlEncode(writeJson(header));
         String encodedPayload = base64UrlEncode(writeJson(claims));
