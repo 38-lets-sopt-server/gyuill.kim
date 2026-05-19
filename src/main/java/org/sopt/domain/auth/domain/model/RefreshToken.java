@@ -30,8 +30,8 @@ public class RefreshToken extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false, unique = true, length = 500)
-    private String token;
+    @Column(nullable = false, unique = true, length = 100)
+    private String tokenHash;
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
@@ -43,12 +43,12 @@ public class RefreshToken extends BaseTimeEntity {
      * refresh token 저장 데이터를 생성한다.
      *
      * @param user 토큰 소유 사용자
-     * @param token refresh token
+     * @param tokenHash refresh token HMAC 값
      * @param expiresAt 만료 시각
      */
-    public RefreshToken(User user, String token, LocalDateTime expiresAt) {
+    public RefreshToken(User user, String tokenHash, LocalDateTime expiresAt) {
         this.user = user;
-        this.token = token;
+        this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
     }
 
@@ -71,12 +71,12 @@ public class RefreshToken extends BaseTimeEntity {
     }
 
     /**
-     * 저장된 refresh token을 반환한다.
+     * 저장된 refresh token HMAC 값을 반환한다.
      *
-     * @return refresh token
+     * @return refresh token HMAC 값
      */
-    public String getToken() {
-        return token;
+    public String getTokenHash() {
+        return tokenHash;
     }
 
     /**
@@ -89,24 +89,14 @@ public class RefreshToken extends BaseTimeEntity {
     }
 
     /**
-     * 새 refresh token으로 교체한다.
+     * 새 refresh token HMAC 값으로 교체한다.
      *
-     * @param token 새 refresh token
+     * @param tokenHash 새 refresh token HMAC 값
      * @param expiresAt 새 만료 시각
      */
-    public void updateToken(String token, LocalDateTime expiresAt) {
-        this.token = token;
+    public void updateTokenHash(String tokenHash, LocalDateTime expiresAt) {
+        this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
-    }
-
-    /**
-     * 전달된 토큰이 저장된 토큰과 같은지 확인한다.
-     *
-     * @param token 비교할 refresh token
-     * @return 일치 여부
-     */
-    public boolean matches(String token) {
-        return this.token.equals(token);
     }
 
     /**

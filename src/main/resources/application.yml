@@ -25,3 +25,6 @@ jwt:
   secret: ${JWT_SECRET:local-development-secret-key-that-should-be-overridden}
   access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_VALIDITY:3600000}
   refresh-token-validity-in-milliseconds: ${JWT_REFRESH_TOKEN_VALIDITY:1209600000}
+
+refresh-token:
+  hash-secret: ${REFRESH_TOKEN_HASH_SECRET:local-refresh-token-hash-secret-that-should-be-overridden}

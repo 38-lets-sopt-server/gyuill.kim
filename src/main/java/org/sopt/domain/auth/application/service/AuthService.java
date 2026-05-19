@@ -11,6 +11,7 @@ import org.sopt.domain.user.domain.repository.UserRepository;
 import org.sopt.global.exception.BaseException;
 import org.sopt.global.security.JwtTokenProvider;
 import org.sopt.global.security.JwtTokenType;
+import org.sopt.global.security.RefreshTokenHasher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenHasher refreshTokenHasher;
 
     /**
      * 로그인 ID와 비밀번호를 검증하고 토큰을 발급한다.
@@ -63,7 +65,8 @@ public class AuthService {
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
         RefreshToken savedRefreshToken = refreshTokenRepository.findByUserId(userId)
                 .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
-        if (!savedRefreshToken.matches(refreshToken) || savedRefreshToken.isExpired()) {
+        if (!refreshTokenHasher.matches(refreshToken, savedRefreshToken.getTokenHash())
+                || savedRefreshToken.isExpired()) {
             throw new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }
 
@@ -85,10 +88,11 @@ public class AuthService {
 
     private void saveRefreshToken(User user, String token) {
         LocalDateTime expiresAt = jwtTokenProvider.getExpiresAt(token, JwtTokenType.REFRESH);
+        String tokenHash = refreshTokenHasher.hash(token);
         refreshTokenRepository.findByUserId(user.getId())
                 .ifPresentOrElse(
-                        refreshToken -> refreshToken.updateToken(token, expiresAt),
-                        () -> refreshTokenRepository.save(new RefreshToken(user, token, expiresAt))
+                        refreshToken -> refreshToken.updateTokenHash(tokenHash, expiresAt),
+                        () -> refreshTokenRepository.save(new RefreshToken(user, tokenHash, expiresAt))
                 );
     }
 }
