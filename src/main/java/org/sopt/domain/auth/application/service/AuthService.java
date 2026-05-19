@@ -9,6 +9,7 @@ import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
 import org.sopt.global.exception.BaseException;
+import org.sopt.global.security.JwtToken;
 import org.sopt.global.security.JwtTokenProvider;
 import org.sopt.global.security.JwtTokenType;
 import org.sopt.global.security.RefreshTokenHasher;
@@ -75,20 +76,22 @@ public class AuthService {
 
     private AuthTokenResult issueAndSaveTokens(User user) {
         Long userId = user.getId();
-        String accessToken = jwtTokenProvider.createAccessToken(userId);
-        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+        JwtToken accessToken = jwtTokenProvider.createAccessToken(userId);
+        JwtToken refreshToken = jwtTokenProvider.createRefreshToken(userId);
         saveRefreshToken(user, refreshToken);
 
         return new AuthTokenResult(
                 BEARER_TYPE,
-                accessToken,
-                refreshToken
+                accessToken.value(),
+                accessToken.expiresAt(),
+                refreshToken.value(),
+                refreshToken.expiresAt()
         );
     }
 
-    private void saveRefreshToken(User user, String token) {
-        LocalDateTime expiresAt = jwtTokenProvider.getExpiresAt(token, JwtTokenType.REFRESH);
-        String tokenHash = refreshTokenHasher.hash(token);
+    private void saveRefreshToken(User user, JwtToken token) {
+        LocalDateTime expiresAt = token.expiresAt();
+        String tokenHash = refreshTokenHasher.hash(token.value());
         refreshTokenRepository.findByUserId(user.getId())
                 .ifPresentOrElse(
                         refreshToken -> refreshToken.updateTokenHash(tokenHash, expiresAt),

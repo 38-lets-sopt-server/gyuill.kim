@@ -390,17 +390,36 @@ query 서비스는 fetch join/entity graph로 필요한 연관을 명시적으�
 
 다만 이번 작업에서는 원문 저장 제거를 우선 적용하고, 재발급 동시성 보강은 별도 작업으로 분리합니다.
 
-### 11.5 JWT 직접 구현
+### 11.5 JWT 라이브러리 전환
 
-현재 `JwtTokenProvider`는 외부 JWT 라이브러리 없이 HMAC-SHA256 JWT를 직접 생성/검증합니다.
+기존 `JwtTokenProvider`는 외부 JWT 라이브러리 없이 HMAC-SHA256 JWT를 직접 생성/검증했습니다.
 
-학습/과제 목적에서는 내부 동작을 드러내는 장점이 있지만 운영 관점에서는 검증된 JWT 라이브러리를 사용하는 것이 더 적절합니다.
+학습 목적에서는 내부 동작을 드러내는 장점이 있지만, 운영 관점에서는 검증된 JWT 라이브러리를 사용하는 것이 더 적절하다고 판단했습니다.
 
-직접 구현을 유지한다면 추가로 보강할 수 있는 항목은 다음과 같습니다.
+직접 구현을 유지하면 다음 항목을 계속 직접 책임져야 합니다.
 
 - signature 비교 constant-time 처리
 - secret 길이 검증
 - issuer/audience claim 검증
 - clock skew 허용
+- 표준 claim 직렬화/역직렬화와 만료 검증
 
-현재 과제 범위에서는 직접 구현을 유지하되, 운영 수준으로 확장할 때는 라이브러리 전환 또는 위 보강을 검토합니다.
+최종 방향은 JJWT 전환입니다.
+
+적용 내용:
+
+- `io.jsonwebtoken:jjwt-*` 의존성 추가
+- JWT 서명/검증/claim 파싱을 JJWT에 위임
+- `issuer` 검증 추가
+- `clockSkewSeconds` 설정 추가
+- HS256 secret 길이 검증은 JJWT의 `Keys.hmacShaKeyFor()`와 `WeakKeyException`에 위임
+- `typ` claim으로 access/refresh token 타입 검증 유지
+- `jti` claim 유지
+
+또한 토큰 응답에 만료 시각을 포함하도록 API 응답을 확장했습니다.
+
+이유:
+
+- 클라이언트가 access token 만료 전 재발급 시점을 판단할 수 있음
+- refresh token 만료 시각도 세션 처리에 활용할 수 있음
+- 서버는 토큰 발급 시 만료 시각을 이미 알고 있으므로 응답 모델에 포함하는 것이 자연스러움

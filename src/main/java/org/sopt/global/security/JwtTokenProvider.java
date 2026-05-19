@@ -1,52 +1,51 @@
 package org.sopt.global.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.WeakKeyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Date;
 import java.util.UUID;
 
 /**
- * 외부 JWT 라이브러리 없이 HMAC-SHA256 기반 JWT를 생성하고 검증한다.
+ * JJWT 기반 JWT 생성/검증 컴포넌트.
  */
 @Component
 public class JwtTokenProvider {
 
-    private static final String HMAC_ALGORITHM = "HmacSHA256";
     private static final String TOKEN_TYPE_CLAIM = "typ";
-    private static final String SUBJECT_CLAIM = "sub";
-    private static final String ISSUED_AT_CLAIM = "iat";
-    private static final String EXPIRES_AT_CLAIM = "exp";
-    private static final String JWT_ID_CLAIM = "jti";
 
-    private final ObjectMapper objectMapper;
-    private final byte[] secret;
+    private final String issuer;
+    private final SecretKey secretKey;
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
+    private final long clockSkewInSeconds;
 
     public JwtTokenProvider(
-            ObjectMapper objectMapper,
+            @Value("${jwt.issuer}") String issuer,
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityInMilliseconds,
-            @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityInMilliseconds
+            @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityInMilliseconds,
+            @Value("${jwt.clock-skew-in-seconds}") long clockSkewInSeconds
     ) {
-        this.objectMapper = objectMapper;
-        this.secret = secret.getBytes(StandardCharsets.UTF_8);
+        if (!StringUtils.hasText(issuer)) {
+            throw new IllegalArgumentException("JWT issuer must not be blank.");
+        }
+        this.issuer = issuer;
+        this.secretKey = createSecretKey(secret);
         this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+        this.clockSkewInSeconds = clockSkewInSeconds;
     }
 
     /**
@@ -55,7 +54,7 @@ public class JwtTokenProvider {
      * @param userId 사용자 ID
      * @return access token
      */
-    public String createAccessToken(Long userId) {
+    public JwtToken createAccessToken(Long userId) {
         return createToken(userId, JwtTokenType.ACCESS, accessTokenValidityInMilliseconds);
     }
 
@@ -65,7 +64,7 @@ public class JwtTokenProvider {
      * @param userId 사용자 ID
      * @return refresh token
      */
-    public String createRefreshToken(Long userId) {
+    public JwtToken createRefreshToken(Long userId) {
         return createToken(userId, JwtTokenType.REFRESH, refreshTokenValidityInMilliseconds);
     }
 
@@ -77,101 +76,63 @@ public class JwtTokenProvider {
      * @return 사용자 ID
      */
     public Long getUserId(String token, JwtTokenType expectedType) {
-        Map<String, Object> claims = validateClaims(token, expectedType);
-        return Long.valueOf(String.valueOf(claims.get(SUBJECT_CLAIM)));
+        Claims claims = validateClaims(token, expectedType);
+        return Long.valueOf(claims.getSubject());
     }
 
-    /**
-     * 토큰을 검증하고 만료 시각을 반환한다.
-     *
-     * @param token JWT
-     * @param expectedType 기대하는 토큰 타입
-     * @return 만료 시각
-     */
-    public LocalDateTime getExpiresAt(String token, JwtTokenType expectedType) {
-        Map<String, Object> claims = validateClaims(token, expectedType);
-        long expiresAt = ((Number) claims.get(EXPIRES_AT_CLAIM)).longValue();
-        return LocalDateTime.ofInstant(Instant.ofEpochSecond(expiresAt), ZoneId.systemDefault());
-    }
-
-    private Map<String, Object> validateClaims(String token, JwtTokenType expectedType) {
-        Map<String, Object> claims = parseClaims(token);
-        String tokenType = String.valueOf(claims.get(TOKEN_TYPE_CLAIM));
-        if (!expectedType.name().equals(tokenType)) {
-            throw new JwtAuthenticationException("Token type is invalid.");
-        }
-
-        long expiresAt = ((Number) claims.get(EXPIRES_AT_CLAIM)).longValue();
-        if (expiresAt < Instant.now().getEpochSecond()) {
-            throw new JwtAuthenticationException("Token is expired.");
-        }
-
-        return claims;
-    }
-
-    private String createToken(Long userId, JwtTokenType tokenType, long validityInMilliseconds) {
+    private JwtToken createToken(Long userId, JwtTokenType tokenType, long validityInMilliseconds) {
         Instant now = Instant.now();
-        Map<String, Object> header = Map.of(
-                "alg", "HS256",
-                "typ", "JWT"
-        );
-        Map<String, Object> claims = new LinkedHashMap<>();
-        claims.put(SUBJECT_CLAIM, String.valueOf(userId));
-        claims.put(TOKEN_TYPE_CLAIM, tokenType.name());
-        claims.put(ISSUED_AT_CLAIM, now.getEpochSecond());
-        claims.put(EXPIRES_AT_CLAIM, now.plusMillis(validityInMilliseconds).getEpochSecond());
-        claims.put(JWT_ID_CLAIM, UUID.randomUUID().toString());
+        Instant expiresAt = now.plusMillis(validityInMilliseconds);
+        String token = Jwts.builder()
+                .issuer(issuer)
+                .subject(String.valueOf(userId))
+                .id(UUID.randomUUID().toString())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiresAt))
+                .claim(TOKEN_TYPE_CLAIM, tokenType.name())
+                .signWith(secretKey, Jwts.SIG.HS256)
+                .compact();
 
-        String encodedHeader = base64UrlEncode(writeJson(header));
-        String encodedPayload = base64UrlEncode(writeJson(claims));
-        String unsignedToken = encodedHeader + "." + encodedPayload;
-        return unsignedToken + "." + base64UrlEncode(sign(unsignedToken));
+        return new JwtToken(token, toLocalDateTime(expiresAt));
     }
 
-    private Map<String, Object> parseClaims(String token) {
+    private Claims validateClaims(String token, JwtTokenType expectedType) {
         if (!StringUtils.hasText(token)) {
             throw new JwtAuthenticationException("Token is empty.");
         }
 
-        String[] parts = token.split("\\.");
-        if (parts.length != 3) {
-            throw new JwtAuthenticationException("Token format is invalid.");
-        }
-
-        String unsignedToken = parts[0] + "." + parts[1];
-        String expectedSignature = base64UrlEncode(sign(unsignedToken));
-        if (!expectedSignature.equals(parts[2])) {
-            throw new JwtAuthenticationException("Token signature is invalid.");
-        }
-
         try {
-            byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
-            return objectMapper.readValue(payload, new TypeReference<>() {
-            });
-        } catch (IllegalArgumentException | IOException e) {
-            throw new JwtAuthenticationException("Token payload is invalid.");
+            Claims claims = Jwts.parser()
+                    .requireIssuer(issuer)
+                    .verifyWith(secretKey)
+                    .clockSkewSeconds(clockSkewInSeconds)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            String tokenType = claims.get(TOKEN_TYPE_CLAIM, String.class);
+            if (!expectedType.name().equals(tokenType)) {
+                throw new JwtAuthenticationException("Token type is invalid.");
+            }
+            return claims;
+        } catch (JwtAuthenticationException e) {
+            throw e;
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new JwtAuthenticationException("Token is invalid.");
         }
     }
 
-    private byte[] writeJson(Map<String, Object> value) {
+    private SecretKey createSecretKey(String secret) {
+        if (!StringUtils.hasText(secret)) {
+            throw new IllegalArgumentException("JWT secret must not be blank.");
+        }
         try {
-            return objectMapper.writeValueAsBytes(value);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to write JWT JSON.", e);
+            return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        } catch (WeakKeyException e) {
+            throw new IllegalArgumentException("JWT secret must be at least 256 bits for HS256.", e);
         }
     }
 
-    private byte[] sign(String value) {
-        try {
-            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
-            mac.init(new SecretKeySpec(secret, HMAC_ALGORITHM));
-            return mac.doFinal(value.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to sign JWT.", e);
-        }
-    }
-
-    private String base64UrlEncode(byte[] value) {
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(value);
+    private LocalDateTime toLocalDateTime(Instant instant) {
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 }
