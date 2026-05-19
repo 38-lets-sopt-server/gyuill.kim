@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import org.sopt.global.code.ErrorCode;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -32,15 +33,15 @@ public class SwaggerErrorExampleGenerator {
     public void addErrorResponses(Operation operation, Class<? extends Enum<?>>[] errorEnums) {
         ApiResponses responses = operation.getResponses();
         List<ErrorCode> errorCodes = extractErrorCodes(errorEnums);
-        Map<Integer, List<ErrorCode>> errorCodesByStatus = errorCodes.stream()
+        Map<HttpStatus, List<ErrorCode>> errorCodesByStatus = errorCodes.stream()
                 .collect(Collectors.groupingBy(
-                        errorCode -> errorCode.getHttpStatus().value(),
+                        ErrorCode::getHttpStatus,
                         LinkedHashMap::new,
                         Collectors.toList()
                 ));
 
         errorCodesByStatus.forEach((status, codes) ->
-                responses.addApiResponse(String.valueOf(status), createApiResponse(codes))
+                mergeIntoResponses(responses, status, codes)
         );
     }
 
@@ -64,20 +65,30 @@ public class SwaggerErrorExampleGenerator {
      * @param errorCodes 상태 코드가 같은 에러 코드 목록
      * @return Swagger 응답 객체
      */
-    private ApiResponse createApiResponse(List<ErrorCode> errorCodes) {
-        MediaType mediaType = new MediaType();
-        errorCodes.forEach(errorCode -> mediaType.addExamples(
-                ((Enum<?>) errorCode).name(),
-                createExample(errorCode)
-        ));
+    private void mergeIntoResponses(ApiResponses responses, HttpStatus status, List<ErrorCode> errorCodes) {
+        String statusKey = String.valueOf(status.value());
 
-        Content content = new Content();
-        content.addMediaType(APPLICATION_JSON, mediaType);
+        ApiResponse apiResponse = responses.get(statusKey);
+        if (apiResponse == null) {
+            apiResponse = new ApiResponse().description(status.getReasonPhrase());
+            responses.addApiResponse(statusKey, apiResponse);
+        }
 
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setDescription(errorCodes.get(0).getHttpStatus().getReasonPhrase());
-        apiResponse.setContent(content);
-        return apiResponse;
+        Content content = apiResponse.getContent();
+        if (content == null) {
+            content = new Content();
+            apiResponse.setContent(content);
+        }
+
+        MediaType mediaType = content.get(APPLICATION_JSON);
+        if (mediaType == null) {
+            mediaType = new MediaType();
+            content.addMediaType(APPLICATION_JSON, mediaType);
+        }
+
+        for (ErrorCode errorCode : errorCodes) {
+            mediaType.addExamples(errorCode.getCode(), createExample(errorCode));
+        }
     }
 
     /**
@@ -95,7 +106,8 @@ public class SwaggerErrorExampleGenerator {
         body.put("details", null);
 
         Example example = new Example();
-        example.setSummary(errorCode.getMessage());
+        example.setSummary(errorCode.getCode());
+        example.setDescription(errorCode.getMessage());
         example.setValue(body);
         return example;
     }
