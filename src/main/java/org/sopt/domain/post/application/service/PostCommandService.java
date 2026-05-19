@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
+import org.sopt.domain.post.application.mapper.PostResultMapper;
 import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.application.service.validator.PostContentPolicyValidator;
 import org.sopt.domain.post.application.service.validator.PostModerationResult;
@@ -49,19 +50,7 @@ public class PostCommandService {
                 authorUser
         ));
         applyModerationResult(post, moderationResult);
-        return new PostResult(
-                post.getId(),
-                post.getBoardType(),
-                post.getStatus(),
-                post.getStatusReason(),
-                post.getTitle(),
-                post.getContent(),
-                post.isAnonymous(),
-                post.getDisplayAuthorName(),
-                post.getLikeCount(),
-                post.getScrapCount(),
-                post.getCreatedAt()
-        );
+        return PostResultMapper.toResult(post);
     }
 
     /**

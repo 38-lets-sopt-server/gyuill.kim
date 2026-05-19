@@ -3,6 +3,7 @@ package org.sopt.domain.post.application.service;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.PostCursorResult;
 import org.sopt.domain.post.application.dto.PostResult;
+import org.sopt.domain.post.application.mapper.PostResultMapper;
 import org.sopt.domain.post.domain.exception.PostNotAccessibleException;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.model.BoardType;
@@ -64,7 +65,7 @@ public class PostQueryService {
         if (!post.isVisibleToPublic()) {
             throw new PostNotAccessibleException(post);
         }
-        return toPostResult(post);
+        return PostResultMapper.toResult(post);
     }
 
     /**
@@ -83,7 +84,7 @@ public class PostQueryService {
                 || post.getStatus() == PostStatus.BLOCKED) {
             throw new PostNotAccessibleException(post);
         }
-        return toPostResult(post);
+        return PostResultMapper.toResult(post);
     }
 
     /**
@@ -94,34 +95,12 @@ public class PostQueryService {
      */
     private PostCursorResult toPostCursorResult(Slice<Post> posts) {
         List<PostResult> content = posts.getContent().stream()
-                .map(this::toPostResult)
+                .map(PostResultMapper::toResult)
                 .toList();
 
         Long nextCursor = posts.hasNext() && !content.isEmpty()
                 ? content.get(content.size() - 1).id()
                 : null;
         return new PostCursorResult(content, nextCursor, posts.getSize(), posts.hasNext());
-    }
-
-    /**
-     * 게시글 엔티티를 응답용 결과 모델로 변환한다.
-     *
-     * @param post 게시글 엔티티
-     * @return 게시글 결과
-     */
-    private PostResult toPostResult(Post post) {
-        return new PostResult(
-                post.getId(),
-                post.getBoardType(),
-                post.getStatus(),
-                post.getStatusReason(),
-                post.getTitle(),
-                post.getContent(),
-                post.isAnonymous(),
-                post.getDisplayAuthorName(),
-                post.getLikeCount(),
-                post.getScrapCount(),
-                post.getCreatedAt()
-        );
     }
 }
