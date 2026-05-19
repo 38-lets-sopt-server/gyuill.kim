@@ -14,6 +14,8 @@ import org.sopt.domain.post.domain.model.ReactionType;
 import org.sopt.domain.post.domain.repository.PostReactionRepository;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.sopt.domain.user.domain.model.User;
+import org.sopt.global.code.GlobalErrorCode;
+import org.sopt.global.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,11 +59,13 @@ public class PostCommandService {
      * 게시글 내용을 수정하고 정책 검사를 적용한다.
      *
      * @param id 게시글 ID
+     * @param requesterUserId 수정 요청 사용자 ID
      * @param command 수정 입력값
      */
-    public void updatePost(Long id, UpdatePostCommand command) {
+    public void updatePost(Long id, Long requesterUserId, UpdatePostCommand command) {
         PostModerationResult moderationResult = postContentPolicyValidator.validate(command.title(), command.content());
         Post post = findPostOrThrow(id);
+        ensureAuthor(post, requesterUserId);
         post.update(command.title(), command.content());
         applyModerationResult(post, moderationResult);
     }
@@ -70,9 +74,11 @@ public class PostCommandService {
      * 게시글을 삭제 상태로 전환한다.
      *
      * @param id 게시글 ID
+     * @param requesterUserId 삭제 요청 사용자 ID
      */
-    public void deletePost(Long id) {
+    public void deletePost(Long id, Long requesterUserId) {
         Post post = findPostOrThrow(id);
+        ensureAuthor(post, requesterUserId);
         post.markDeleted();
     }
 
@@ -111,6 +117,18 @@ public class PostCommandService {
     private Post findPostOrThrow(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
+    }
+
+    /**
+     * 게시글 작성자 본인인지 확인한다.
+     *
+     * @param post 대상 게시글
+     * @param requesterUserId 요청 사용자 ID
+     */
+    private void ensureAuthor(Post post, Long requesterUserId) {
+        if (!post.getAuthorUser().getId().equals(requesterUserId)) {
+            throw new BaseException(GlobalErrorCode.FORBIDDEN);
+        }
     }
 
     /**

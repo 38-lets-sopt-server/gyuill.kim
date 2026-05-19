@@ -13,7 +13,6 @@ import org.sopt.domain.post.application.service.PostCommandService;
 import org.sopt.domain.post.domain.exception.PostErrorCode;
 import org.sopt.domain.post.presentation.code.PostSuccessCode;
 import org.sopt.domain.post.presentation.dto.request.CreatePostRequest;
-import org.sopt.domain.post.presentation.dto.request.PostReactionRequest;
 import org.sopt.domain.post.presentation.dto.request.UpdatePostRequest;
 import org.sopt.domain.post.presentation.dto.response.PostReactionToggleResponse;
 import org.sopt.domain.post.presentation.dto.response.PostResponse;
@@ -21,7 +20,9 @@ import org.sopt.domain.post.presentation.mapper.PostResponseMapper;
 import org.sopt.global.annotation.ApiExceptions;
 import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.CommonApiResponse;
+import org.sopt.global.security.AuthenticatedUser;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,13 +55,14 @@ public class PostCommandController {
     @ApiResponse(responseCode = "201", description = "게시글 생성 성공")
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<PostResponse>> createPost(
-            @Valid @RequestBody CreatePostRequest request
+            @Valid @RequestBody CreatePostRequest request,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         CreatePostCommand command = new CreatePostCommand(
                 request.boardType(),
                 request.title(),
                 request.content(),
-                request.authorUserId(),
+                authenticatedUser.userId(),
                 request.isAnonymous()
         );
         PostResult result = postCommandService.createPost(command);
@@ -83,11 +85,12 @@ public class PostCommandController {
     public ResponseEntity<CommonApiResponse<Void>> updatePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
-            @Valid @RequestBody UpdatePostRequest request
+            @Valid @RequestBody UpdatePostRequest request,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
         UpdatePostCommand command = new UpdatePostCommand(request.title(), request.content());
 
-        postCommandService.updatePost(postId, command);
+        postCommandService.updatePost(postId, authenticatedUser.userId(), command);
         return CommonApiResponse.successResponse(PostSuccessCode.POST_UPDATED, null);
     }
 
@@ -103,9 +106,10 @@ public class PostCommandController {
     @ApiExceptions({PostErrorCode.class, GlobalErrorCode.class})
     public ResponseEntity<CommonApiResponse<Void>> deletePost(
             @Parameter(description = "게시글 ID", example = "1")
-            @PathVariable Long postId
+            @PathVariable Long postId,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
-        postCommandService.deletePost(postId);
+        postCommandService.deletePost(postId, authenticatedUser.userId());
         return CommonApiResponse.successResponse(PostSuccessCode.POST_DELETED, null);
     }
 
@@ -123,9 +127,9 @@ public class PostCommandController {
     public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleLikePost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
-            @Valid @RequestBody PostReactionRequest request
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
-        boolean reacted = postCommandService.toggleLikePost(postId, request.userId());
+        boolean reacted = postCommandService.toggleLikePost(postId, authenticatedUser.userId());
         PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
 
         return CommonApiResponse.successResponse(PostSuccessCode.POST_LIKE_TOGGLED, response);
@@ -145,9 +149,9 @@ public class PostCommandController {
     public ResponseEntity<CommonApiResponse<PostReactionToggleResponse>> toggleScrapPost(
             @Parameter(description = "게시글 ID", example = "1")
             @PathVariable Long postId,
-            @Valid @RequestBody PostReactionRequest request
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
-        boolean reacted = postCommandService.toggleScrapPost(postId, request.userId());
+        boolean reacted = postCommandService.toggleScrapPost(postId, authenticatedUser.userId());
         PostReactionToggleResponse response = new PostReactionToggleResponse(reacted);
 
         return CommonApiResponse.successResponse(PostSuccessCode.POST_SCRAP_TOGGLED, response);
