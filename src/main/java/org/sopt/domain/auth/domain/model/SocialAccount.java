@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.global.entity.BaseTimeEntity;
 
@@ -34,6 +35,7 @@ public class SocialAccount extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -75,15 +77,6 @@ public class SocialAccount extends BaseTimeEntity {
         this.providerUserId = providerUserId;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
-    }
-
-    /**
-     * 내부 사용자를 반환한다.
-     *
-     * @return 내부 사용자
-     */
-    public User getUser() {
-        return user;
     }
 
     /**
