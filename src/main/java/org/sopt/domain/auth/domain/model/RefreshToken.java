@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.global.entity.BaseTimeEntity;
 
@@ -30,6 +31,7 @@ public class RefreshToken extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Getter
     @Column(nullable = false, unique = true, length = 100)
     private String tokenHash;
 
@@ -50,15 +52,6 @@ public class RefreshToken extends BaseTimeEntity {
         this.user = user;
         this.tokenHash = tokenHash;
         this.expiresAt = expiresAt;
-    }
-
-    /**
-     * 저장된 refresh token HMAC 값을 반환한다.
-     *
-     * @return refresh token HMAC 값
-     */
-    public String getTokenHash() {
-        return tokenHash;
     }
 
     /**

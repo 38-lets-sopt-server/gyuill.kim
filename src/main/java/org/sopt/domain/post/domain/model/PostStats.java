@@ -9,6 +9,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.Getter;
 
 /**
  * PostReaction과 별도 테이블로 분리한 이유는 다음과 같은데요
@@ -35,9 +36,11 @@ public class PostStats {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Getter
     @Column(nullable = false)
     private long likeCount;
 
+    @Getter
     @Column(nullable = false)
     private long scrapCount;
 
@@ -54,42 +57,6 @@ public class PostStats {
      */
     public PostStats(Post post) {
         this.post = post;
-    }
-
-    /**
-     * 게시글 ID를 반환한다.
-     *
-     * @return 게시글 ID
-     */
-    public Long getPostId() {
-        return postId;
-    }
-
-    /**
-     * 연결된 게시글을 반환한다.
-     *
-     * @return 게시글
-     */
-    public Post getPost() {
-        return post;
-    }
-
-    /**
-     * 좋아요 수를 반환한다.
-     *
-     * @return 좋아요 수
-     */
-    public long getLikeCount() {
-        return likeCount;
-    }
-
-    /**
-     * 스크랩 수를 반환한다.
-     *
-     * @return 스크랩 수
-     */
-    public long getScrapCount() {
-        return scrapCount;
     }
 
     /**

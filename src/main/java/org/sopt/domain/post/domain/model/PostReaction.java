@@ -69,39 +69,4 @@ public class PostReaction extends BaseTimeEntity {
         this.type = type;
     }
 
-    /**
-     * 반응 ID를 반환한다.
-     *
-     * @return 반응 ID
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * 대상 게시글을 반환한다.
-     *
-     * @return 게시글
-     */
-    public Post getPost() {
-        return post;
-    }
-
-    /**
-     * 반응 사용자를 반환한다.
-     *
-     * @return 사용자
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     * 반응 타입을 반환한다.
-     *
-     * @return 반응 타입
-     */
-    public ReactionType getType() {
-        return type;
-    }
 }
