@@ -46,39 +46,4 @@ public class AccessTokenBlacklist extends BaseTimeEntity {
         this.expiresAt = expiresAt;
     }
 
-    /**
-     * 블랙리스트 ID를 반환한다.
-     *
-     * @return 블랙리스트 ID
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * JWT ID를 반환한다.
-     *
-     * @return JWT ID
-     */
-    public String getTokenId() {
-        return tokenId;
-    }
-
-    /**
-     * 토큰 소유 사용자 ID를 반환한다.
-     *
-     * @return 사용자 ID
-     */
-    public Long getUserId() {
-        return userId;
-    }
-
-    /**
-     * access token 만료 시각을 반환한다.
-     *
-     * @return 만료 시각
-     */
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
 }
