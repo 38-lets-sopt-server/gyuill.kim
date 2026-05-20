@@ -102,17 +102,11 @@ public class AuthService {
     @Transactional
     public AuthTokenResult reissue(String refreshToken) {
         Long userId = jwtTokenProvider.getUserId(refreshToken, JwtTokenType.REFRESH);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
-        RefreshToken savedRefreshToken = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
-        if (!refreshTokenHasher.matches(refreshToken, savedRefreshToken.getTokenHash())
-                || savedRefreshToken.isExpired()) {
-            refreshTokenRepository.deleteByUserId(userId);
-            throw new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN);
-        }
+        User user = findActiveUser(userId);
+        RefreshToken savedRefreshToken = findSavedRefreshToken(userId);
+        validateRefreshToken(refreshToken, savedRefreshToken, userId);
 
-        return issueAndSaveTokens(user);
+        return rotateTokens(user);
     }
 
     /**
@@ -147,6 +141,29 @@ public class AuthService {
                 refreshToken.value(),
                 refreshToken.expiresAt()
         );
+    }
+
+    private AuthTokenResult rotateTokens(User user) {
+        return issueAndSaveTokens(user);
+    }
+
+    private User findActiveUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
+    }
+
+    private RefreshToken findSavedRefreshToken(Long userId) {
+        return refreshTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+    }
+
+    private void validateRefreshToken(String refreshToken, RefreshToken savedRefreshToken, Long userId) {
+        if (refreshTokenHasher.matches(refreshToken, savedRefreshToken.getTokenHash())
+                && !savedRefreshToken.isExpired()) {
+            return;
+        }
+        refreshTokenRepository.deleteByUserId(userId);
+        throw new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN);
     }
 
     private void saveRefreshToken(User user, JwtToken token) {

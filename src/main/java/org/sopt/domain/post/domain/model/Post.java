@@ -27,6 +27,11 @@ import org.sopt.global.entity.BaseTimeEntity;
 @Entity
 @Table(name = "posts")
 public class Post extends BaseTimeEntity {
+
+    private static final String ANONYMOUS_AUTHOR_NAME = "익명";
+    private static final String DELETED_AUTHOR_NAME = "탈퇴한 사용자";
+    private static final String USER_DELETE_STATUS_REASON = "사용자 삭제 요청";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -187,9 +192,9 @@ public class Post extends BaseTimeEntity {
      */
     public String getDisplayAuthorName() {
         if (isAnonymous) {
-            return "익명";
+            return ANONYMOUS_AUTHOR_NAME;
         }
-        return authorUser.isDeleted() ? "탈퇴한 사용자" : authorUser.getNickname();
+        return authorUser.isDeleted() ? DELETED_AUTHOR_NAME : authorUser.getNickname();
     }
 
     /**
@@ -240,7 +245,7 @@ public class Post extends BaseTimeEntity {
             return;
         }
         this.status = PostStatus.DELETED;
-        this.statusReason = "사용자 삭제 요청";
+        this.statusReason = USER_DELETE_STATUS_REASON;
     }
 
     /**

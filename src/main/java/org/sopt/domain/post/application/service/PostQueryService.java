@@ -60,8 +60,7 @@ public class PostQueryService {
      * @return 게시글 결과
      */
     public PostResult getPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id));
+        Post post = findPostOrThrow(id);
         if (!post.isVisibleToPublic()) {
             throw new PostNotAccessibleException(post);
         }
@@ -78,13 +77,17 @@ public class PostQueryService {
      * @return 게시글 결과
      */
     public PostResult getHiddenPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id));
+        Post post = findPostOrThrow(id);
         if (post.getStatus() == PostStatus.DELETED
                 || post.getStatus() == PostStatus.BLOCKED) {
             throw new PostNotAccessibleException(post);
         }
         return PostResultMapper.toResult(post);
+    }
+
+    private Post findPostOrThrow(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
     }
 
     /**
