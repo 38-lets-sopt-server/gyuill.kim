@@ -53,39 +53,12 @@ public class RefreshToken extends BaseTimeEntity {
     }
 
     /**
-     * refresh token ID를 반환한다.
-     *
-     * @return refresh token ID
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * 토큰 소유 사용자를 반환한다.
-     *
-     * @return 사용자
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
      * 저장된 refresh token HMAC 값을 반환한다.
      *
      * @return refresh token HMAC 값
      */
     public String getTokenHash() {
         return tokenHash;
-    }
-
-    /**
-     * 만료 시각을 반환한다.
-     *
-     * @return 만료 시각
-     */
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
     }
 
     /**
