@@ -30,3 +30,7 @@ jwt:
 
 refresh-token:
   hash-secret: ${REFRESH_TOKEN_HASH_SECRET:local-refresh-token-hash-secret-that-should-be-overridden}
+
+oauth:
+  google:
+    client-ids: ${GOOGLE_OAUTH_CLIENT_IDS:}

@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/reissue").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/reissue", "/auth/oauth/google").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/posts", "/posts/search", "/posts/{postId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()

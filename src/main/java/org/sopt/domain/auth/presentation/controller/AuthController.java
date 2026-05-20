@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.application.dto.AuthTokenResult;
 import org.sopt.domain.auth.application.service.AuthService;
 import org.sopt.domain.auth.presentation.code.AuthSuccessCode;
+import org.sopt.domain.auth.presentation.dto.request.GoogleOAuthLoginRequest;
 import org.sopt.domain.auth.presentation.dto.request.LoginRequest;
 import org.sopt.domain.auth.presentation.dto.request.TokenReissueRequest;
 import org.sopt.domain.auth.presentation.dto.response.AuthTokenResponse;
@@ -39,6 +40,21 @@ public class AuthController implements AuthControllerDocs {
             @Valid @RequestBody LoginRequest request
     ) {
         AuthTokenResult result = authService.login(request.loginId(), request.password());
+        return CommonApiResponse.successResponse(AuthSuccessCode.LOGIN_SUCCESS, AuthTokenResponse.from(result));
+    }
+
+    /**
+     * Google ID Token으로 로그인하거나 자동 회원가입 후 토큰을 발급한다.
+     *
+     * @param request Google OAuth 로그인 요청
+     * @return 토큰 응답
+     */
+    @PostMapping("/oauth/google")
+    @Override
+    public ResponseEntity<CommonApiResponse<AuthTokenResponse>> loginWithGoogle(
+            @Valid @RequestBody GoogleOAuthLoginRequest request
+    ) {
+        AuthTokenResult result = authService.loginWithGoogle(request.idToken());
         return CommonApiResponse.successResponse(AuthSuccessCode.LOGIN_SUCCESS, AuthTokenResponse.from(result));
     }
 

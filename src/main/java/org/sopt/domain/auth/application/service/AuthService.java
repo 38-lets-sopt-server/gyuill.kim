@@ -1,12 +1,17 @@
 package org.sopt.domain.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.domain.auth.application.client.OAuthProviderClientRegistry;
 import org.sopt.domain.auth.application.dto.AuthTokenResult;
+import org.sopt.domain.auth.application.dto.OAuthUserProfile;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;
 import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
+import org.sopt.domain.auth.domain.model.OAuthProvider;
 import org.sopt.domain.auth.domain.model.RefreshToken;
+import org.sopt.domain.auth.domain.model.SocialAccount;
 import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
 import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
+import org.sopt.domain.auth.domain.repository.SocialAccountRepository;
 import org.sopt.domain.auth.infrastructure.RefreshTokenHasher;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
@@ -35,6 +40,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
+    private final SocialAccountRepository socialAccountRepository;
+    private final OAuthProviderClientRegistry oAuthProviderClientRegistry;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenHasher refreshTokenHasher;
@@ -50,9 +57,38 @@ public class AuthService {
     public AuthTokenResult login(String loginId, String password) {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
+        if (user.getPassword() == null) {
+            throw new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS);
+        }
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS);
         }
+
+        return issueAndSaveTokens(user);
+    }
+
+    /**
+     * Google ID Token을 검증하고 소셜 계정 기준으로 로그인 또는 자동 회원가입을 처리한다.
+     *
+     * @param idToken Google ID Token
+     * @return 발급된 토큰
+     */
+    @Transactional
+    public AuthTokenResult loginWithGoogle(String idToken) {
+        OAuthUserProfile profile = oAuthProviderClientRegistry.getClient(OAuthProvider.GOOGLE).verify(idToken);
+        User user = socialAccountRepository.findByProviderAndProviderUserId(
+                        profile.provider(),
+                        profile.providerUserId()
+                )
+                .map(socialAccount -> {
+                    socialAccount.updateProfile(profile.email(), profile.profileImageUrl());
+                    User socialUser = socialAccount.getUser();
+                    if (socialUser.isDeleted()) {
+                        throw new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS);
+                    }
+                    return socialUser;
+                })
+                .orElseGet(() -> registerSocialUser(profile));
 
         return issueAndSaveTokens(user);
     }
@@ -121,5 +157,17 @@ public class AuthService {
                         refreshToken -> refreshToken.updateTokenHash(tokenHash, expiresAt),
                         () -> refreshTokenRepository.save(new RefreshToken(user, tokenHash, expiresAt))
                 );
+    }
+
+    private User registerSocialUser(OAuthUserProfile profile) {
+        User user = userRepository.save(User.createSocialUser(profile.nickname()));
+        socialAccountRepository.save(new SocialAccount(
+                user,
+                profile.provider(),
+                profile.providerUserId(),
+                profile.email(),
+                profile.profileImageUrl()
+        ));
+        return user;
     }
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;
+import org.sopt.domain.auth.presentation.dto.request.GoogleOAuthLoginRequest;
 import org.sopt.domain.auth.presentation.dto.request.LoginRequest;
 import org.sopt.domain.auth.presentation.dto.request.TokenReissueRequest;
 import org.sopt.domain.auth.presentation.dto.response.AuthTokenResponse;
@@ -25,6 +26,13 @@ public interface AuthControllerDocs {
     @ApiExceptions({UserErrorCode.class, GlobalErrorCode.class})
     ResponseEntity<CommonApiResponse<AuthTokenResponse>> login(
             @Valid @RequestBody LoginRequest request
+    );
+
+    @Operation(summary = "Google OAuth 로그인", description = "Google ID Token을 검증해 로그인하거나 자동 회원가입 후 JWT를 발급합니다.")
+    @ApiResponse(responseCode = "200", description = "Google OAuth 로그인 성공")
+    @ApiExceptions({AuthErrorCode.class, GlobalErrorCode.class})
+    ResponseEntity<CommonApiResponse<AuthTokenResponse>> loginWithGoogle(
+            @Valid @RequestBody GoogleOAuthLoginRequest request
     );
 
     @Operation(summary = "토큰 재발급", description = "refresh token을 검증해 새 JWT를 발급합니다.")
