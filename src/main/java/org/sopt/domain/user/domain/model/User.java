@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.sopt.global.entity.SoftDeleteBaseEntity;
 
 /**
@@ -19,18 +20,22 @@ import org.sopt.global.entity.SoftDeleteBaseEntity;
 public class User extends SoftDeleteBaseEntity {
 
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, length = 50)
     private String loginId;
 
+    @Getter
     @Column(nullable = false, length = 30)
     private String nickname;
 
+    @Getter
     @Column(length = 100)
     private String password;
 
+    @Getter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private UserRole role;
@@ -63,57 +68,12 @@ public class User extends SoftDeleteBaseEntity {
     }
 
     /**
-     * 사용자 식별자를 반환한다.
-     *
-     * @return 사용자 ID
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * 로그인 ID를 반환한다.
-     *
-     * @return 로그인 ID
-     */
-    public String getLoginId() {
-        return loginId;
-    }
-
-    /**
-     * 현재 닉네임을 반환한다.
-     *
-     * @return 닉네임
-     */
-    public String getNickname() {
-        return nickname;
-    }
-
-    /**
-     * 암호화된 비밀번호를 반환한다.
-     *
-     * @return 암호화된 비밀번호
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
      * 비밀번호 기반 로그인이 가능한 계정인지 확인한다.
      *
      * @return 비밀번호가 있으면 {@code true}
      */
     public boolean hasPassword() {
         return password != null;
-    }
-
-    /**
-     * 사용자 전역 권한을 반환한다.
-     *
-     * @return 사용자 권한
-     */
-    public UserRole getRole() {
-        return role;
     }
 
     /**

@@ -2,6 +2,7 @@ package org.sopt.global.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
@@ -12,17 +13,9 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public abstract class SoftDeleteBaseEntity extends BaseTimeEntity {
 
+    @Getter
     @Column
     private LocalDateTime deletedAt;
-
-    /**
-     * 삭제 시각을 반환한다.
-     *
-     * @return 삭제 시각, 삭제되지 않았다면 {@code null}
-     */
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
 
     /**
      * 현재 시각으로 삭제 처리한다.

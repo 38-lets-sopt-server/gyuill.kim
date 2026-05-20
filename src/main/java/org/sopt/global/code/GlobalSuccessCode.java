@@ -1,5 +1,6 @@
 package org.sopt.global.code;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
  * 그러면 global success code를 안쓰게 됩니다.
  * 그래도 아직은 하위 호환성이나 개발 편의를 위해너 놔두는게 맞지 않을까 하는 생각으로 만들어두고 있습니다.
  */
+@Getter
 public enum GlobalSuccessCode implements SuccessCode {
 
     OK("GLB-S001", HttpStatus.OK, "요청이 성공했습니다."),
@@ -23,20 +25,5 @@ public enum GlobalSuccessCode implements SuccessCode {
         this.code = code;
         this.httpStatus = httpStatus;
         this.message = message;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
     }
 }

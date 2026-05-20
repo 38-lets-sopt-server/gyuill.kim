@@ -1,11 +1,13 @@
 package org.sopt.domain.post.presentation.code;
 
+import lombok.Getter;
 import org.sopt.global.code.SuccessCode;
 import org.springframework.http.HttpStatus;
 
 /**
  * Post API 성공 코드 모음.
  */
+@Getter
 public enum PostSuccessCode implements SuccessCode {
 
     POST_CREATED("PST-S001", HttpStatus.CREATED, "게시글 등록 완료"),
@@ -26,20 +28,5 @@ public enum PostSuccessCode implements SuccessCode {
         this.code = code;
         this.httpStatus = httpStatus;
         this.message = message;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
     }
 }

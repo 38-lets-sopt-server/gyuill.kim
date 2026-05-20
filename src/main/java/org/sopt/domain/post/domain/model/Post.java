@@ -13,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
+import lombok.Getter;
 import org.sopt.domain.post.domain.exception.PostNotReactableException;
 import org.sopt.domain.post.domain.exception.PostNotUpdatableException;
 import org.sopt.domain.user.domain.model.User;
@@ -33,33 +34,42 @@ public class Post extends BaseTimeEntity {
     private static final String USER_DELETE_STATUS_REASON = "사용자 삭제 요청";
 
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private BoardType boardType;
 
+    @Getter
     @Column(nullable = false, length = 50)
     private String title;
 
+    @Getter
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Getter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PostStatus status;
 
+    @Getter
     @Column(length = 255)
     private String statusReason;
 
+    @Getter
     @Column(nullable = false)
     private boolean isAnonymous;
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_user_id", nullable = false)
     private User authorUser;
 
+    @Getter
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private PostStats stats;
 
@@ -83,87 +93,6 @@ public class Post extends BaseTimeEntity {
         this.isAnonymous = anonymous;
         this.authorUser = authorUser;
         this.stats = new PostStats(this);
-    }
-
-    /**
-     * 게시글 ID를 반환한다.
-     *
-     * @return 게시글 ID
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * 게시판 타입을 반환한다.
-     *
-     * @return 게시판 타입
-     */
-    public BoardType getBoardType() {
-        return boardType;
-    }
-
-    /**
-     * 제목을 반환한다.
-     *
-     * @return 제목
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * 본문을 반환한다.
-     *
-     * @return 본문
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * 현재 게시글 상태를 반환한다.
-     *
-     * @return 게시글 상태
-     */
-    public PostStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * 현재 상태 사유를 반환한다.
-     *
-     * @return 상태 사유
-     */
-    public String getStatusReason() {
-        return statusReason;
-    }
-
-    /**
-     * 익명 작성 여부를 반환한다.
-     *
-     * @return 익명 게시글이면 {@code true}
-     */
-    public boolean isAnonymous() {
-        return isAnonymous;
-    }
-
-    /**
-     * 작성자 엔티티를 반환한다.
-     *
-     * @return 작성자
-     */
-    public User getAuthorUser() {
-        return authorUser;
-    }
-
-    /**
-     * 반응 통계 엔티티를 반환한다.
-     *
-     * @return 통계 엔티티
-     */
-    public PostStats getStats() {
-        return stats;
     }
 
     /**
@@ -211,7 +140,7 @@ public class Post extends BaseTimeEntity {
      *
      * @return 수정 가능 여부
      */
-    public boolean canUpdate() {
+    private boolean canUpdate() {
         return status == PostStatus.PUBLISHED || status == PostStatus.HIDDEN;
     }
 
@@ -220,7 +149,7 @@ public class Post extends BaseTimeEntity {
      *
      * @return 반응 가능 여부
      */
-    public boolean canReact() {
+    private boolean canReact() {
         return status == PostStatus.PUBLISHED;
     }
 
@@ -278,7 +207,7 @@ public class Post extends BaseTimeEntity {
     /**
      * 수정 가능 상태가 아니면 예외를 던진다.
      */
-    public void ensureUpdatable() {
+    private void ensureUpdatable() {
         if (!canUpdate()) {
             throw new PostNotUpdatableException(this);
         }
