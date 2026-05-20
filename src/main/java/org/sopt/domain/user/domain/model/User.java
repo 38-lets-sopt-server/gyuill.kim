@@ -99,6 +99,15 @@ public class User extends SoftDeleteBaseEntity {
     }
 
     /**
+     * 비밀번호 기반 로그인이 가능한 계정인지 확인한다.
+     *
+     * @return 비밀번호가 있으면 {@code true}
+     */
+    public boolean hasPassword() {
+        return password != null;
+    }
+
+    /**
      * 사용자 전역 권한을 반환한다.
      *
      * @return 사용자 권한

@@ -57,7 +57,7 @@ public class AuthService {
     public AuthTokenResult login(String loginId, String password) {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
-        if (user.getPassword() == null) {
+        if (!user.hasPassword()) {
             throw new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS);
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
