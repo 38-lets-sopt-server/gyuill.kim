@@ -6,11 +6,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
+import org.sopt.domain.user.domain.model.User;
+import org.sopt.domain.user.domain.repository.UserRepository;
 import org.sopt.global.security.exception.JwtAuthenticationException;
 import org.sopt.global.security.jwt.JwtTokenPayload;
 import org.sopt.global.security.jwt.JwtTokenProvider;
 import org.sopt.global.security.jwt.JwtTokenType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -29,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final BearerTokenResolver bearerTokenResolver;
     private final JwtTokenProvider jwtTokenProvider;
     private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
+    private final UserRepository userRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
@@ -44,13 +48,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (accessTokenBlacklistRepository.existsByTokenId(payload.tokenId())) {
                     throw new JwtAuthenticationException("Access token is blacklisted.");
                 }
+                User user = userRepository.findById(payload.userId())
+                        .orElseThrow(() -> new JwtAuthenticationException("User is inactive."));
                 AuthenticatedUser principal = new AuthenticatedUser(
                         payload.userId(),
+                        user.getRole(),
                         payload.tokenId(),
                         payload.expiresAt()
                 );
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(principal, null, List.of());
+                        new UsernamePasswordAuthenticationToken(
+                                principal,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                        );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (JwtAuthenticationException e) {

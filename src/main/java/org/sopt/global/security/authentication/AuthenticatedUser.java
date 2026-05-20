@@ -1,5 +1,7 @@
 package org.sopt.global.security.authentication;
 
+import org.sopt.domain.user.domain.model.UserRole;
+
 import java.time.LocalDateTime;
 
 /**
@@ -7,6 +9,7 @@ import java.time.LocalDateTime;
  */
 public record AuthenticatedUser(
         Long userId,
+        UserRole role,
         String tokenId,
         LocalDateTime accessTokenExpiresAt
 ) {

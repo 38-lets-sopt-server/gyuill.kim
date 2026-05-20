@@ -2,6 +2,8 @@ package org.sopt.domain.user.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,6 +31,10 @@ public class User extends SoftDeleteBaseEntity {
     @Column(length = 100)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role;
+
     protected User() {
     }
 
@@ -43,6 +49,7 @@ public class User extends SoftDeleteBaseEntity {
         this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
+        this.role = UserRole.USER;
     }
 
     /**
@@ -89,6 +96,15 @@ public class User extends SoftDeleteBaseEntity {
      */
     public String getPassword() {
         return password;
+    }
+
+    /**
+     * 사용자 전역 권한을 반환한다.
+     *
+     * @return 사용자 권한
+     */
+    public UserRole getRole() {
+        return role;
     }
 
     /**

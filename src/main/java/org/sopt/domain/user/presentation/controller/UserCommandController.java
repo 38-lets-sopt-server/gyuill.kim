@@ -82,7 +82,7 @@ public class UserCommandController implements UserCommandControllerDocs {
     public ResponseEntity<CommonApiResponse<Void>> deleteUser(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     ) {
-        userCommandService.deleteUser(authenticatedUser.userId());
+        userCommandService.deleteUser(authenticatedUser);
         return CommonApiResponse.successResponse(UserSuccessCode.USER_DELETED, null);
     }
 }

@@ -1,6 +1,9 @@
 package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
+import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
+import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
@@ -10,6 +13,7 @@ import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
 import org.sopt.global.exception.BaseException;
+import org.sopt.global.security.authentication.AuthenticatedUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -55,11 +61,19 @@ public class UserCommandService {
     /**
      * 인증된 사용자 본인을 소프트 삭제한다.
      *
-     * @param authenticatedUserId 인증 사용자 ID
+     * @param authenticatedUser 인증 사용자
      */
-    public void deleteUser(Long authenticatedUserId) {
-        User user = findUserOrThrow(authenticatedUserId);
+    public void deleteUser(AuthenticatedUser authenticatedUser) {
+        User user = findUserOrThrow(authenticatedUser.userId());
         user.markDeleted();
+        refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
+        if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {
+            accessTokenBlacklistRepository.save(new AccessTokenBlacklist(
+                    authenticatedUser.tokenId(),
+                    authenticatedUser.userId(),
+                    authenticatedUser.accessTokenExpiresAt()
+            ));
+        }
     }
 
     /**
