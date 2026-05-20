@@ -50,18 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
                 User user = userRepository.findById(payload.userId())
                         .orElseThrow(() -> new JwtAuthenticationException("User is inactive."));
-                AuthenticatedUser principal = new AuthenticatedUser(
-                        payload.userId(),
-                        user.getRole(),
-                        payload.tokenId(),
-                        payload.expiresAt()
-                );
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                principal,
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-                        );
+                UsernamePasswordAuthenticationToken authentication = createAuthentication(payload, user);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (JwtAuthenticationException e) {
@@ -70,5 +59,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private static UsernamePasswordAuthenticationToken createAuthentication(JwtTokenPayload payload, User user) {
+        AuthenticatedUser principal = new AuthenticatedUser(
+                payload.userId(),
+                user.getRole(),
+                payload.tokenId(),
+                payload.expiresAt()
+        );
+
+        return new UsernamePasswordAuthenticationToken(
+                principal,
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        );
     }
 }
