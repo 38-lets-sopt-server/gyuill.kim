@@ -12,10 +12,12 @@ import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.global.annotation.ApiExceptions;
 import org.sopt.global.code.GlobalErrorCode;
 import org.sopt.global.response.CommonApiResponse;
+import org.sopt.global.security.authentication.AuthenticatedUser;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@Tag(name = "Auth", description = "로그인 및 토큰 재발급 API")
+@Tag(name = "Auth", description = "로그인, 로그아웃 및 토큰 재발급 API")
 public interface AuthControllerDocs {
 
     @Operation(summary = "로그인", description = "로그인 ID와 비밀번호를 검증해 JWT를 발급합니다.")
@@ -30,5 +32,12 @@ public interface AuthControllerDocs {
     @ApiExceptions({AuthErrorCode.class, UserErrorCode.class, GlobalErrorCode.class})
     ResponseEntity<CommonApiResponse<AuthTokenResponse>> reissue(
             @Valid @RequestBody TokenReissueRequest request
+    );
+
+    @Operation(summary = "로그아웃", description = "refresh token을 삭제하고 현재 access token을 블랙리스트에 등록합니다.")
+    @ApiResponse(responseCode = "200", description = "로그아웃 성공")
+    @ApiExceptions({AuthErrorCode.class, GlobalErrorCode.class})
+    ResponseEntity<CommonApiResponse<Void>> logout(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     );
 }

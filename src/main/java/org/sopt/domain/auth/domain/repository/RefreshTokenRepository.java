@@ -24,4 +24,11 @@ public interface RefreshTokenRepository {
      * @return refresh token 조회 결과
      */
     Optional<RefreshToken> findByUserId(Long userId);
+
+    /**
+     * 사용자 ID로 refresh token을 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    void deleteByUserId(Long userId);
 }

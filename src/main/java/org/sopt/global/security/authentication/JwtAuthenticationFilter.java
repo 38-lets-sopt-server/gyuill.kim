@@ -5,14 +5,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
 import org.sopt.global.security.exception.JwtAuthenticationException;
+import org.sopt.global.security.jwt.JwtTokenPayload;
 import org.sopt.global.security.jwt.JwtTokenProvider;
 import org.sopt.global.security.jwt.JwtTokenType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,10 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
-
+    private final BearerTokenResolver bearerTokenResolver;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
@@ -37,11 +37,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = resolveToken(request);
+        String token = bearerTokenResolver.resolve(request);
         try {
-            if (StringUtils.hasText(token)) {
-                Long userId = jwtTokenProvider.getUserId(token, JwtTokenType.ACCESS);
-                AuthenticatedUser principal = new AuthenticatedUser(userId);
+            if (token != null) {
+                JwtTokenPayload payload = jwtTokenProvider.getPayload(token, JwtTokenType.ACCESS);
+                if (accessTokenBlacklistRepository.existsByTokenId(payload.tokenId())) {
+                    throw new JwtAuthenticationException("Access token is blacklisted.");
+                }
+                AuthenticatedUser principal = new AuthenticatedUser(
+                        payload.userId(),
+                        payload.tokenId(),
+                        payload.expiresAt()
+                );
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(principal, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -52,13 +59,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith(BEARER_PREFIX)) {
-            return null;
-        }
-        return authorizationHeader.substring(BEARER_PREFIX.length());
     }
 }

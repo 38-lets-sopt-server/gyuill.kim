@@ -37,4 +37,14 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     public Optional<RefreshToken> findByUserId(Long userId) {
         return refreshTokenJpaRepository.findByUser_Id(userId);
     }
+
+    /**
+     * 사용자 ID로 refresh token을 삭제한다.
+     *
+     * @param userId 사용자 ID
+     */
+    @Override
+    public void deleteByUserId(Long userId) {
+        refreshTokenJpaRepository.deleteByUser_Id(userId);
+    }
 }

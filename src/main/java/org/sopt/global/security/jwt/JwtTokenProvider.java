@@ -77,9 +77,29 @@ public class JwtTokenProvider {
      * @return 사용자 ID
      */
     public Long getUserId(String token, JwtTokenType expectedType) {
+        return getPayload(token, expectedType).userId();
+    }
+
+    /**
+     * 토큰을 검증하고 애플리케이션에서 사용하는 payload 값을 반환한다.
+     *
+     * @param token JWT
+     * @param expectedType 기대하는 토큰 타입
+     * @return 검증된 JWT payload
+     */
+    public JwtTokenPayload getPayload(String token, JwtTokenType expectedType) {
         Claims claims = validateClaims(token, expectedType);
+        String tokenId = claims.getId();
+        Date expiration = claims.getExpiration();
+        if (!StringUtils.hasText(tokenId) || expiration == null) {
+            throw new JwtAuthenticationException("Token payload is invalid.");
+        }
         try {
-            return Long.valueOf(claims.getSubject());
+            return new JwtTokenPayload(
+                    Long.valueOf(claims.getSubject()),
+                    tokenId,
+                    toLocalDateTime(expiration.toInstant())
+            );
         } catch (NumberFormatException e) {
             throw new JwtAuthenticationException("Token subject is invalid.");
         }

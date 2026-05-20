@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum AuthErrorCode implements ErrorCode {
 
     INVALID_REFRESH_TOKEN("ATH-E001", HttpStatus.UNAUTHORIZED, "refresh token이 올바르지 않습니다."),
+    INVALID_ACCESS_TOKEN("ATH-E002", HttpStatus.UNAUTHORIZED, "access token이 올바르지 않습니다."),
     ;
 
     private final String code;

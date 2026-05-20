@@ -3,13 +3,16 @@ package org.sopt.domain.auth.application.service;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.application.dto.AuthTokenResult;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;
+import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
 import org.sopt.domain.auth.domain.model.RefreshToken;
+import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
 import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.auth.infrastructure.RefreshTokenHasher;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
 import org.sopt.global.exception.BaseException;
+import org.sopt.global.security.authentication.AuthenticatedUser;
 import org.sopt.global.security.jwt.JwtToken;
 import org.sopt.global.security.jwt.JwtTokenProvider;
 import org.sopt.global.security.jwt.JwtTokenType;
@@ -31,6 +34,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenHasher refreshTokenHasher;
@@ -68,10 +72,30 @@ public class AuthService {
                 .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
         if (!refreshTokenHasher.matches(refreshToken, savedRefreshToken.getTokenHash())
                 || savedRefreshToken.isExpired()) {
+            refreshTokenRepository.deleteByUserId(userId);
             throw new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         return issueAndSaveTokens(user);
+    }
+
+    /**
+     * refresh token을 삭제하고 현재 access token을 블랙리스트에 등록한다.
+     *
+     * @param authenticatedUser 인증된 사용자
+     */
+    @Transactional
+    public void logout(AuthenticatedUser authenticatedUser) {
+        refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
+        if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {
+            accessTokenBlacklistRepository.save(
+                    new AccessTokenBlacklist(
+                            authenticatedUser.tokenId(),
+                            authenticatedUser.userId(),
+                            authenticatedUser.accessTokenExpiresAt()
+                    )
+            );
+        }
     }
 
     private AuthTokenResult issueAndSaveTokens(User user) {

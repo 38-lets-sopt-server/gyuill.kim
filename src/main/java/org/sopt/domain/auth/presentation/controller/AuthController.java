@@ -8,8 +8,10 @@ import org.sopt.domain.auth.presentation.code.AuthSuccessCode;
 import org.sopt.domain.auth.presentation.dto.request.LoginRequest;
 import org.sopt.domain.auth.presentation.dto.request.TokenReissueRequest;
 import org.sopt.domain.auth.presentation.dto.response.AuthTokenResponse;
+import org.sopt.global.security.authentication.AuthenticatedUser;
 import org.sopt.global.response.CommonApiResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,5 +55,20 @@ public class AuthController implements AuthControllerDocs {
     ) {
         AuthTokenResult result = authService.reissue(request.refreshToken());
         return CommonApiResponse.successResponse(AuthSuccessCode.TOKEN_REISSUED, AuthTokenResponse.from(result));
+    }
+
+    /**
+     * refresh token을 삭제하고 현재 access token을 블랙리스트에 등록한다.
+     *
+     * @param authenticatedUser 인증된 사용자
+     * @return 로그아웃 응답
+     */
+    @PostMapping("/logout")
+    @Override
+    public ResponseEntity<CommonApiResponse<Void>> logout(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        authService.logout(authenticatedUser);
+        return CommonApiResponse.successResponse(AuthSuccessCode.LOGOUT_SUCCESS, null);
     }
 }
