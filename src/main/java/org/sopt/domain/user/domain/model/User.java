@@ -20,13 +20,13 @@ public class User extends SoftDeleteBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(unique = true, length = 50)
     private String loginId;
 
     @Column(nullable = false, length = 30)
     private String nickname;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String password;
 
     protected User() {
@@ -43,6 +43,16 @@ public class User extends SoftDeleteBaseEntity {
         this.loginId = loginId;
         this.nickname = nickname;
         this.password = password;
+    }
+
+    /**
+     * 소셜 로그인 사용자를 생성한다.
+     *
+     * @param nickname 사용자 닉네임
+     * @return 소셜 로그인 사용자
+     */
+    public static User createSocialUser(String nickname) {
+        return new User(null, nickname, null);
     }
 
     /**
