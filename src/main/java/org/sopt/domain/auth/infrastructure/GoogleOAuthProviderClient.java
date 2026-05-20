@@ -71,7 +71,7 @@ public class GoogleOAuthProviderClient implements OAuthProviderClient {
     @Override
     public OAuthUserProfile verify(String token) {
         if (clientIds.isEmpty()) {
-            throw new BaseException(AuthErrorCode.INVALID_OAUTH_TOKEN);
+            throw new BaseException(AuthErrorCode.OAUTH_CLIENT_NOT_CONFIGURED);
         }
 
         try {

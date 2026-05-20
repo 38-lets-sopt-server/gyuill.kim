@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class AuthService {
 
     private static final String BEARER_TYPE = "Bearer";
@@ -53,7 +53,6 @@ public class AuthService {
      * @param password 평문 비밀번호
      * @return 발급된 토큰
      */
-    @Transactional
     public AuthTokenResult login(String loginId, String password) {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
@@ -73,7 +72,6 @@ public class AuthService {
      * @param idToken Google ID Token
      * @return 발급된 토큰
      */
-    @Transactional
     public AuthTokenResult loginWithGoogle(String idToken) {
         OAuthUserProfile profile = oAuthProviderClientRegistry.getClient(OAuthProvider.GOOGLE).verify(idToken);
         User user = socialAccountRepository.findByProviderAndProviderUserId(
@@ -99,7 +97,6 @@ public class AuthService {
      * @param refreshToken refresh token
      * @return 새로 발급된 토큰
      */
-    @Transactional
     public AuthTokenResult reissue(String refreshToken) {
         Long userId = jwtTokenProvider.getUserId(refreshToken, JwtTokenType.REFRESH);
         User user = findActiveUser(userId);
@@ -114,7 +111,6 @@ public class AuthService {
      *
      * @param authenticatedUser 인증된 사용자
      */
-    @Transactional
     public void logout(AuthenticatedUser authenticatedUser) {
         refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
         if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {

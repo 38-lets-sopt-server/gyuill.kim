@@ -33,6 +33,7 @@ public class BearerTokenResolver {
         if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith(BEARER_PREFIX)) {
             return null;
         }
-        return authorizationHeader.substring(BEARER_PREFIX.length());
+        String token = authorizationHeader.substring(BEARER_PREFIX.length()).trim();
+        return StringUtils.hasText(token) ? token : null;
     }
 }
