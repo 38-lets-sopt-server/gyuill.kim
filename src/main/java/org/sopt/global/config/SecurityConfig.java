@@ -28,6 +28,14 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
+    /**
+     * 보안 필터 체인을 구성한다.
+     *
+     * <p>CSRF 정책: 인증은 access token(Authorization 헤더)을 기반으로 하며,
+     * refresh token 쿠키는 Path=/auth + HttpOnly + SameSite로 보호한다.
+     * 헤더 인증은 CSRF에 면역이고, 쿠키 운반 경로는 SameSite로 크로스 사이트 자동 전송이 차단되므로
+     * Spring Security의 CSRF 필터를 비활성화한다.</p>
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
