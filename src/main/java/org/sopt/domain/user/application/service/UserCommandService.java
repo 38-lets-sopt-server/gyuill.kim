@@ -2,6 +2,7 @@ package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.auth.domain.service.AuthTokenService;
+import org.sopt.global.security.authentication.UserRoleCache;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
@@ -27,6 +28,7 @@ public class UserCommandService {
 
     private final UserRepository userRepository;
     private final AuthTokenService authTokenService;
+    private final UserRoleCache userRoleCache;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -64,6 +66,7 @@ public class UserCommandService {
         User user = findUserOrThrow(authenticatedUser.userId());
         user.markDeleted();
         authTokenService.revoke(authenticatedUser);
+        userRoleCache.evict(authenticatedUser.userId());
     }
 
     /**

@@ -82,13 +82,14 @@ public class AuthTokenService {
 
         if (refreshTokenHasher.matches(refreshToken, savedToken.getTokenHash())
                 && !savedToken.isExpired()) {
-            gracePeriodStore.store(incomingHash, userId);
-            return issueAndSaveTokens(user);
+            AuthTokenResult result = issueAndSaveTokens(user);
+            gracePeriodStore.store(incomingHash, result);
+            return result;
         }
 
-        Long graceUserId = gracePeriodStore.consumeIfPresent(incomingHash);
-        if (graceUserId != null && graceUserId.equals(userId)) {
-            return issueAndSaveTokens(user);
+        AuthTokenResult graceResult = gracePeriodStore.consumeIfPresent(incomingHash);
+        if (graceResult != null) {
+            return graceResult;
         }
 
         refreshTokenRepository.deleteByUserId(userId);
