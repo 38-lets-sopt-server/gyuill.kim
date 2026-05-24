@@ -2,7 +2,7 @@ package org.sopt.domain.auth.presentation.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.application.dto.AuthTokenResult;
+import org.sopt.domain.auth.domain.model.AuthTokenResult;
 import org.sopt.domain.auth.application.service.AuthService;
 import org.sopt.domain.auth.presentation.code.AuthSuccessCode;
 import org.sopt.domain.auth.presentation.cookie.RefreshTokenCookieFactory;

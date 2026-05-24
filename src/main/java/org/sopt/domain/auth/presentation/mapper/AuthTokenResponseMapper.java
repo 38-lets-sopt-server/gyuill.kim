@@ -1,6 +1,6 @@
 package org.sopt.domain.auth.presentation.mapper;
 
-import org.sopt.domain.auth.application.dto.AuthTokenResult;
+import org.sopt.domain.auth.domain.model.AuthTokenResult;
 import org.sopt.domain.auth.presentation.dto.response.AuthTokenResponse;
 import org.springframework.stereotype.Component;
 

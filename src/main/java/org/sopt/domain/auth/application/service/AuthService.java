@@ -1,7 +1,9 @@
 package org.sopt.domain.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.application.dto.AuthTokenResult;
+import org.sopt.domain.auth.domain.model.AuthTokenResult;
+import org.sopt.domain.auth.domain.service.AuthTokenService;
+import org.sopt.domain.auth.domain.service.SocialLoginService;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;

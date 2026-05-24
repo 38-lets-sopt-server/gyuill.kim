@@ -1,8 +1,8 @@
-package org.sopt.domain.auth.application.service;
+package org.sopt.domain.auth.domain.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.application.client.OAuthProviderClientRegistry;
-import org.sopt.domain.auth.application.dto.OAuthUserProfile;
+import org.sopt.domain.auth.domain.port.OAuthProviderClientRegistry;
+import org.sopt.domain.auth.domain.port.OAuthUserProfile;
 import org.sopt.domain.auth.domain.model.OAuthProvider;
 import org.sopt.domain.auth.domain.model.SocialAccount;
 import org.sopt.domain.auth.domain.repository.SocialAccountRepository;

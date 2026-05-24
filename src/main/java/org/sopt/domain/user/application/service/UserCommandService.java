@@ -1,7 +1,7 @@
 package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.application.service.AuthTokenService;
+import org.sopt.domain.auth.domain.service.AuthTokenService;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;

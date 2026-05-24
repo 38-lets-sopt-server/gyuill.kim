@@ -1,8 +1,8 @@
-package org.sopt.domain.auth.application.service;
+package org.sopt.domain.auth.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.sopt.domain.auth.application.dto.AuthTokenResult;
+import org.sopt.domain.auth.domain.model.AuthTokenResult;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;
 import org.sopt.domain.auth.domain.model.RefreshToken;
 import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
