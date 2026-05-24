@@ -34,7 +34,15 @@ public class UserRoleCache {
      * @return 사용자 역할. 사용자가 존재하지 않으면 {@code null}
      */
     public UserRole getRole(Long userId) {
-        return cache.get(userId, this::loadUserRole);
+        UserRole cached = cache.getIfPresent(userId);
+        if (cached != null) {
+            return cached;
+        }
+        UserRole role = loadUserRole(userId);
+        if (role != null) {
+            cache.put(userId, role);
+        }
+        return role;
     }
 
     /**

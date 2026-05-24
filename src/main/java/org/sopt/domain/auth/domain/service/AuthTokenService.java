@@ -7,8 +7,8 @@ import org.sopt.domain.auth.domain.exception.AuthErrorCode;
 import org.sopt.domain.auth.domain.model.RefreshToken;
 import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
 import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
-import org.sopt.domain.auth.infrastructure.RefreshTokenGracePeriodStore;
-import org.sopt.domain.auth.infrastructure.RefreshTokenHasher;
+import org.sopt.domain.auth.domain.port.RefreshTokenGracePeriodPort;
+import org.sopt.domain.auth.domain.port.RefreshTokenHashPort;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
@@ -46,8 +46,8 @@ public class AuthTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenHasher refreshTokenHasher;
-    private final RefreshTokenGracePeriodStore gracePeriodStore;
+    private final RefreshTokenHashPort refreshTokenHasher;
+    private final RefreshTokenGracePeriodPort gracePeriodStore;
 
     /**
      * 사용자에 대한 access token과 refresh token을 발급한다.
@@ -65,9 +65,15 @@ public class AuthTokenService {
      * <p>재발급 흐름:
      * <ol>
      *   <li>현재 DB의 해시와 일치하면 정상 회전 후 구 해시를 Grace Period에 등록한다.</li>
-     *   <li>DB 해시와 불일치하지만 Grace Period에 존재하면 동시 요청으로 간주해 허용한다.</li>
+     *   <li>DB 해시와 불일치하지만 Grace Period에 존재하면 동시 요청으로 간주해
+     *       재회전 없이 기존 발급 결과를 반환한다.</li>
      *   <li>양쪽 모두 실패하면 Reuse로 판단, 사용자의 토큰을 전체 무효화한다.</li>
      * </ol>
+     *
+     * <p><b>동시성 참고:</b> 같은 refresh token을 두 스레드가 동시에 정상 경로(1단계)로
+     * 통과하면 두 번째 스레드가 첫 번째의 토큰을 덮어쓸 수 있다.
+     * 트래픽이 높아지면 {@code findByUserId}에 비관적 락(SELECT FOR UPDATE)을 적용해
+     * 직렬화하는 것을 고려해야 한다.</p>
      *
      * @param refreshToken refresh token 원문
      * @return 새로 발급된 토큰

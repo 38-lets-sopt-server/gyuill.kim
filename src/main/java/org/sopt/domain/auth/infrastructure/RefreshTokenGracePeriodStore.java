@@ -3,6 +3,7 @@ package org.sopt.domain.auth.infrastructure;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.sopt.domain.auth.domain.model.AuthTokenResult;
+import org.sopt.domain.auth.domain.port.RefreshTokenGracePeriodPort;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -16,7 +17,7 @@ import java.time.Duration;
  * 재회전 없이 동일한 토큰을 반환한다.</p>
  */
 @Component
-public class RefreshTokenGracePeriodStore {
+public class RefreshTokenGracePeriodStore implements RefreshTokenGracePeriodPort {
 
     private final Cache<String, AuthTokenResult> cache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofSeconds(10))
