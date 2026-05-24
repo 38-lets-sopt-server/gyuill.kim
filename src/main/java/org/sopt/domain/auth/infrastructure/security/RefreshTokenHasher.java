@@ -1,4 +1,4 @@
-package org.sopt.domain.auth.infrastructure;
+package org.sopt.domain.auth.infrastructure.security;
 
 import org.sopt.domain.auth.domain.port.RefreshTokenHashPort;
 import org.springframework.beans.factory.annotation.Value;

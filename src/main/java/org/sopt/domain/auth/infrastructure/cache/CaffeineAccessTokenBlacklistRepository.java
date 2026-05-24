@@ -1,4 +1,4 @@
-package org.sopt.domain.auth.infrastructure;
+package org.sopt.domain.auth.infrastructure.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

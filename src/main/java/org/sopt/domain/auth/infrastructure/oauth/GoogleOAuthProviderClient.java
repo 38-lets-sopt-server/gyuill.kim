@@ -1,4 +1,4 @@
-package org.sopt.domain.auth.infrastructure;
+package org.sopt.domain.auth.infrastructure.oauth;
 
 import org.sopt.domain.auth.domain.port.OAuthProviderClient;
 import org.sopt.domain.auth.domain.port.OAuthUserProfile;

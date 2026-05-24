@@ -1,4 +1,4 @@
-package org.sopt.domain.auth.infrastructure;
+package org.sopt.domain.auth.infrastructure.persistence;
 
 import org.sopt.domain.auth.domain.model.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
