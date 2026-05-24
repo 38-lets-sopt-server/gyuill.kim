@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.CreatePostCommand;
 import org.sopt.domain.post.application.dto.PostResult;
 import org.sopt.domain.post.application.dto.UpdatePostCommand;
+import org.sopt.domain.post.application.mapper.PostResultMapper;
 import org.sopt.domain.post.application.port.UserPort;
 import org.sopt.domain.post.application.service.validator.PostContentPolicyValidator;
 import org.sopt.domain.post.application.service.validator.PostModerationResult;
@@ -13,6 +14,8 @@ import org.sopt.domain.post.domain.model.ReactionType;
 import org.sopt.domain.post.domain.repository.PostReactionRepository;
 import org.sopt.domain.post.domain.repository.PostRepository;
 import org.sopt.domain.user.domain.model.User;
+import org.sopt.global.code.GlobalErrorCode;
+import org.sopt.global.exception.BaseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,30 +52,20 @@ public class PostCommandService {
                 authorUser
         ));
         applyModerationResult(post, moderationResult);
-        return new PostResult(
-                post.getId(),
-                post.getBoardType(),
-                post.getStatus(),
-                post.getStatusReason(),
-                post.getTitle(),
-                post.getContent(),
-                post.isAnonymous(),
-                post.getDisplayAuthorName(),
-                post.getLikeCount(),
-                post.getScrapCount(),
-                post.getCreatedAt()
-        );
+        return PostResultMapper.toResult(post);
     }
 
     /**
      * 게시글 내용을 수정하고 정책 검사를 적용한다.
      *
      * @param id 게시글 ID
+     * @param requesterUserId 수정 요청 사용자 ID
      * @param command 수정 입력값
      */
-    public void updatePost(Long id, UpdatePostCommand command) {
+    public void updatePost(Long id, Long requesterUserId, UpdatePostCommand command) {
         PostModerationResult moderationResult = postContentPolicyValidator.validate(command.title(), command.content());
         Post post = findPostOrThrow(id);
+        ensureAuthor(post, requesterUserId);
         post.update(command.title(), command.content());
         applyModerationResult(post, moderationResult);
     }
@@ -81,9 +74,11 @@ public class PostCommandService {
      * 게시글을 삭제 상태로 전환한다.
      *
      * @param id 게시글 ID
+     * @param requesterUserId 삭제 요청 사용자 ID
      */
-    public void deletePost(Long id) {
+    public void deletePost(Long id, Long requesterUserId) {
         Post post = findPostOrThrow(id);
+        ensureAuthor(post, requesterUserId);
         post.markDeleted();
     }
 
@@ -125,6 +120,18 @@ public class PostCommandService {
     }
 
     /**
+     * 게시글 작성자 본인인지 확인한다.
+     *
+     * @param post 대상 게시글
+     * @param requesterUserId 요청 사용자 ID
+     */
+    private void ensureAuthor(Post post, Long requesterUserId) {
+        if (!post.getAuthorUser().getId().equals(requesterUserId)) {
+            throw new BaseException(GlobalErrorCode.FORBIDDEN);
+        }
+    }
+
+    /**
      * 검수 결과가 숨김인 경우 게시글 상태에 반영한다.
      * 정상 판정이더라도 숨김 게시글 자동 복구 정책은 아직 정해지지 않아 현재 상태를 유지한다.
      *
@@ -153,7 +160,7 @@ public class PostCommandService {
      * 단일 서비스 과제 범위에서 구현 복잡도와 운영 개념까지 함께 끌어오는 부담이 커 구현할 엄두가 나지 않네요.. 리뷰해주시는 분들께도 죄송하고요...
      * 따라서 현재는 과제 요구사항과 구현 복잡도의 균형을 위해 PostStats 하나에 좋아요/스크랩 집계를 함께 두고
      * @Version + 재시도 구조를 공용으로 유지하는 방향으로 정했습니다.
-     * 의도 상태(shouldReact)는 재시도 진입 전에 결정해 재시도 중 상태가 뒤집히지 않도록 멱등성을 보장하게 적용합니다.
+     * 목표 상태(targetReacted)는 재시도 진입 전에 결정해 재시도 중 상태가 뒤집히지 않도록 멱등성을 보장하게 적용합니다.
      * 이후 인증/인가와 멱등 정책이 구체화되면 등록/취소 분리 여부를 다시 검토할 수 있습니다.
      *
      * @param postId 게시글 ID
@@ -162,7 +169,7 @@ public class PostCommandService {
      * @return 토글 후 반응이 활성화된 상태면 {@code true}, 해제된 상태면 {@code false}
      */
     private boolean toggleReaction(Long postId, Long userId, ReactionType type) {
-        boolean shouldReact = !postReactionRepository.existsByPostIdAndUserIdAndType(postId, userId, type);
-        return postReactionTransactionExecutor.applyReactionState(postId, userId, type, shouldReact);
+        boolean targetReacted = !postReactionRepository.existsByPostIdAndUserIdAndType(postId, userId, type);
+        return postReactionTransactionExecutor.applyReactionState(postId, userId, type, targetReacted);
     }
 }

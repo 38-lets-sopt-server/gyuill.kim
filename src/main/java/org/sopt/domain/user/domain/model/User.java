@@ -2,10 +2,13 @@ package org.sopt.domain.user.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.sopt.global.entity.SoftDeleteBaseEntity;
 
 /**
@@ -17,40 +20,60 @@ import org.sopt.global.entity.SoftDeleteBaseEntity;
 public class User extends SoftDeleteBaseEntity {
 
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, length = 50)
+    private String loginId;
+
+    @Getter
     @Column(nullable = false, length = 30)
     private String nickname;
+
+    @Getter
+    @Column(length = 100)
+    private String password;
+
+    @Getter
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role;
 
     protected User() {
     }
 
     /**
-     * 닉네임으로 사용자를 생성한다.
+     * 로그인 ID, 닉네임, 암호화된 비밀번호로 사용자를 생성한다.
+     *
+     * @param loginId 로그인 ID
+     * @param nickname 사용자 닉네임
+     * @param password 암호화된 비밀번호
+     */
+    public User(String loginId, String nickname, String password) {
+        this.loginId = loginId;
+        this.nickname = nickname;
+        this.password = password;
+        this.role = UserRole.USER;
+    }
+
+    /**
+     * 소셜 로그인 사용자를 생성한다.
      *
      * @param nickname 사용자 닉네임
+     * @return 소셜 로그인 사용자
      */
-    public User(String nickname) {
-        this.nickname = nickname;
+    public static User createSocialUser(String nickname) {
+        return new User(null, nickname, null);
     }
 
     /**
-     * 사용자 식별자를 반환한다.
+     * 비밀번호 기반 로그인이 가능한 계정인지 확인한다.
      *
-     * @return 사용자 ID
+     * @return 비밀번호가 있으면 {@code true}
      */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * 현재 닉네임을 반환한다.
-     *
-     * @return 닉네임
-     */
-    public String getNickname() {
-        return nickname;
+    public boolean hasPassword() {
+        return password != null;
     }
 
     /**

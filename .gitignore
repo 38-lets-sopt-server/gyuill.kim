@@ -23,5 +23,6 @@ Thumbs.db
 ### Etc ###
 *.log
 *.tmp
+docs/
 
 .sdkmanrc

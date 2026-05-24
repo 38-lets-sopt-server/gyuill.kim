@@ -3,6 +3,7 @@ package org.sopt.domain.post.application.service;
 import lombok.RequiredArgsConstructor;
 import org.sopt.domain.post.application.dto.PostCursorResult;
 import org.sopt.domain.post.application.dto.PostResult;
+import org.sopt.domain.post.application.mapper.PostResultMapper;
 import org.sopt.domain.post.domain.exception.PostNotAccessibleException;
 import org.sopt.domain.post.domain.exception.PostNotFoundException;
 import org.sopt.domain.post.domain.model.BoardType;
@@ -59,31 +60,34 @@ public class PostQueryService {
      * @return 게시글 결과
      */
     public PostResult getPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id));
+        Post post = findPostOrThrow(id);
         if (!post.isVisibleToPublic()) {
             throw new PostNotAccessibleException(post);
         }
-        return toPostResult(post);
+        return PostResultMapper.toResult(post);
     }
 
     /**
      * 숨김 게시글 확인용 상세 조회.
      * 숨김은 허용하되 삭제/차단 상태는 여전히 차단한다.
-     * 일단은 과제 범위여서 이렇게 구현했지만 원래대로면 일반 사용자는 접근할 수 없어야 합니다.
-     * 다만 아직 인증/인가가 없어서 임시 동작 확인용입니다.
+     * TODO: Role/Authority 모델을 도입한 뒤 관리자 전용 API로 제한해야 한다.
+     * 현재는 관리자 권한 모델이 없어 인증 여부만 확인되는 임시 상태다.
      *
      * @param id 게시글 ID
      * @return 게시글 결과
      */
     public PostResult getHiddenPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id));
+        Post post = findPostOrThrow(id);
         if (post.getStatus() == PostStatus.DELETED
                 || post.getStatus() == PostStatus.BLOCKED) {
             throw new PostNotAccessibleException(post);
         }
-        return toPostResult(post);
+        return PostResultMapper.toResult(post);
+    }
+
+    private Post findPostOrThrow(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
     }
 
     /**
@@ -94,34 +98,12 @@ public class PostQueryService {
      */
     private PostCursorResult toPostCursorResult(Slice<Post> posts) {
         List<PostResult> content = posts.getContent().stream()
-                .map(this::toPostResult)
+                .map(PostResultMapper::toResult)
                 .toList();
 
         Long nextCursor = posts.hasNext() && !content.isEmpty()
                 ? content.get(content.size() - 1).id()
                 : null;
         return new PostCursorResult(content, nextCursor, posts.getSize(), posts.hasNext());
-    }
-
-    /**
-     * 게시글 엔티티를 응답용 결과 모델로 변환한다.
-     *
-     * @param post 게시글 엔티티
-     * @return 게시글 결과
-     */
-    private PostResult toPostResult(Post post) {
-        return new PostResult(
-                post.getId(),
-                post.getBoardType(),
-                post.getStatus(),
-                post.getStatusReason(),
-                post.getTitle(),
-                post.getContent(),
-                post.isAnonymous(),
-                post.getDisplayAuthorName(),
-                post.getLikeCount(),
-                post.getScrapCount(),
-                post.getCreatedAt()
-        );
     }
 }

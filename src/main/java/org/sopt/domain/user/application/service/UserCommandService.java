@@ -1,18 +1,26 @@
 package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
+import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
+import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
+import org.sopt.domain.user.application.mapper.UserResultMapper;
+import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
 import org.sopt.domain.user.domain.repository.UserRepository;
+import org.sopt.global.exception.BaseException;
+import org.sopt.global.security.authentication.AuthenticatedUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 사용자 생성, 수정, 삭제를 담당하는 command 서비스.
- * 과제 범위에서는 인증/인가 없이 사용자 자체 생명주기만 다룬다.
+ * 사용자 본인에 대한 수정/삭제는 인증 사용자 ID를 기준으로 처리한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -20,6 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 사용자를 생성한다.
@@ -28,44 +39,41 @@ public class UserCommandService {
      * @return 생성된 사용자 결과
      */
     public UserResult createUser(CreateUserCommand command) {
-        User user = userRepository.save(new User(command.nickname()));
-        return toUserResult(user);
+        if (userRepository.existsByLoginId(command.loginId())) {
+            throw new BaseException(UserErrorCode.USER_LOGIN_ID_DUPLICATED);
+        }
+        String encodedPassword = passwordEncoder.encode(command.password());
+        User user = userRepository.save(new User(command.loginId(), command.nickname(), encodedPassword));
+        return UserResultMapper.toResult(user);
     }
 
     /**
-     * 사용자 응답용 결과 모델로 변환한다.
+     * 인증된 사용자 본인의 닉네임을 수정한다.
      *
-     * @param user 사용자 엔티티
-     * @return 사용자 결과
-     */
-    private UserResult toUserResult(User user) {
-        return new UserResult(
-                user.getId(),
-                user.getNickname(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
-    }
-
-    /**
-     * 사용자 닉네임을 수정한다.
-     *
-     * @param id 사용자 ID
+     * @param authenticatedUserId 인증 사용자 ID
      * @param command 수정 입력값
      */
-    public void updateUser(Long id, UpdateUserCommand command) {
-        User user = findUserOrThrow(id);
+    public void updateUser(Long authenticatedUserId, UpdateUserCommand command) {
+        User user = findUserOrThrow(authenticatedUserId);
         user.updateNickname(command.nickname());
     }
 
     /**
-     * 사용자를 소프트 삭제한다.
+     * 인증된 사용자 본인을 소프트 삭제한다.
      *
-     * @param id 사용자 ID
+     * @param authenticatedUser 인증 사용자
      */
-    public void deleteUser(Long id) {
-        User user = findUserOrThrow(id);
+    public void deleteUser(AuthenticatedUser authenticatedUser) {
+        User user = findUserOrThrow(authenticatedUser.userId());
         user.markDeleted();
+        refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
+        if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {
+            accessTokenBlacklistRepository.save(new AccessTokenBlacklist(
+                    authenticatedUser.tokenId(),
+                    authenticatedUser.userId(),
+                    authenticatedUser.accessTokenExpiresAt()
+            ));
+        }
     }
 
     /**

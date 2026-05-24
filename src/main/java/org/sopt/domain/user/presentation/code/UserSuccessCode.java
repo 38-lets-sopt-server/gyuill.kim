@@ -1,11 +1,13 @@
 package org.sopt.domain.user.presentation.code;
 
+import lombok.Getter;
 import org.sopt.global.code.SuccessCode;
 import org.springframework.http.HttpStatus;
 
 /**
  * User API 성공 코드 모음.
  */
+@Getter
 public enum UserSuccessCode implements SuccessCode {
 
     USER_CREATED("USR-S001", HttpStatus.CREATED, "사용자 등록 완료"),
@@ -23,20 +25,5 @@ public enum UserSuccessCode implements SuccessCode {
         this.code = code;
         this.httpStatus = httpStatus;
         this.message = message;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
     }
 }

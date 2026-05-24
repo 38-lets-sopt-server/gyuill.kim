@@ -42,12 +42,12 @@ public class PostReactionTransactionExecutor {
 
     /**
      * 반응 의도 상태를 적용한다. 낙관적 락 충돌 시 새 트랜잭션에서 자동 재시도된다.
-     * 의도 상태(shouldReact)를 외부에서 미리 결정해 넘기므로 재시도 중에도 멱등성을 유지한다.
+     * 목표 상태(targetReacted)를 외부에서 미리 결정해 넘기므로 재시도 중에도 멱등성을 유지한다.
      *
      * @param postId 게시글 ID
      * @param userId 사용자 ID
      * @param type 반응 타입
-     * @param shouldReact 최종적으로 적용하고 싶은 반응 상태
+     * @param targetReacted 최종적으로 적용하고 싶은 반응 상태
      * @return 적용 후 반응 활성화 여부
      */
     @Retryable(
@@ -56,30 +56,39 @@ public class PostReactionTransactionExecutor {
             backoff = @Backoff(delay = 50)
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public boolean applyReactionState(Long postId, Long userId, ReactionType type, boolean shouldReact) {
+    public boolean applyReactionState(Long postId, Long userId, ReactionType type, boolean targetReacted) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
         post.ensureReactable();
         User user = userPort.getUser(userId);
         boolean reacted = postReactionRepository.existsByPostIdAndUserIdAndType(postId, userId, type);
 
-        if (shouldReact) {
-            if (!reacted) {
-                try {
-                    postReactionRepository.save(new PostReaction(post, user, type));
-                } catch (DataIntegrityViolationException e) {
-                    throw new PostReactionDuplicateException(postId, userId, type);
-                }
-                post.getStats().increaseReactionCount(type);
-            }
+        if (targetReacted) {
+            applyReaction(post, user, type, reacted);
             return true;
         }
 
+        cancelReaction(post, userId, type, reacted);
+        return false;
+    }
+
+    private void applyReaction(Post post, User user, ReactionType type, boolean reacted) {
         if (reacted) {
-            postReactionRepository.deleteByPostIdAndUserIdAndType(postId, userId, type);
+            return;
+        }
+        try {
+            postReactionRepository.save(new PostReaction(post, user, type));
+        } catch (DataIntegrityViolationException e) {
+            throw new PostReactionDuplicateException(post.getId(), user.getId(), type);
+        }
+        post.getStats().increaseReactionCount(type);
+    }
+
+    private void cancelReaction(Post post, Long userId, ReactionType type, boolean reacted) {
+        if (reacted) {
+            postReactionRepository.deleteByPostIdAndUserIdAndType(post.getId(), userId, type);
             post.getStats().decreaseReactionCount(type);
         }
-        return false;
     }
 
     /**
@@ -92,7 +101,7 @@ public class PostReactionTransactionExecutor {
             Long postId,
             Long userId,
             ReactionType type,
-            boolean shouldReact
+            boolean targetReacted
     ) {
         throw new PostReactionOptimisticLockException(postId, userId, type, POST_REACTION_MAX_RETRY_COUNT);
     }

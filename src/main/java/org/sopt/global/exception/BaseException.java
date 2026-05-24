@@ -1,5 +1,6 @@
 package org.sopt.global.exception;
 
+import lombok.Getter;
 import org.sopt.global.code.ErrorCode;
 
 import java.util.Map;
@@ -10,7 +11,9 @@ import java.util.Map;
  */
 public class BaseException extends RuntimeException {
 
+    @Getter
     private final ErrorCode errorCode;
+    @Getter
     private final Map<String, Object> details;
 
     /**
@@ -32,23 +35,5 @@ public class BaseException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
         this.details = details;
-    }
-
-    /**
-     * 응답 변환에 사용할 에러 코드를 반환한다.
-     *
-     * @return 에러 코드
-     */
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
-
-    /**
-     * 응답의 {@code details} 필드로 내려갈 구조화 상세 정보를 반환한다.
-     *
-     * @return 상세 정보 맵
-     */
-    public Map<String, Object> getDetails() {
-        return details;
     }
 }

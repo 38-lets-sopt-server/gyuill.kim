@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -99,6 +100,19 @@ public class GlobalExceptionHandler {
     public CommonApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn("Validation failed: {}", e.getMessage());
         return CommonApiResponse.failureBody(GlobalErrorCode.INVALID_REQUEST);
+    }
+
+    /**
+     * 인증 토큰 검증 실패를 401 응답으로 처리한다.
+     *
+     * @param e 인증 예외
+     * @return 공통 실패 응답
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public CommonApiResponse<Void> handleAuthenticationException(AuthenticationException e) {
+        log.warn("Authentication failed: {}", e.getMessage());
+        return CommonApiResponse.failureBody(GlobalErrorCode.UNAUTHORIZED);
     }
 
     /**

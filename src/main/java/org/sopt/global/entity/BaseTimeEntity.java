@@ -3,6 +3,7 @@ package org.sopt.global.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,28 +21,12 @@ import java.time.LocalDateTime;
 public abstract class BaseTimeEntity {
 
     @CreatedDate
+    @Getter
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Getter
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    /**
-     * 엔티티 생성 시각을 반환한다.
-     *
-     * @return 생성 시각
-     */
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    /**
-     * 엔티티 최종 수정 시각을 반환한다.
-     *
-     * @return 수정 시각
-     */
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 }
