@@ -8,6 +8,7 @@ import org.sopt.domain.user.domain.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * 인증 필터에서 사용하는 사용자 역할 캐시.
@@ -18,7 +19,7 @@ public class UserRoleCache {
 
     private final UserRepository userRepository;
 
-    private final Cache<Long, UserRole> cache = Caffeine.newBuilder()
+    private final Cache<Long, Optional<UserRole>> cache = Caffeine.newBuilder()
             .maximumSize(10_000)
             .expireAfterWrite(Duration.ofMinutes(5))
             .build();
@@ -34,15 +35,8 @@ public class UserRoleCache {
      * @return 사용자 역할. 사용자가 존재하지 않으면 {@code null}
      */
     public UserRole getRole(Long userId) {
-        UserRole cached = cache.getIfPresent(userId);
-        if (cached != null) {
-            return cached;
-        }
-        UserRole role = loadUserRole(userId);
-        if (role != null) {
-            cache.put(userId, role);
-        }
-        return role;
+        return cache.get(userId, this::loadUserRole)
+                .orElse(null);
     }
 
     /**
@@ -55,9 +49,8 @@ public class UserRoleCache {
         cache.invalidate(userId);
     }
 
-    private UserRole loadUserRole(Long userId) {
+    private Optional<UserRole> loadUserRole(Long userId) {
         return userRepository.findById(userId)
-                .map(User::getRole)
-                .orElse(null);
+                .map(User::getRole);
     }
 }
