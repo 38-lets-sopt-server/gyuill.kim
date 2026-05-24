@@ -1,8 +1,7 @@
 package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
-import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
+import org.sopt.domain.auth.application.service.AuthTokenService;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
@@ -27,8 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
+    private final AuthTokenService authTokenService;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -58,18 +56,14 @@ public class UserCommandService {
     }
 
     /**
-     * 인증된 사용자 본인을 소프트 삭제한다.
+     * 인증된 사용자 본인을 소프트 삭제하고 인증 토큰을 회수한다.
      *
      * @param authenticatedUser 인증 사용자
      */
     public void deleteUser(AuthenticatedUser authenticatedUser) {
         User user = findUserOrThrow(authenticatedUser.userId());
         user.markDeleted();
-        refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
-        accessTokenBlacklistRepository.add(
-                authenticatedUser.tokenId(),
-                authenticatedUser.accessTokenExpiresAt()
-        );
+        authTokenService.revoke(authenticatedUser);
     }
 
     /**
