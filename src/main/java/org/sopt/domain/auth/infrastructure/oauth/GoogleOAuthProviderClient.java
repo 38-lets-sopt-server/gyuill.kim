@@ -1,7 +1,7 @@
-package org.sopt.domain.auth.infrastructure;
+package org.sopt.domain.auth.infrastructure.oauth;
 
-import org.sopt.domain.auth.application.client.OAuthProviderClient;
-import org.sopt.domain.auth.application.dto.OAuthUserProfile;
+import org.sopt.domain.auth.domain.port.OAuthProviderClient;
+import org.sopt.domain.auth.domain.port.OAuthUserProfile;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;
 import org.sopt.domain.auth.domain.model.OAuthProvider;
 import org.sopt.global.exception.BaseException;

@@ -1,4 +1,4 @@
-package org.sopt.domain.auth.application.client;
+package org.sopt.domain.auth.domain.port;
 
 import org.sopt.domain.auth.domain.model.OAuthProvider;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;

@@ -1,13 +1,11 @@
 package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
-import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
-import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
 import org.sopt.domain.user.application.dto.UpdateUserCommand;
 import org.sopt.domain.user.application.dto.UserResult;
 import org.sopt.domain.user.application.mapper.UserResultMapper;
+import org.sopt.domain.user.application.port.AuthSessionPort;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.exception.UserNotFoundException;
 import org.sopt.domain.user.domain.model.User;
@@ -28,8 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandService {
 
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final AccessTokenBlacklistRepository accessTokenBlacklistRepository;
+    private final AuthSessionPort authSessionPort;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -59,21 +56,14 @@ public class UserCommandService {
     }
 
     /**
-     * 인증된 사용자 본인을 소프트 삭제한다.
+     * 인증된 사용자 본인을 소프트 삭제하고 인증 토큰을 회수한다.
      *
      * @param authenticatedUser 인증 사용자
      */
     public void deleteUser(AuthenticatedUser authenticatedUser) {
         User user = findUserOrThrow(authenticatedUser.userId());
         user.markDeleted();
-        refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
-        if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {
-            accessTokenBlacklistRepository.save(new AccessTokenBlacklist(
-                    authenticatedUser.tokenId(),
-                    authenticatedUser.userId(),
-                    authenticatedUser.accessTokenExpiresAt()
-            ));
-        }
+        authSessionPort.revoke(authenticatedUser);
     }
 
     /**

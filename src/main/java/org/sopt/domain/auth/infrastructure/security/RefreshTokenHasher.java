@@ -1,5 +1,6 @@
-package org.sopt.domain.auth.infrastructure;
+package org.sopt.domain.auth.infrastructure.security;
 
+import org.sopt.domain.auth.domain.port.RefreshTokenHashPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -14,7 +15,7 @@ import java.util.Base64;
  * refresh token 원문을 DB에 저장하지 않기 위한 HMAC 해시 유틸리티.
  */
 @Component
-public class RefreshTokenHasher {
+public class RefreshTokenHasher implements RefreshTokenHashPort {
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";
 

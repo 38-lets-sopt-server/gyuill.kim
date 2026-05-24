@@ -1,6 +1,4 @@
-package org.sopt.domain.auth.application.client;
-
-import org.sopt.domain.auth.application.dto.OAuthUserProfile;
+package org.sopt.domain.auth.domain.port;
 import org.sopt.domain.auth.domain.model.OAuthProvider;
 
 /**
