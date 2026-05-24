@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -58,8 +58,13 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * {@code {bcrypt}} 프리픽스 기반의 DelegatingPasswordEncoder를 제공한다.
+     * 새로 저장되는 비밀번호는 {@code {bcrypt}} 프리픽스가 붙어 알고리즘을 식별하며,
+     * 향후 Argon2id 등으로 점진적 마이그레이션이 가능하다.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
