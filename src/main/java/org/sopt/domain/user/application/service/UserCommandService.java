@@ -1,7 +1,6 @@
 package org.sopt.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
 import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
 import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.user.application.dto.CreateUserCommand;
@@ -67,13 +66,10 @@ public class UserCommandService {
         User user = findUserOrThrow(authenticatedUser.userId());
         user.markDeleted();
         refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
-        if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {
-            accessTokenBlacklistRepository.save(new AccessTokenBlacklist(
-                    authenticatedUser.tokenId(),
-                    authenticatedUser.userId(),
-                    authenticatedUser.accessTokenExpiresAt()
-            ));
-        }
+        accessTokenBlacklistRepository.add(
+                authenticatedUser.tokenId(),
+                authenticatedUser.accessTokenExpiresAt()
+        );
     }
 
     /**
