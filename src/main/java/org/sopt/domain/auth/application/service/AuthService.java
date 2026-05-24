@@ -1,17 +1,18 @@
 package org.sopt.domain.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.sopt.domain.auth.application.client.OAuthProviderClientRegistry;
 import org.sopt.domain.auth.application.dto.AuthTokenResult;
 import org.sopt.domain.auth.application.dto.OAuthUserProfile;
 import org.sopt.domain.auth.domain.exception.AuthErrorCode;
-import org.sopt.domain.auth.domain.model.AccessTokenBlacklist;
 import org.sopt.domain.auth.domain.model.OAuthProvider;
 import org.sopt.domain.auth.domain.model.RefreshToken;
 import org.sopt.domain.auth.domain.model.SocialAccount;
 import org.sopt.domain.auth.domain.repository.AccessTokenBlacklistRepository;
 import org.sopt.domain.auth.domain.repository.RefreshTokenRepository;
 import org.sopt.domain.auth.domain.repository.SocialAccountRepository;
+import org.sopt.domain.auth.infrastructure.RefreshTokenGracePeriodStore;
 import org.sopt.domain.auth.infrastructure.RefreshTokenHasher;
 import org.sopt.domain.user.domain.exception.UserErrorCode;
 import org.sopt.domain.user.domain.model.User;
@@ -28,8 +29,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 /**
- * 로그인과 토큰 재발급을 담당하는 인증 서비스.
+ * 로그인, 토큰 재발급, 로그아웃을 담당하는 인증 서비스.
+ *
+ * <p>Refresh Token Rotation + Reuse Detection + Grace Period 전략을 적용한다.
+ * <ul>
+ *   <li><b>Rotation</b>: 재발급 시 구 토큰을 즉시 무효화하고 새 토큰을 발급한다.</li>
+ *   <li><b>Reuse Detection</b>: 이미 회전된 토큰이 다시 사용되면 해당 사용자의
+ *       토큰을 전체 무효화하여 탈취를 차단한다.</li>
+ *   <li><b>Grace Period</b>: 회전 직후 10초간 구 토큰을 허용하여
+ *       동시 요청에 의한 정상 사용자 세션 끊김을 방지한다.</li>
+ * </ul>
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -45,11 +56,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenHasher refreshTokenHasher;
+    private final RefreshTokenGracePeriodStore gracePeriodStore;
 
     /**
      * 로그인 ID와 비밀번호를 검증하고 토큰을 발급한다.
      *
-     * @param loginId 로그인 ID
+     * @param loginId  로그인 ID
      * @param password 평문 비밀번호
      * @return 발급된 토큰
      */
@@ -94,16 +106,38 @@ public class AuthService {
     /**
      * refresh token을 검증하고 새 토큰 쌍을 발급한다.
      *
-     * @param refreshToken refresh token
+     * <p>재발급 흐름:
+     * <ol>
+     *   <li>현재 DB의 해시와 일치하면 정상 회전 후 구 해시를 Grace Period에 등록한다.</li>
+     *   <li>DB 해시와 불일치하지만 Grace Period에 존재하면 동시 요청으로 간주해 허용한다.</li>
+     *   <li>양쪽 모두 실패하면 Reuse로 판단, 사용자의 토큰을 전체 무효화한다.</li>
+     * </ol>
+     *
+     * @param refreshToken refresh token 원문
      * @return 새로 발급된 토큰
      */
     public AuthTokenResult reissue(String refreshToken) {
         Long userId = jwtTokenProvider.getUserId(refreshToken, JwtTokenType.REFRESH);
         User user = findActiveUser(userId);
-        RefreshToken savedRefreshToken = findSavedRefreshToken(userId);
-        validateRefreshToken(refreshToken, savedRefreshToken, userId);
+        String incomingHash = refreshTokenHasher.hash(refreshToken);
 
-        return rotateTokens(user);
+        RefreshToken savedToken = refreshTokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+
+        if (refreshTokenHasher.matches(refreshToken, savedToken.getTokenHash())
+                && !savedToken.isExpired()) {
+            gracePeriodStore.store(incomingHash, userId);
+            return issueAndSaveTokens(user);
+        }
+
+        Long graceUserId = gracePeriodStore.consumeIfPresent(incomingHash);
+        if (graceUserId != null && graceUserId.equals(userId)) {
+            return issueAndSaveTokens(user);
+        }
+
+        refreshTokenRepository.deleteByUserId(userId);
+        log.warn("Refresh token reuse detected: userId={}", userId);
+        throw new BaseException(AuthErrorCode.REFRESH_TOKEN_REUSE_DETECTED);
     }
 
     /**
@@ -113,15 +147,10 @@ public class AuthService {
      */
     public void logout(AuthenticatedUser authenticatedUser) {
         refreshTokenRepository.deleteByUserId(authenticatedUser.userId());
-        if (!accessTokenBlacklistRepository.existsByTokenId(authenticatedUser.tokenId())) {
-            accessTokenBlacklistRepository.save(
-                    new AccessTokenBlacklist(
-                            authenticatedUser.tokenId(),
-                            authenticatedUser.userId(),
-                            authenticatedUser.accessTokenExpiresAt()
-                    )
-            );
-        }
+        accessTokenBlacklistRepository.add(
+                authenticatedUser.tokenId(),
+                authenticatedUser.accessTokenExpiresAt()
+        );
     }
 
     private AuthTokenResult issueAndSaveTokens(User user) {
@@ -139,27 +168,9 @@ public class AuthService {
         );
     }
 
-    private AuthTokenResult rotateTokens(User user) {
-        return issueAndSaveTokens(user);
-    }
-
     private User findActiveUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(UserErrorCode.INVALID_LOGIN_CREDENTIALS));
-    }
-
-    private RefreshToken findSavedRefreshToken(Long userId) {
-        return refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN));
-    }
-
-    private void validateRefreshToken(String refreshToken, RefreshToken savedRefreshToken, Long userId) {
-        if (refreshTokenHasher.matches(refreshToken, savedRefreshToken.getTokenHash())
-                && !savedRefreshToken.isExpired()) {
-            return;
-        }
-        refreshTokenRepository.deleteByUserId(userId);
-        throw new BaseException(AuthErrorCode.INVALID_REFRESH_TOKEN);
     }
 
     private void saveRefreshToken(User user, JwtToken token) {
